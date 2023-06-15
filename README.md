@@ -7,4 +7,4 @@ allow me to redistribute it. Since they are a really good (paid) asset, I think
 it is more fair to him/her if anyone interested in running this project visit
 the artist's website and consider buying the "Modern Exteriors" package.
 
-[1]: https://limezu.itch.io/
+[limezu]: https://limezu.itch.io/
