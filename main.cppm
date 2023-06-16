@@ -4,6 +4,7 @@ import casein;
 import quack;
 import sires;
 import silog;
+import stubby;
 
 class game {
   quack::renderer *m_r;
@@ -12,16 +13,20 @@ public:
   explicit constexpr game(quack::renderer *r) : m_r{r} {}
 
   void setup() {
-    constexpr const auto w = 512;
-    constexpr const auto h = 2704;
-    m_r->load_atlas(w, h, [](auto *p) {
-      sires::open("atlas.img")
-          .fmap([p](auto &rdr) { return rdr->read(p, w * h * 4); })
-          .map([] { silog::log(silog::info, "%dx%d atlas loaded", w, h); })
-          .take([](auto err) {
-            silog::log(silog::error, "Error loading atlas: %s", err);
+    stbi::load_from_resource("11_Camping_16x16.png")
+        .map([this](const auto &img) {
+          m_r->load_atlas(img.width, img.height, [&img](auto *p) {
+            const auto pixies = img.width * img.height;
+            const auto data = reinterpret_cast<const decltype(p)>(*img.data);
+            for (auto i = 0; i < pixies; i++) {
+              p[i] = data[i];
+            }
           });
-    });
+          silog::log(silog::info, "%dx%d atlas loaded", img.width, img.height);
+        })
+        .take([](auto err) {
+          silog::log(silog::error, "Error loading atlas: %s", err);
+        });
   }
 };
 
