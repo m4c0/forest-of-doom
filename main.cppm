@@ -9,7 +9,7 @@ class game {
   ecs::ec m_ec{};
 
 public:
-  game(qsu::main *q) {
+  void setup(qsu::main *q) {
     sprite s{};
     s.pos = {0, 0, 1, 1};
     s.uv = {0, 0, 1, 1};
@@ -23,7 +23,7 @@ public:
 
 extern "C" void casein_handle(const casein::event &e) {
   static qsu::main q{};
-  static game gg{&q};
+  static game gg{};
 
   static constexpr const auto k_map = [] {
     casein::key_map res{};
@@ -35,12 +35,11 @@ extern "C" void casein_handle(const casein::event &e) {
   }();
   static constexpr const auto map = [] {
     casein::event_map res{};
-    // res[casein::CREATE_WINDOW] = [](auto) { gg.setup(); };
+    res[casein::CREATE_WINDOW] = [](auto) { gg.setup(&q); };
     res[casein::KEY_DOWN] = [](auto e) { k_map.handle(e); };
     return res;
   }();
 
   q.process_event(e);
-  // gg.process_event(e);
   map.handle(e);
 }

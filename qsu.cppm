@@ -45,6 +45,28 @@ public:
   }
 
   template <unsigned N>
-  void fill_sprites(const pog::sparse_set<sprite, N> &set) {}
+  void fill_sprites(const pog::sparse_set<sprite, N> &set) {
+    m_spr.batch()->colours().map([&](auto *cs) {
+      for (auto _ : set) {
+        *cs++ = {};
+      }
+    });
+    m_spr.batch()->multipliers().map([&](auto *ms) {
+      for (auto [spr, _] : set) {
+        *ms++ = {1, 1, 1, 1};
+      }
+    });
+    m_spr.batch()->positions().map([&](auto *ps) {
+      for (auto [spr, _] : set) {
+        *ps++ = quack::rect{spr.pos.x, spr.pos.y, spr.pos.w, spr.pos.h};
+      }
+    });
+    m_spr.batch()->uvs().map([&](auto *uvs) {
+      for (auto [spr, _] : set) {
+        *uvs++ = quack::uv{spr.uv.x, spr.uv.y, spr.uv.w, spr.uv.h};
+      }
+    });
+    m_spr.batch()->set_count(set.size());
+  }
 };
 } // namespace qsu
