@@ -8,6 +8,14 @@ class game {
   ecs::ec m_ec{};
 
 public:
+  game() {
+    ecs::c::sprite s{};
+    s.pos = {0, 0, 1, 1};
+    s.uv = {0, 0, 1, 1};
+
+    auto e = m_ec.e.alloc();
+    m_ec.sprites.add(e, s);
+  }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
