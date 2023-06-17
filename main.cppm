@@ -6,16 +6,21 @@ import sires;
 import silog;
 import stubby;
 
-class game {
-  quack::renderer *m_r;
+class sprite_layout : public quack::instance_layout<void, 1> {
+  void resize(unsigned w, unsigned h) override { batch()->resize(7, 7, w, h); }
 
 public:
-  explicit constexpr game(quack::renderer *r) : m_r{r} {}
+  using instance_layout::instance_layout;
+};
+
+class qsu {
+  quack::renderer m_r{1};
+  sprite_layout m_spr{&m_r};
 
   void setup() {
     stbi::load_from_resource("11_Camping_16x16.png")
         .map([this](const auto &img) {
-          m_r->load_atlas(img.width, img.height, [&img](auto *p) {
+          m_r.load_atlas(img.width, img.height, [&img](auto *p) {
             const auto pixies = img.width * img.height;
             const auto data = reinterpret_cast<const decltype(p)>(*img.data);
             for (auto i = 0; i < pixies; i++) {
@@ -28,11 +33,20 @@ public:
           silog::log(silog::error, "Error loading atlas: %s", err);
         });
   }
+
+public:
+  void process_event(const casein::event &e) {
+    m_r.process_event(e);
+    m_spr.process_event(e);
+
+    if (e.type() == casein::CREATE_WINDOW)
+      setup();
+  }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
-  static quack::renderer r{1};
-  static game gg{&r};
+  static qsu q{};
+  // static game gg{&r};
 
   static constexpr const auto k_map = [] {
     casein::key_map res{};
@@ -44,12 +58,12 @@ extern "C" void casein_handle(const casein::event &e) {
   }();
   static constexpr const auto map = [] {
     casein::event_map res{};
-    res[casein::CREATE_WINDOW] = [](auto) { gg.setup(); };
+    // res[casein::CREATE_WINDOW] = [](auto) { gg.setup(); };
     res[casein::KEY_DOWN] = [](auto e) { k_map.handle(e); };
     return res;
   }();
 
-  r.process_event(e);
+  q.process_event(e);
   // gg.process_event(e);
   map.handle(e);
 }
