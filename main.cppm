@@ -3,24 +3,27 @@ export module main;
 import casein;
 import ecs;
 import qsu;
+import sprite;
 
 class game {
   ecs::ec m_ec{};
 
 public:
-  game() {
-    ecs::c::sprite s{};
+  game(qsu::main *q) {
+    sprite s{};
     s.pos = {0, 0, 1, 1};
     s.uv = {0, 0, 1, 1};
 
     auto e = m_ec.e.alloc();
     m_ec.sprites.add(e, s);
+
+    q->fill_sprites(m_ec.sprites);
   }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
   static qsu::main q{};
-  static game gg{};
+  static game gg{&q};
 
   static constexpr const auto k_map = [] {
     casein::key_map res{};

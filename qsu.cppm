@@ -1,7 +1,9 @@
 export module qsu;
 import casein;
+import pog;
 import quack;
 import silog;
+import sprite;
 import stubby;
 
 namespace qsu {
@@ -41,5 +43,8 @@ public:
     if (e.type() == casein::CREATE_WINDOW)
       setup();
   }
+
+  template <unsigned N>
+  void fill_sprites(const pog::sparse_set<sprite, N> &set) {}
 };
 } // namespace qsu

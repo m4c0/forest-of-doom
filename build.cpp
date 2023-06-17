@@ -16,11 +16,15 @@ int main(int argc, char **argv) {
 
   auto all = unit::create<app>("fod");
 
+  auto rect = all->add_unit<mod>("rect");
+  auto sprite = all->add_unit<mod>("sprite");
+
   auto ecs = all->add_unit<mod>("ecs");
   ecs->add_wsdep("pog", pog);
 
   auto qsu = all->add_unit<mod>("qsu");
   qsu->add_wsdep("casein", casein);
+  qsu->add_wsdep("pog", pog);
   qsu->add_wsdep("quack", quack);
   qsu->add_wsdep("silog", silog);
   qsu->add_wsdep("stubby", stubby);
