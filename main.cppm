@@ -10,12 +10,16 @@ class game {
 
 public:
   void setup(qsu::main *q) {
-    sprite s{};
-    s.pos = {0, 0, 1, 1};
-    s.uv = {0, 1.0, 4.0, 5.0};
+    for (auto y = 0.0f; y < 5; y++) {
+      for (auto x = 0.0f; x < 4; x++) {
+        sprite s{};
+        s.pos = {x, y, 1, 1};
+        s.uv = {x, y + 1, 1, 1};
 
-    auto e = m_ec.e.alloc();
-    m_ec.sprites.add(e, s);
+        auto e = m_ec.e.alloc();
+        m_ec.sprites.add(e, s);
+      }
+    }
 
     q->fill_sprites(m_ec.sprites);
   }

@@ -8,7 +8,7 @@ import stubby;
 
 namespace qsu {
 class sprite_layout : public quack::instance_layout<void, 1> {
-  void resize(unsigned w, unsigned h) override { batch()->resize(1, 1, w, h); }
+  void resize(unsigned w, unsigned h) override { batch()->resize(4, 4, w, h); }
 
 public:
   using instance_layout::instance_layout;
@@ -72,8 +72,8 @@ public:
         *uvs++ = quack::uv{
             spr.uv.x * sprite_sz / m_atlas_w,
             spr.uv.y * sprite_sz / m_atlas_h,
-            spr.uv.w * sprite_sz / m_atlas_w,
-            spr.uv.h * sprite_sz / m_atlas_h,
+            (spr.uv.x + spr.uv.w) * sprite_sz / m_atlas_w,
+            (spr.uv.y + spr.uv.h) * sprite_sz / m_atlas_h,
         };
       }
     });
