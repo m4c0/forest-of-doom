@@ -12,7 +12,7 @@ public:
   void setup(qsu::main *q) {
     sprite s{};
     s.pos = {0, 0, 1, 1};
-    s.uv = {0, 1.0 / 169.0, 4.0 / 32.0, 5.0 / 169.0};
+    s.uv = {0, 1.0, 4.0, 5.0};
 
     auto e = m_ec.e.alloc();
     m_ec.sprites.add(e, s);

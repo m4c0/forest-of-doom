@@ -15,12 +15,18 @@ public:
 };
 
 export class main {
+  static constexpr const auto sprite_sz = 16.0f;
+
   quack::renderer m_r{1};
   sprite_layout m_spr{&m_r};
+  float m_atlas_w;
+  float m_atlas_h;
 
   void setup() {
     stbi::load_from_resource("11_Camping_16x16.png")
         .map([this](const auto &img) {
+          m_atlas_w = img.width;
+          m_atlas_h = img.height;
           m_r.load_atlas(img.width, img.height, [&img](auto *p) {
             const auto pixies = img.width * img.height;
             const auto data = reinterpret_cast<const decltype(p)>(*img.data);
@@ -63,7 +69,12 @@ public:
     });
     m_spr.batch()->uvs().map([&](auto *uvs) {
       for (auto [spr, _] : set) {
-        *uvs++ = quack::uv{spr.uv.x, spr.uv.y, spr.uv.w, spr.uv.h};
+        *uvs++ = quack::uv{
+            spr.uv.x * sprite_sz / m_atlas_w,
+            spr.uv.y * sprite_sz / m_atlas_h,
+            spr.uv.w * sprite_sz / m_atlas_w,
+            spr.uv.h * sprite_sz / m_atlas_h,
+        };
       }
     });
     m_spr.batch()->set_count(set.size());
