@@ -1,11 +1,18 @@
 export module main;
 
 import casein;
+import ecs;
 import qsu;
+
+class game {
+  ecs::ec m_ec{};
+
+public:
+};
 
 extern "C" void casein_handle(const casein::event &e) {
   static qsu::main q{};
-  // static game gg{&r};
+  static game gg{};
 
   static constexpr const auto k_map = [] {
     casein::key_map res{};

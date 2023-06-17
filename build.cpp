@@ -12,10 +12,12 @@ int main(int argc, char **argv) {
   auto pog = ::pog();
   auto quack = ::quack();
   auto silog = ::silog();
-  auto sires = ::sires();
   auto stubby = ::stubby();
 
   auto all = unit::create<app>("fod");
+
+  auto ecs = all->add_unit<mod>("ecs");
+  ecs->add_wsdep("pog", pog);
 
   auto qsu = all->add_unit<mod>("qsu");
   qsu->add_wsdep("casein", casein);
