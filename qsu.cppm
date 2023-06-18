@@ -45,8 +45,7 @@ public:
       setup();
   }
 
-  template <unsigned N>
-  void fill_sprites(const pog::sparse_set<sprite, N> &set) {
+  void fill_sprites(const pog::sparse_set<sprite> &set) {
     m_spr.batch()->colours().map([&](auto *cs) {
       for (auto _ : set) {
         *cs++ = {};
