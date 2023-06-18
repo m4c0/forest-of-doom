@@ -7,22 +7,16 @@ import sprite;
 import stubby;
 
 namespace qsu {
-class sprite_layout : public quack::instance_layout<void, 1> {
-  void resize(unsigned w, unsigned h) override { batch()->resize(4, 4, w, h); }
-
-public:
-  using instance_layout::instance_layout;
-};
-
 export class main {
   static constexpr const auto sprite_sz = 16.0f;
 
   quack::renderer m_r{1};
-  sprite_layout m_spr{&m_r};
+  quack::ilayout m_spr{&m_r, 1};
   float m_atlas_w;
   float m_atlas_h;
 
   void setup() {
+    m_spr.set_grid(4, 4);
     stbi::load_from_resource("11_Camping_16x16.png")
         .map([this](const auto &img) {
           m_atlas_w = img.width;
