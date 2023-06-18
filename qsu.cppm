@@ -9,9 +9,10 @@ import stubby;
 namespace qsu {
 export class main {
   static constexpr const auto sprite_sz = 16.0f;
+  static constexpr const auto max_sprites = 1024;
 
   quack::renderer m_r{1};
-  quack::ilayout m_spr{&m_r, 1};
+  quack::ilayout m_spr{&m_r, max_sprites};
   float m_atlas_w;
   float m_atlas_h;
 
