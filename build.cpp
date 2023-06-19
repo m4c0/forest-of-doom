@@ -18,9 +18,13 @@ int main(int argc, char **argv) {
 
   auto rect = all->add_unit<mod>("rect");
   auto sprite = all->add_unit<mod>("sprite");
+  auto tile = all->add_unit<mod>("tile");
 
   auto ecs = all->add_unit<mod>("ecs");
   ecs->add_wsdep("pog", pog);
+
+  auto tiles = all->add_unit<mod>("tiles");
+  tiles->add_wsdep("pog", pog);
 
   auto qsu = all->add_unit<mod>("qsu");
   qsu->add_wsdep("casein", casein);

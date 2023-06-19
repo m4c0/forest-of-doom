@@ -4,22 +4,20 @@ import casein;
 import ecs;
 import qsu;
 import sprite;
+import tile;
+import tiles;
 
 class game {
   ecs::ec m_ec{};
 
 public:
   void setup(qsu::main *q) {
-    for (auto y = 0.0f; y < 5; y++) {
-      for (auto x = 0.0f; x < 4; x++) {
-        sprite s{};
-        s.pos = {x, y, 1, 1};
-        s.uv = {x, y + 1, 1, 1};
-
-        auto e = m_ec.e.alloc();
-        m_ec.sprites.add(e, s);
-      }
-    }
+    tiles::add_tile(&m_ec, grass_0, 0, 0);
+    tiles::add_tile(&m_ec, grass_1, 1, 0);
+    tiles::add_tile(&m_ec, grass_1, 0, 1);
+    tiles::add_tile(&m_ec, grass_0, 1, 1);
+    tiles::add_tile(&m_ec, island_b, 0, 2);
+    tiles::add_tile(&m_ec, island_b, 1, 2);
 
     q->fill_sprites(m_ec.sprites);
   }
