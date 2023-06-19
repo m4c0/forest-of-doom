@@ -19,6 +19,7 @@ public:
     tiles::add_tile(&m_ec, island_b, 0, 2);
     tiles::add_tile(&m_ec, island_b, 1, 2);
 
+    q->center_at(4, 4);
     q->fill_sprites(m_ec.sprites);
   }
 };
