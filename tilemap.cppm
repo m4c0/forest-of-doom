@@ -20,7 +20,10 @@ public:
   constexpr void set(unsigned x, unsigned y, tile t) noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
       return;
+
     m_data[y][x] = t;
+    if (tiles::tile_uv(t).h > 1)
+      set(x, y + 1, blank);
   }
 
   void add_entities(ecs::ec *ec, float dx, float dy) const noexcept {
