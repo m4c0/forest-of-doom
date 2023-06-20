@@ -1,6 +1,7 @@
 export module tile;
 
 export enum tile : unsigned {
+  blank = 0,
   island_tl = 0x00010101,
   island_t = 0x01010101,
   island_tr = 0x03010101,

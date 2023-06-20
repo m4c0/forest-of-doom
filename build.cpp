@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
   ecs->add_wsdep("pog", pog);
 
   auto tiles = all->add_unit<mod>("tiles");
-  tiles->add_wsdep("pog", pog);
+  auto tilemap = all->add_unit<mod>("tilemap");
 
   auto qsu = all->add_unit<mod>("qsu");
   qsu->add_wsdep("casein", casein);
