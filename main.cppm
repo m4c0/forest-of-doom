@@ -13,12 +13,11 @@ class game {
 public:
   void setup(qsu::main *q) {
     tilemap map{};
+    map.fill(water);
     map.set(0, 0, island_tl);
     map.set(1, 0, island_tr);
     map.set(0, 1, island_bl);
     map.set(1, 1, island_br);
-    map.set(2, 0, water);
-    map.add_entities(&m_ec, 2, 2);
     map.add_entities(&m_ec, 0, 0);
 
     q->center_at(2, 2);

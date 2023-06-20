@@ -10,6 +10,13 @@ export class tilemap {
   tile m_data[height][width];
 
 public:
+  constexpr void fill(tile t) noexcept {
+    for (auto &row : m_data) {
+      for (auto &tile : row) {
+        tile = t;
+      }
+    }
+  }
   constexpr void set(unsigned x, unsigned y, tile t) noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
       return;

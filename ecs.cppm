@@ -3,7 +3,7 @@ import pog;
 import sprite;
 
 namespace ecs {
-static constexpr const auto max_entities = 100U;
+static constexpr const auto max_entities = 1000U;
 
 export struct ec {
   pog::entity_list<max_entities> e{};
