@@ -14,28 +14,41 @@ int main(int argc, char **argv) {
   auto silog = ::silog();
   auto stubby = ::stubby();
 
-  auto all = unit::create<app>("fod");
+  auto all = unit::create<seq>("all");
 
-  auto rect = all->add_unit<mod>("rect");
-  auto sprite = all->add_unit<mod>("sprite");
-  auto tile = all->add_unit<mod>("tile");
+  auto fod = all->add_unit<app>("fod");
 
-  auto ecs = all->add_unit<mod>("ecs");
+  auto rect = fod->add_unit<mod>("rect");
+  auto sprite = fod->add_unit<mod>("sprite");
+  auto tile = fod->add_unit<mod>("tile");
+
+  auto ecs = fod->add_unit<mod>("ecs");
   ecs->add_wsdep("pog", pog);
 
-  auto tiles = all->add_unit<mod>("tiles");
-  auto tilemap = all->add_unit<mod>("tilemap");
+  auto tiles = fod->add_unit<mod>("tiles");
+  auto tilemap = fod->add_unit<mod>("tilemap");
 
-  auto qsu = all->add_unit<mod>("qsu");
+  auto qsu = fod->add_unit<mod>("qsu");
   qsu->add_wsdep("casein", casein);
   qsu->add_wsdep("pog", pog);
   qsu->add_wsdep("quack", quack);
   qsu->add_wsdep("silog", silog);
   qsu->add_wsdep("stubby", stubby);
+  qsu->add_resource("11_Camping_16x16.png");
 
-  auto main = all->add_unit<mod>("main");
+  auto main = fod->add_unit<mod>("main");
   main->add_wsdep("casein", casein);
-  main->add_resource("11_Camping_16x16.png");
+
+  auto tme = all->add_unit<app>("tme");
+  tme->add_ref(ecs);
+  tme->add_ref(rect);
+  tme->add_ref(qsu);
+  tme->add_ref(sprite);
+  tme->add_ref(tile);
+  tme->add_ref(tiles);
+  tme->add_ref(tilemap);
+  tme->add_wsdep("casein", casein);
+  tme->add_unit<mod>("tme");
 
   return run_main(all, argc, argv);
 }
