@@ -10,10 +10,12 @@ namespace qsu {
 export class main {
   static constexpr const auto sprite_sz = 16.0f;
   static constexpr const auto max_sprites = 1024;
+  static constexpr const auto no_sprite = max_sprites + 1;
 
-  quack::renderer m_r{1};
+  quack::renderer m_r{2};
   quack::ilayout m_spr{&m_r, max_sprites};
   quack::mouse_tracker m_mouse{};
+  quack::ilayout m_mouse_view{&m_r, 1};
   float m_atlas_w;
   float m_atlas_h;
 
@@ -37,14 +39,24 @@ export class main {
         });
   }
 
+  void update_cursor() {
+    auto idx = m_mouse.current_hover(m_spr.batch()).unwrap(no_sprite);
+    if (idx == no_sprite)
+      return;
+    m_spr.batch()->multipliers().map([&](auto *ms) { ms[idx].a = 0.8; });
+  }
+
 public:
   void process_event(const casein::event &e) {
     m_r.process_event(e);
     m_spr.process_event(e);
     m_mouse.process_event(e);
+    m_mouse_view.process_event(e);
 
     if (e.type() == casein::CREATE_WINDOW)
       setup();
+    if (e.type() == casein::MOUSE_MOVE)
+      update_cursor();
   }
 
   void center_at(float x, float y) { m_spr.batch()->center_at(x, y); }
