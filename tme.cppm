@@ -6,15 +6,44 @@ import qsu;
 import tilemap;
 
 class game {
+  static constexpr const auto step = 1.0f;
+
   ecs::ec m_ec{};
+  qsu::main *m_q{};
+  tilemap::map m_map{};
+
+  float m_cx = tilemap::width / 2.0f;
+  float m_cy = tilemap::height / 2.0f;
+
+  void set_center() { m_q->center_at(m_cx, m_cy); }
 
 public:
   void setup(qsu::main *q) {
-    tilemap map{};
-    map.add_entities(&m_ec, 0, 0);
+    m_q = q;
 
-    q->center_at(2, 2);
+    m_map.add_island(0, 0);
+    m_map.add_island(4, 4);
+    m_map.add_entities(&m_ec, 0, 0);
+
     q->fill_sprites(m_ec.sprites);
+    set_center();
+  }
+
+  void down() {
+    m_cy += step;
+    set_center();
+  }
+  void up() {
+    m_cy -= step;
+    set_center();
+  }
+  void left() {
+    m_cx += step;
+    set_center();
+  }
+  void right() {
+    m_cx -= step;
+    set_center();
   }
 };
 
@@ -24,10 +53,10 @@ extern "C" void casein_handle(const casein::event &e) {
 
   static constexpr const auto k_map = [] {
     casein::key_map res{};
-    // res[casein::K_DOWN] = [](auto) { gg.down(); };
-    // res[casein::K_LEFT] = [](auto) { gg.left(); };
-    // res[casein::K_RIGHT] = [](auto) { gg.right(); };
-    // res[casein::K_UP] = [](auto) { gg.up(); };
+    res[casein::K_DOWN] = [](auto) { gg.down(); };
+    res[casein::K_LEFT] = [](auto) { gg.left(); };
+    res[casein::K_RIGHT] = [](auto) { gg.right(); };
+    res[casein::K_UP] = [](auto) { gg.up(); };
     return res;
   }();
   static constexpr const auto map = [] {

@@ -12,7 +12,7 @@ class game {
 
 public:
   void setup(qsu::main *q) {
-    tilemap map{};
+    tilemap::map map{};
     map.add_island(0, 0);
     map.add_island(3, 3);
     map.add_entities(&m_ec, 0, 0);

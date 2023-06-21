@@ -3,10 +3,11 @@ import ecs;
 import tile;
 import tiles;
 
-export class tilemap {
-  static constexpr unsigned width = 16;
-  static constexpr unsigned height = 16;
+export namespace tilemap {
+constexpr const unsigned width = 16;
+constexpr const unsigned height = 16;
 
+class map {
   tile m_data[height][width];
 
 public:
@@ -50,3 +51,4 @@ public:
     }
   }
 };
+} // namespace tilemap
