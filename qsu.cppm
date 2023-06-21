@@ -13,6 +13,7 @@ export class main {
 
   quack::renderer m_r{1};
   quack::ilayout m_spr{&m_r, max_sprites};
+  quack::mouse_tracker m_mouse{};
   float m_atlas_w;
   float m_atlas_h;
 
@@ -40,6 +41,7 @@ public:
   void process_event(const casein::event &e) {
     m_r.process_event(e);
     m_spr.process_event(e);
+    m_mouse.process_event(e);
 
     if (e.type() == casein::CREATE_WINDOW)
       setup();
