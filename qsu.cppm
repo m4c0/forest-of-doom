@@ -39,13 +39,6 @@ export class main {
         });
   }
 
-  void update_cursor() {
-    auto idx = m_mouse.current_hover(m_spr.batch()).unwrap(no_sprite);
-    if (idx == no_sprite)
-      return;
-    m_spr.batch()->multipliers().map([&](auto *ms) { ms[idx].a = 0.8; });
-  }
-
 public:
   void process_event(const casein::event &e) {
     m_r.process_event(e);
@@ -55,11 +48,13 @@ public:
 
     if (e.type() == casein::CREATE_WINDOW)
       setup();
-    if (e.type() == casein::MOUSE_MOVE)
-      update_cursor();
   }
 
   void center_at(float x, float y) { m_spr.batch()->center_at(x, y); }
+
+  [[nodiscard]] auto current_mouse_pos() const noexcept {
+    return m_mouse.current_mouse_pos(m_spr.batch());
+  }
 
   void fill_sprites(const pog::sparse_set<sprite> &set) {
     m_spr.batch()->colours().map([&](auto *cs) {
