@@ -36,8 +36,8 @@ int main(int argc, char **argv) {
   qsu->add_wsdep("stubby", stubby);
   qsu->add_resource("11_Camping_16x16.png");
 
-  auto main = fod->add_unit<mod>("main");
-  main->add_wsdep("casein", casein);
+  fod->add_unit<mod>("fod");
+  fod->add_wsdep("casein", casein);
 
   auto tme = all->add_unit<app>("tme");
   tme->add_ref(ecs);

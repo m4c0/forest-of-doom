@@ -1,4 +1,4 @@
-export module main;
+export module fod;
 
 import casein;
 import ecs;
