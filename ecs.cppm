@@ -10,5 +10,6 @@ export struct ec {
   pog::entity_list e{max_entities};
   cursor::compo cursor{};
   sprite::compo sprites{max_entities};
+  sprite::compo ui_sprites{max_entities};
 };
 } // namespace ecs

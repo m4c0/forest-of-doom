@@ -1,5 +1,6 @@
 export module main;
 
+import cursor;
 import casein;
 import ecs;
 import qsu;
@@ -21,11 +22,14 @@ public:
   void setup(qsu::main *q) {
     m_q = q;
 
+    cursor::add_entity(&m_ec.e, &m_ec.cursor, &m_ec.ui_sprites);
+
     m_map.add_island(0, 0);
     m_map.add_island(4, 4);
     m_map.add_entities({&m_ec.e, &m_ec.sprites}, 0, 0);
 
     q->fill_sprites(m_ec.sprites);
+    q->fill_ui_sprites(m_ec.ui_sprites);
     set_center();
   }
 
