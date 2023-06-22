@@ -1,5 +1,4 @@
 export module tilemap;
-import ecs;
 import tile;
 import tiles;
 
@@ -37,14 +36,14 @@ public:
     set(cx + 1, cy + 1, island_br);
   }
 
-  void add_entities(ecs::ec *ec, float dx, float dy) const noexcept {
+  void add_entities(tiles::builder tb, float dx, float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto t = m_data[y][x];
         if (t == blank)
           continue;
 
-        tiles::add_tile(ec, t, x + dx, y + dy);
+        tiles::add_tile(tb, t, x + dx, y + dy);
       }
     }
   }

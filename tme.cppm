@@ -23,7 +23,7 @@ public:
 
     m_map.add_island(0, 0);
     m_map.add_island(4, 4);
-    m_map.add_entities(&m_ec, 0, 0);
+    m_map.add_entities({&m_ec.e, &m_ec.sprites}, 0, 0);
 
     q->fill_sprites(m_ec.sprites);
     set_center();

@@ -1,5 +1,5 @@
 export module tiles;
-import ecs;
+import pog;
 import rect;
 import sprite;
 import tile;
@@ -15,14 +15,18 @@ constexpr rect tile_uv(tile t) {
   };
 }
 
-export void add_tile(ecs::ec *ec, tile t, float x, float y) {
+export struct builder {
+  pog::entity_list *e;
+  sprite::compo *sprites;
+};
+export void add_tile(tiles::builder b, tile t, float x, float y) {
   auto uv = tile_uv(t);
   sprite spr{
       .pos = {x, y, uv.w, uv.h},
       .uv = uv,
   };
 
-  auto id = ec->e.alloc();
-  ec->sprites.add(id, spr);
+  auto id = b.e->alloc();
+  b.sprites->add(id, spr);
 }
 } // namespace tiles
