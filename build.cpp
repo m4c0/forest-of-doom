@@ -5,50 +5,40 @@
 #include "../silog/build.hpp"
 #include "../stubby/build.hpp"
 
+using namespace ecow;
+
+auto base_app(const char *name) {
+  auto a = unit::create<app>(name);
+  a->add_wsdep("casein", casein());
+  a->add_wsdep("pog", pog());
+  a->add_wsdep("quack", quack());
+  a->add_wsdep("silog", silog());
+  a->add_wsdep("stubby", stubby());
+  a->add_resource("11_Camping_16x16.png");
+
+  // Components
+  a->add_unit<mod>("rect");
+  a->add_unit<mod>("tile");
+
+  // Second-order components
+  a->add_unit<mod>("sprite");
+
+  // Systems
+  a->add_unit<mod>("qsu");
+  a->add_unit<mod>("tiles");
+
+  // Second-order systems
+  a->add_unit<mod>("tilemap");
+
+  // ECS + App
+  a->add_unit<mod>("ecs");
+  a->add_unit<mod>(name);
+  return a;
+}
+
 int main(int argc, char **argv) {
-  using namespace ecow;
-
-  auto casein = ::casein();
-  auto pog = ::pog();
-  auto quack = ::quack();
-  auto silog = ::silog();
-  auto stubby = ::stubby();
-
   auto all = unit::create<seq>("all");
-
-  auto fod = all->add_unit<app>("fod");
-
-  auto rect = fod->add_unit<mod>("rect");
-  auto sprite = fod->add_unit<mod>("sprite");
-  auto tile = fod->add_unit<mod>("tile");
-
-  auto ecs = fod->add_unit<mod>("ecs");
-  ecs->add_wsdep("pog", pog);
-
-  auto tiles = fod->add_unit<mod>("tiles");
-  auto tilemap = fod->add_unit<mod>("tilemap");
-
-  auto qsu = fod->add_unit<mod>("qsu");
-  qsu->add_wsdep("casein", casein);
-  qsu->add_wsdep("pog", pog);
-  qsu->add_wsdep("quack", quack);
-  qsu->add_wsdep("silog", silog);
-  qsu->add_wsdep("stubby", stubby);
-  qsu->add_resource("11_Camping_16x16.png");
-
-  fod->add_unit<mod>("fod");
-  fod->add_wsdep("casein", casein);
-
-  auto tme = all->add_unit<app>("tme");
-  tme->add_ref(ecs);
-  tme->add_ref(rect);
-  tme->add_ref(qsu);
-  tme->add_ref(sprite);
-  tme->add_ref(tile);
-  tme->add_ref(tiles);
-  tme->add_ref(tilemap);
-  tme->add_wsdep("casein", casein);
-  tme->add_unit<mod>("tme");
-
+  all->add_ref(base_app("tme"));
+  all->add_ref(base_app("fod"));
   return run_main(all, argc, argv);
 }
