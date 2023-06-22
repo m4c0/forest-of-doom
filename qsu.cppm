@@ -82,8 +82,8 @@ public:
 
   void center_at(float x, float y) { m_spr.batch()->center_at(x, y); }
 
-  [[nodiscard]] auto current_mouse_pos() const noexcept {
-    return m_mouse.current_mouse_pos(m_spr.batch());
+  [[nodiscard]] auto ui_mouse_pos() const noexcept {
+    return m_mouse.current_mouse_pos(m_ui_spr.batch());
   }
 
   void fill_sprites(const pog::sparse_set<sprite> &set) {

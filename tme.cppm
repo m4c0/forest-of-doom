@@ -49,6 +49,11 @@ public:
     m_cx -= step;
     set_center();
   }
+  void mouse_moved() {
+    auto [x, y] = m_q->ui_mouse_pos();
+    cursor::update(&m_ec.cursor, &m_ec.ui_sprites, x, y);
+    m_q->fill_ui_sprites(m_ec.ui_sprites);
+  }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
@@ -67,6 +72,7 @@ extern "C" void casein_handle(const casein::event &e) {
     casein::event_map res{};
     res[casein::CREATE_WINDOW] = [](auto) { gg.setup(&q); };
     res[casein::KEY_DOWN] = [](auto e) { k_map.handle(e); };
+    res[casein::MOUSE_MOVE] = [](auto e) { gg.mouse_moved(); };
     return res;
   }();
 
