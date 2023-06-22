@@ -22,7 +22,7 @@ public:
   void setup(qsu::main *q) {
     m_q = q;
 
-    cursor::add_entity(&m_ec.e, &m_ec.cursor, &m_ec.ui_sprites);
+    cursor::add_entity(&m_ec.e, &m_ec.cursor, &m_ec.sprites);
 
     m_map.add_island(0, 0);
     m_map.add_island(4, 4);
@@ -50,9 +50,9 @@ public:
     set_center();
   }
   void mouse_moved() {
-    auto [x, y] = m_q->ui_mouse_pos();
-    cursor::update(&m_ec.cursor, &m_ec.ui_sprites, x, y);
-    m_q->fill_ui_sprites(m_ec.ui_sprites);
+    auto [x, y] = m_q->mouse_pos();
+    cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
+    m_q->fill_sprites(m_ec.sprites);
   }
 };
 
