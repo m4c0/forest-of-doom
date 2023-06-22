@@ -9,7 +9,7 @@ namespace ecs {
 static constexpr const auto max_entities = 1000U;
 
 export struct ec {
-  pog::entity_list<max_entities> e{};
+  pog::entity_list e{max_entities};
   pog::sparse_set<sprite> sprites{max_entities};
   pog::singleton<c::marker> cursor{};
 };
