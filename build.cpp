@@ -24,6 +24,7 @@ auto base_app(const char *name) {
   a->add_unit<mod>("sprite");
 
   // Systems
+  a->add_unit<mod>("cursor");
   a->add_unit<mod>("qsu");
   a->add_unit<mod>("tiles");
 
