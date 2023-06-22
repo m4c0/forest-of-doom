@@ -7,4 +7,5 @@ export struct sprite {
 
   rect pos;
   rect uv;
+  unsigned layer;
 };

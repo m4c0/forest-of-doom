@@ -89,11 +89,18 @@ public:
     return m_mouse.current_mouse_pos(m_ui_spr.batch());
   }
 
-  void fill_sprites(const pog::sparse_set<sprite> &set) {
-    fill(m_spr.batch(), set);
-  }
-  void fill_ui_sprites(const pog::sparse_set<sprite> &set) {
+  void fill_sprites(const sprite::compo &set) { fill(m_spr.batch(), set); }
+  void fill_ui_sprites(const sprite::compo &set) {
     fill(m_ui_spr.batch(), set);
+  }
+
+  void sort_sprites(sprite::compo &set) {
+    set.sort([](sprite &a, sprite &b) -> int {
+      auto l = a.layer - b.layer;
+      if (l != 0)
+        return l;
+      return a.pos.y - b.pos.y;
+    });
   }
 };
 } // namespace qsu

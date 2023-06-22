@@ -9,7 +9,7 @@ using compo = pog::singleton<c>;
 void add_entity(pog::entity_list *e, compo *cur, sprite::compo *sprites) {
   auto id = e->alloc();
   cur->set(id, {});
-  sprites->add(id, {.pos = {0, 0, 1, 1}, .uv = {1, 2, 1, 1}});
+  sprites->add(id, {.pos = {0, 0, 1, 1}, .uv = {1, 2, 1, 1}, .layer = 100});
 }
 
 void update(compo *cur, sprite::compo *sprites, float x, float y) {

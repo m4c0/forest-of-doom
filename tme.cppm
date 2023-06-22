@@ -29,6 +29,7 @@ public:
     m_map.add_entities({&m_ec.e, &m_ec.sprites}, 0, 0);
 
     q->fill_sprites(m_ec.sprites);
+    q->sort_sprites(m_ec.sprites);
     q->fill_ui_sprites(m_ec.ui_sprites);
     set_center();
   }
