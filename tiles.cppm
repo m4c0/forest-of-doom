@@ -5,7 +5,7 @@ import sprite;
 import tile;
 
 namespace tiles {
-export constexpr rect tile_uv(tile t) {
+constexpr rect tile_uv(tile t) {
   auto ut = static_cast<unsigned>(t);
   return rect{
       .x = static_cast<float>((t >> 24) & 0xFFU),

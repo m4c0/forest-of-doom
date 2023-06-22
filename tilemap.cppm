@@ -23,8 +23,6 @@ public:
       return;
 
     m_data[y][x] = t;
-    if (tiles::tile_uv(t).h > 1)
-      set(x, y + 1, blank);
   }
 
   constexpr void add_island(unsigned cx, unsigned cy) noexcept {
