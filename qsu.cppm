@@ -81,6 +81,7 @@ public:
   }
 
   void center_at(float x, float y) { m_spr.batch()->center_at(x, y); }
+  void set_grid(float w, float h) { m_spr.set_grid(w, h); }
 
   [[nodiscard]] auto mouse_pos() const noexcept {
     return m_mouse.current_mouse_pos(m_spr.batch());
