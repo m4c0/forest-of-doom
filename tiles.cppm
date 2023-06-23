@@ -30,6 +30,13 @@ export pog::eid add_tile(tiles::builder b, tile t, float x, float y) {
   b.sprites->add(id, spr);
   return id;
 }
+export void update_tile(pog::eid id, sprite::compo *sprites, tile t) {
+  auto spr = sprites->get(id);
+  spr.uv = tile_uv(t);
+  spr.pos.w = spr.uv.w;
+  spr.pos.h = spr.uv.h;
+  sprites->update(id, spr);
+}
 export void remove_tile(pog::eid id, tiles::builder b) {
   b.sprites->remove(id);
   b.e->dealloc(id);

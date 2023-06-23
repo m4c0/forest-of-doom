@@ -4,6 +4,7 @@ import cursor;
 import casein;
 import ecs;
 import qsu;
+import tile;
 import tiles;
 import tilemap;
 
@@ -22,7 +23,13 @@ public:
     q->center_at(8, 8);
 
     cursor::add_entity(&m_ec.e, &m_ec.cursor, &m_ec.sprites);
+    set_brush(grass_0);
+
     q->fill_sprites(m_ec.sprites);
+  }
+
+  void set_brush(tile t) {
+    tiles::update_tile(m_ec.cursor.get_id(), &m_ec.sprites, t);
   }
 
   void mouse_moved() {
