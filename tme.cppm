@@ -30,8 +30,8 @@ public:
     m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
 
     q->fill_sprites(m_ec.sprites);
-    q->sort_sprites(m_ec.sprites);
     q->fill_ui_sprites(m_ec.ui_sprites);
+    sort_sprites(m_ec.sprites);
     set_center();
   }
 
@@ -71,6 +71,7 @@ public:
     m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
 
     cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
+    sort_sprites(m_ec.sprites);
     m_q->fill_sprites(m_ec.sprites);
   }
 };

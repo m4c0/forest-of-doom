@@ -93,14 +93,5 @@ public:
   void fill_ui_sprites(const sprite::compo &set) {
     fill(m_ui_spr.batch(), set);
   }
-
-  void sort_sprites(sprite::compo &set) {
-    set.sort([](sprite &a, sprite &b) -> int {
-      auto l = a.layer - b.layer;
-      if (l != 0)
-        return l;
-      return a.pos.y - b.pos.y;
-    });
-  }
 };
 } // namespace qsu
