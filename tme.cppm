@@ -40,7 +40,7 @@ public:
     });
 
     auto [x, y] = m_q->mouse_pos();
-    m_map.add_island(x, y);
+    m_map.set(x, y, grass_0);
     m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
 
     cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);

@@ -28,18 +28,6 @@ public:
     m_data[y][x] = t;
   }
 
-  constexpr void add_island(unsigned cx, unsigned cy) noexcept {
-    set(cx - 1, cy - 1, island_tl);
-    set(cx, cy - 1, island_t);
-    set(cx + 1, cy - 1, island_tr);
-    set(cx - 1, cy, island_l);
-    set(cx, cy, grass_0);
-    set(cx + 1, cy, island_r);
-    set(cx - 1, cy + 1, island_bl);
-    set(cx, cy + 1, island_b);
-    set(cx + 1, cy + 1, island_br);
-  }
-
   void add_entities(tiles::builder tb, chunk::compo *c, float dx,
                     float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
