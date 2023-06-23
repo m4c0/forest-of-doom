@@ -30,4 +30,8 @@ export pog::eid add_tile(tiles::builder b, tile t, float x, float y) {
   b.sprites->add(id, spr);
   return id;
 }
+export void remove_tile(pog::eid id, tiles::builder b) {
+  b.sprites->remove(id);
+  b.e->dealloc(id);
+}
 } // namespace tiles

@@ -4,6 +4,7 @@ import cursor;
 import casein;
 import ecs;
 import qsu;
+import tiles;
 import tilemap;
 
 class game {
@@ -50,8 +51,25 @@ public:
     m_cx -= step;
     set_center();
   }
+
   void mouse_moved() {
     auto [x, y] = m_q->mouse_pos();
+    cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
+    m_q->fill_sprites(m_ec.sprites);
+  }
+  void mouse_down() {
+    m_ec.chunks.remove_if([this](auto cid, auto eid) {
+      if (cid != 1)
+        return false;
+
+      tiles::remove_tile(eid, {&m_ec.e, &m_ec.sprites});
+      return true;
+    });
+
+    auto [x, y] = m_q->mouse_pos();
+    m_map.add_island(x, y);
+    m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
+
     cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
     m_q->fill_sprites(m_ec.sprites);
   }
@@ -74,6 +92,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::CREATE_WINDOW] = [](auto) { gg.setup(&q); };
     res[casein::KEY_DOWN] = [](auto e) { k_map.handle(e); };
     res[casein::MOUSE_MOVE] = [](auto e) { gg.mouse_moved(); };
+    res[casein::MOUSE_DOWN] = [](auto e) { gg.mouse_down(); };
     return res;
   }();
 
