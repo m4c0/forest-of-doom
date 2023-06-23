@@ -19,7 +19,7 @@ export struct builder {
   pog::entity_list *e;
   sprite::compo *sprites;
 };
-export void add_tile(tiles::builder b, tile t, float x, float y) {
+export pog::eid add_tile(tiles::builder b, tile t, float x, float y) {
   auto uv = tile_uv(t);
   sprite spr{
       .pos = {x, y, uv.w, uv.h},
@@ -28,5 +28,6 @@ export void add_tile(tiles::builder b, tile t, float x, float y) {
 
   auto id = b.e->alloc();
   b.sprites->add(id, spr);
+  return id;
 }
 } // namespace tiles

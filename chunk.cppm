@@ -2,10 +2,11 @@ export module chunk;
 import pog;
 
 namespace chunk {
-export using compo = pog::sparse_set<unsigned>;
+export using c = unsigned;
+export using compo = pog::sparse_set<c>;
 
-export unsigned &current() {
-  static unsigned i{};
+export c &current() {
+  static c i{};
   return i;
 }
 } // namespace chunk

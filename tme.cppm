@@ -11,7 +11,7 @@ class game {
 
   ecs::ec m_ec{};
   qsu::main *m_q{};
-  tilemap::map m_map{};
+  tilemap::map m_map{1};
 
   float m_cx = tilemap::width / 2.0f;
   float m_cy = tilemap::height / 2.0f;
@@ -26,7 +26,7 @@ public:
 
     m_map.add_island(0, 0);
     m_map.add_island(4, 4);
-    m_map.add_entities({&m_ec.e, &m_ec.sprites}, 0, 0);
+    m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
 
     q->fill_sprites(m_ec.sprites);
     q->sort_sprites(m_ec.sprites);

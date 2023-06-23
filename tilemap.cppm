@@ -1,4 +1,5 @@
 export module tilemap;
+import chunk;
 import tile;
 import tiles;
 
@@ -7,9 +8,12 @@ constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
 class map {
-  tile m_data[height][width];
+  tile m_data[height][width]{};
+  chunk::c m_chunk;
 
 public:
+  explicit constexpr map(chunk::c ch) : m_chunk{ch} {}
+
   constexpr void fill(tile t) noexcept {
     for (auto &row : m_data) {
       for (auto &tile : row) {
@@ -36,14 +40,16 @@ public:
     set(cx + 1, cy + 1, island_br);
   }
 
-  void add_entities(tiles::builder tb, float dx, float dy) const noexcept {
+  void add_entities(tiles::builder tb, chunk::compo *c, float dx,
+                    float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto t = m_data[y][x];
         if (t == blank)
           continue;
 
-        tiles::add_tile(tb, t, x + dx, y + dy);
+        auto e = tiles::add_tile(tb, t, x + dx, y + dy);
+        c->add(e, m_chunk);
       }
     }
   }
