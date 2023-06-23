@@ -17,6 +17,7 @@ auto base_app(const char *name) {
   a->add_resource("11_Camping_16x16.png");
 
   // Components
+  a->add_unit<mod>("chunk");
   a->add_unit<mod>("rect");
   a->add_unit<mod>("tile");
 
