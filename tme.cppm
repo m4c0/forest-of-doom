@@ -14,6 +14,7 @@ class game {
   ecs::ec m_ec{};
   qsu::main *m_q{};
   tilemap::map m_map{1};
+  tile m_brush{};
 
 public:
   void setup(qsu::main *q) {
@@ -29,6 +30,7 @@ public:
   }
 
   void set_brush(tile t) {
+    m_brush = t;
     tiles::update_tile(m_ec.cursor.get_id(), &m_ec.sprites, t);
   }
 
@@ -47,7 +49,7 @@ public:
     });
 
     auto [x, y] = m_q->mouse_pos();
-    m_map.set(x, y, grass_0);
+    m_map.set(x, y, m_brush);
     m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
 
     cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
@@ -63,6 +65,7 @@ extern "C" void casein_handle(const casein::event &e) {
   static constexpr const auto map = [] {
     casein::event_map res{};
     res[casein::CREATE_WINDOW] = [](auto) { gg.setup(&q); };
+    res[casein::KEY_DOWN] = [](auto e) { gg.set_brush(grass_1); };
     res[casein::MOUSE_MOVE] = [](auto e) { gg.mouse_moved(); };
     res[casein::MOUSE_DOWN] = [](auto e) { gg.mouse_down(); };
     return res;
