@@ -8,13 +8,28 @@ import tile;
 import tiles;
 import tilemap;
 
+template <unsigned N> class palette {
+  tile m_tiles[N];
+  unsigned m_index{};
+
+public:
+  constexpr palette(auto... n) : m_tiles{n...} {}
+
+  [[nodiscard]] constexpr auto get() const noexcept { return m_tiles[m_index]; }
+
+  void operator++() noexcept { m_index = (m_index + 1) % N; }
+  void operator--() noexcept { m_index = (m_index + N - 1) % N; }
+};
+
 class game {
   static constexpr const auto step = 1.0f;
-
   ecs::ec m_ec{};
   qsu::main *m_q{};
   tilemap::map m_map{1};
   tile m_brush{};
+
+  palette<8> m_island_pal{island_tl, island_t, island_tr, island_r,
+                          island_br, island_b, island_bl, island_l};
 
 public:
   void setup(qsu::main *q) {
@@ -33,6 +48,14 @@ public:
     m_brush = t;
     tiles::update_tile(m_ec.cursor.get_id(), &m_ec.sprites, t);
     m_q->fill_sprites(m_ec.sprites);
+  }
+  void next_island_brush() {
+    ++m_island_pal;
+    set_brush(m_island_pal.get());
+  }
+  void prev_island_brush() {
+    --m_island_pal;
+    set_brush(m_island_pal.get());
   }
 
   void mouse_moved() {
@@ -65,6 +88,8 @@ extern "C" void casein_handle(const casein::event &e) {
 
   static constexpr const auto kmap = [] {
     casein::key_map res{};
+    res[casein::K_Q] = [](auto) { gg.prev_island_brush(); };
+    res[casein::K_W] = [](auto) { gg.next_island_brush(); };
     res[casein::K_LEFT] = [](auto) { gg.set_brush(grass_0); };
     res[casein::K_RIGHT] = [](auto) { gg.set_brush(grass_1); };
     return res;
