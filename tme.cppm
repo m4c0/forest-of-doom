@@ -31,10 +31,13 @@ static void fail(const char *msg) {
 }
 
 class game {
-  static constexpr const auto step = 1.0f;
+  static constexpr const auto prefab = prefabs::island_0;
+  static constexpr const auto fname = "prefabs-island_0.cppm";
+  static constexpr const auto mname = "prefabs:island_0";
+
   ecs::ec m_ec{};
   qsu::main *m_q{};
-  tilemap::map m_map = prefabs::island_0;
+  tilemap::map m_map = prefab;
   tile m_brush{};
 
   palette<8> m_island_pal{island_tl, island_t, island_tr, island_r,
@@ -74,8 +77,8 @@ public:
   void setup(qsu::main *q) {
     m_q = q;
 
-    q->set_grid(16, 16);
-    q->center_at(8, 8);
+    q->set_grid(tilemap::width, tilemap::height);
+    q->center_at(tilemap::width / 2, tilemap::height / 2);
 
     cursor::add_entity(&m_ec.e, &m_ec.cursor, &m_ec.sprites);
     set_brush(grass_0);
@@ -133,8 +136,8 @@ public:
     using namespace jute::literals;
 
     try {
-      yoyo::file_writer out{"prefabs-island_0.cppm"};
-      out.write("export module prefabs:island_0;\n"_s).take(fail);
+      yoyo::file_writer out{fname};
+      out.writef("export module %s;\n", mname).take(fail);
       out.write("import tile;\n"_s).take(fail);
       out.write("import tilemap;\n"_s).take(fail);
       out.write("\n"_s).take(fail);
@@ -142,7 +145,16 @@ public:
       out.write("export constexpr const tilemap::map island_0 = [] {\n"_s)
           .take(fail);
       out.write("  tilemap::map res{};\n"_s).take(fail);
-      // out.write("  res.set(0, 0, island_tl);\n"_s).take(fail);
+      for (auto y = 0; y < tilemap::height; y++) {
+        for (auto x = 0; x < tilemap::width; x++) {
+          m_map.get(x, y)
+              .fmap([&](auto t) {
+                return out.writef(
+                    "  res.set(%d, %d, static_cast<tile>(0x%08x));\n", x, y, t);
+              })
+              .take(fail);
+        }
+      }
       out.write("  return res;\n"_s).take(fail);
       out.write("}();\n"_s).take(fail);
       out.write("}\n"_s).take(fail);
