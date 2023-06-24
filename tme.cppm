@@ -25,7 +25,7 @@ class game {
   static constexpr const auto step = 1.0f;
   ecs::ec m_ec{};
   qsu::main *m_q{};
-  tilemap::map m_map{1};
+  tilemap::map m_map{};
   tile m_brush{};
 
   palette<8> m_island_pal{island_tl, island_t, island_tr, island_r,
@@ -42,7 +42,7 @@ class game {
       tiles::remove_tile(eid, {&m_ec.e, &m_ec.sprites});
       return true;
     });
-    m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
+    m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 1, 0, 0);
 
     sort_sprites(m_ec.sprites);
     m_q->fill_sprites(m_ec.sprites);

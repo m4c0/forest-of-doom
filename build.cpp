@@ -34,6 +34,10 @@ auto base_app(const char *name) {
   // Second-order systems
   a->add_unit<mod>("tilemap");
 
+  // Third-order systems
+  auto pf = a->add_unit<mod>("prefabs");
+  pf->add_part("island_0");
+
   // ECS + App
   a->add_unit<mod>("ecs");
   a->add_unit<mod>(name);

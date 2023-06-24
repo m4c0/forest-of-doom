@@ -10,11 +10,8 @@ constexpr const unsigned height = 16;
 
 class map {
   tile m_data[height][width]{};
-  chunk::c m_chunk;
 
 public:
-  explicit constexpr map(chunk::c ch) : m_chunk{ch} {}
-
   constexpr void fill(tile t) noexcept {
     for (auto &row : m_data) {
       for (auto &tile : row) {
@@ -35,8 +32,8 @@ public:
     m_data[y][x] = t;
   }
 
-  void add_entities(tiles::builder tb, chunk::compo *c, float dx,
-                    float dy) const noexcept {
+  void add_entities(tiles::builder tb, chunk::compo *c, chunk::c chunk,
+                    float dx, float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto t = m_data[y][x];
@@ -44,7 +41,7 @@ public:
           continue;
 
         auto e = tiles::add_tile(tb, t, x + dx, y + dy);
-        c->add(e, m_chunk);
+        c->add(e, chunk);
       }
     }
   }
