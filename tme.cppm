@@ -32,6 +32,7 @@ public:
   void set_brush(tile t) {
     m_brush = t;
     tiles::update_tile(m_ec.cursor.get_id(), &m_ec.sprites, t);
+    m_q->fill_sprites(m_ec.sprites);
   }
 
   void mouse_moved() {
@@ -62,10 +63,16 @@ extern "C" void casein_handle(const casein::event &e) {
   static qsu::main q{};
   static game gg{};
 
+  static constexpr const auto kmap = [] {
+    casein::key_map res{};
+    res[casein::K_LEFT] = [](auto) { gg.set_brush(grass_0); };
+    res[casein::K_RIGHT] = [](auto) { gg.set_brush(grass_1); };
+    return res;
+  }();
   static constexpr const auto map = [] {
     casein::event_map res{};
     res[casein::CREATE_WINDOW] = [](auto) { gg.setup(&q); };
-    res[casein::KEY_DOWN] = [](auto e) { gg.set_brush(grass_1); };
+    res[casein::KEY_DOWN] = [](auto e) { kmap.handle(e); };
     res[casein::MOUSE_MOVE] = [](auto e) { gg.mouse_moved(); };
     res[casein::MOUSE_DOWN] = [](auto e) { gg.mouse_down(); };
     return res;
