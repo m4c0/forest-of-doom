@@ -122,6 +122,14 @@ public:
     auto [x, y] = m_q->mouse_pos();
     m_undo_map = m_map;
     m_map.set(x, y, m_brush);
+    auto [tx, ty, tw, th] = tiles::tile_uv(m_brush);
+    for (auto dy = 0; dy < th; dy++) {
+      for (auto dx = 0; dx < tw; dx++) {
+        if (dx == 0 && dy == 0)
+          continue;
+        m_map.set(x + dx, y + dy, blank);
+      }
+    }
     cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
     update_sprites();
   }
