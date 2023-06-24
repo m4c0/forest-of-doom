@@ -34,6 +34,31 @@ class game {
                         lake_br, island_t, lake_bl, island_r};
   palette<3> m_land_pal{grass_0, grass_1, water};
 
+  void update_sprites() {
+    m_ec.chunks.remove_if([this](auto cid, auto eid) {
+      if (cid != 1)
+        return false;
+
+      tiles::remove_tile(eid, {&m_ec.e, &m_ec.sprites});
+      return true;
+    });
+    m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
+
+    sort_sprites(m_ec.sprites);
+    m_q->fill_sprites(m_ec.sprites);
+  }
+
+  void flood_fill(auto x, auto y) {
+    if (m_map.get(x, y).unwrap(water) != blank)
+      return;
+
+    m_map.set(x, y, m_brush);
+    flood_fill(x + 1, y);
+    flood_fill(x - 1, y);
+    flood_fill(x, y + 1);
+    flood_fill(x, y - 1);
+  }
+
 public:
   void setup(qsu::main *q) {
     m_q = q;
@@ -80,21 +105,16 @@ public:
     m_q->fill_sprites(m_ec.sprites);
   }
   void mouse_down() {
-    m_ec.chunks.remove_if([this](auto cid, auto eid) {
-      if (cid != 1)
-        return false;
-
-      tiles::remove_tile(eid, {&m_ec.e, &m_ec.sprites});
-      return true;
-    });
-
     auto [x, y] = m_q->mouse_pos();
     m_map.set(x, y, m_brush);
-    m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 0, 0);
-
     cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
-    sort_sprites(m_ec.sprites);
-    m_q->fill_sprites(m_ec.sprites);
+    update_sprites();
+  }
+
+  void flood_fill() {
+    auto [x, y] = m_q->mouse_pos();
+    flood_fill(x, y);
+    update_sprites();
   }
 };
 
@@ -109,6 +129,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::K_A] = [](auto) { gg.prev_lake_brush(); };
     res[casein::K_S] = [](auto) { gg.next_lake_brush(); };
     res[casein::K_E] = [](auto) { gg.next_land_brush(); };
+    res[casein::K_D] = [](auto) { gg.flood_fill(); };
     res[casein::K_SPACE] = [](auto) { gg.set_brush(blank); };
     return res;
   }();

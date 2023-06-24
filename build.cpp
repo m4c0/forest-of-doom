@@ -1,5 +1,6 @@
 #include "../casein/build.hpp"
 #include "../ecow/ecow.hpp"
+#include "../missingno/build.hpp"
 #include "../pog/build.hpp"
 #include "../quack/build.hpp"
 #include "../silog/build.hpp"
@@ -10,6 +11,7 @@ using namespace ecow;
 auto base_app(const char *name) {
   auto a = unit::create<app>(name);
   a->add_wsdep("casein", casein());
+  a->add_wsdep("missingno", missingno());
   a->add_wsdep("pog", pog());
   a->add_wsdep("quack", quack());
   a->add_wsdep("silog", silog());

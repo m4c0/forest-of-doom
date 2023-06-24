@@ -1,5 +1,6 @@
 export module tilemap;
 import chunk;
+import missingno;
 import tile;
 import tiles;
 
@@ -20,6 +21,12 @@ public:
         tile = t;
       }
     }
+  }
+  constexpr mno::req<tile> get(unsigned x, unsigned y) const noexcept {
+    if (x < 0 || x >= width || y < 0 || y >= height)
+      return mno::req<tile>::failed("out-of-bounds");
+
+    return mno::req<tile>{m_data[y][x]};
   }
   constexpr void set(unsigned x, unsigned y, tile t) noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
