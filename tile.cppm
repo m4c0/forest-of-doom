@@ -12,5 +12,9 @@ export enum tile : unsigned {
   island_bl = 0x00030102,
   island_b = 0x01030102,
   island_br = 0x03030102,
+  lake_tl = 0x04010102,
+  lake_tr = 0x07010102,
+  lake_bl = 0x04040101,
+  lake_br = 0x07040101,
   water = 0x05030101,
 };
