@@ -48,15 +48,17 @@ class game {
     m_q->fill_sprites(m_ec.sprites);
   }
 
-  void flood_fill(auto x, auto y) {
-    if (m_map.get(x, y).unwrap(water) != blank)
-      return;
+  void flood_fill(auto x, auto y, tile old) {
+    auto _ = m_map.get(x, y).map([this, x, y, old](auto t) {
+      if (t != old)
+        return;
 
-    m_map.set(x, y, m_brush);
-    flood_fill(x + 1, y);
-    flood_fill(x - 1, y);
-    flood_fill(x, y + 1);
-    flood_fill(x, y - 1);
+      m_map.set(x, y, m_brush);
+      flood_fill(x + 1, y, old);
+      flood_fill(x - 1, y, old);
+      flood_fill(x, y + 1, old);
+      flood_fill(x, y - 1, old);
+    });
   }
 
 public:
@@ -113,8 +115,10 @@ public:
 
   void flood_fill() {
     auto [x, y] = m_q->mouse_pos();
-    flood_fill(x, y);
-    update_sprites();
+    auto _ = m_map.get(x, y).map([this, x, y](auto t) {
+      flood_fill(x, y, t);
+      update_sprites();
+    });
   }
 };
 
