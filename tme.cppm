@@ -3,6 +3,7 @@ export module main;
 import cursor;
 import casein;
 import ecs;
+import prefabs;
 import qsu;
 import tile;
 import tiles;
@@ -25,7 +26,7 @@ class game {
   static constexpr const auto step = 1.0f;
   ecs::ec m_ec{};
   qsu::main *m_q{};
-  tilemap::map m_map{};
+  tilemap::map m_map = prefabs::island_0;
   tile m_brush{};
 
   palette<8> m_island_pal{island_tl, island_t, island_tr, island_r,
@@ -70,8 +71,7 @@ public:
 
     cursor::add_entity(&m_ec.e, &m_ec.cursor, &m_ec.sprites);
     set_brush(grass_0);
-
-    q->fill_sprites(m_ec.sprites);
+    update_sprites();
   }
 
   void set_brush(tile t) {
