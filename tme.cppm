@@ -32,6 +32,7 @@ class game {
                           island_br, island_b, island_bl, island_l};
   palette<8> m_lake_pal{lake_tl, island_b, lake_tr, island_l,
                         lake_br, island_t, lake_bl, island_r};
+  palette<3> m_land_pal{grass_0, grass_1, water};
 
 public:
   void setup(qsu::main *q) {
@@ -68,6 +69,10 @@ public:
     --m_lake_pal;
     set_brush(m_lake_pal.get());
   }
+  void next_land_brush() {
+    ++m_land_pal;
+    set_brush(m_land_pal.get());
+  }
 
   void mouse_moved() {
     auto [x, y] = m_q->mouse_pos();
@@ -103,8 +108,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::K_W] = [](auto) { gg.next_island_brush(); };
     res[casein::K_A] = [](auto) { gg.prev_lake_brush(); };
     res[casein::K_S] = [](auto) { gg.next_lake_brush(); };
-    res[casein::K_LEFT] = [](auto) { gg.set_brush(grass_0); };
-    res[casein::K_RIGHT] = [](auto) { gg.set_brush(grass_1); };
+    res[casein::K_E] = [](auto) { gg.next_land_brush(); };
     res[casein::K_SPACE] = [](auto) { gg.set_brush(blank); };
     return res;
   }();
