@@ -3,11 +3,14 @@ export module main;
 import cursor;
 import casein;
 import ecs;
+import jute;
 import prefabs;
 import qsu;
+import silog;
 import tile;
 import tiles;
 import tilemap;
+import yoyo_libc;
 
 template <unsigned N> class palette {
   tile m_tiles[N];
@@ -21,6 +24,11 @@ public:
   void operator++() noexcept { m_index = (m_index + 1) % N; }
   void operator--() noexcept { m_index = (m_index + N - 1) % N; }
 };
+
+static void fail(const char *msg) {
+  silog::log(silog::error, "Error: %s", msg);
+  throw 0;
+}
 
 class game {
   static constexpr const auto step = 1.0f;
@@ -120,6 +128,28 @@ public:
       update_sprites();
     });
   }
+
+  void dump_map() {
+    using namespace jute::literals;
+
+    try {
+      yoyo::file_writer out{"prefabs-island_0.cppm"};
+      out.write("export module prefabs:island_0;\n"_s).take(fail);
+      out.write("import tile;\n"_s).take(fail);
+      out.write("import tilemap;\n"_s).take(fail);
+      out.write("\n"_s).take(fail);
+      out.write("namespace prefabs {\n"_s).take(fail);
+      out.write("export constexpr const tilemap::map island_0 = [] {\n"_s)
+          .take(fail);
+      out.write("  tilemap::map res{};\n"_s).take(fail);
+      // out.write("  res.set(0, 0, island_tl);\n"_s).take(fail);
+      out.write("  return res;\n"_s).take(fail);
+      out.write("}();\n"_s).take(fail);
+      out.write("}\n"_s).take(fail);
+    } catch (...) {
+    }
+    silog::log(silog::info, "Source saved");
+  }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
@@ -134,6 +164,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::K_S] = [](auto) { gg.next_lake_brush(); };
     res[casein::K_E] = [](auto) { gg.next_land_brush(); };
     res[casein::K_D] = [](auto) { gg.flood_fill(); };
+    res[casein::K_Z] = [](auto) { gg.dump_map(); };
     res[casein::K_SPACE] = [](auto) { gg.set_brush(blank); };
     return res;
   }();

@@ -1,21 +1,25 @@
 #include "../casein/build.hpp"
 #include "../ecow/ecow.hpp"
+#include "../jute/build.hpp"
 #include "../missingno/build.hpp"
 #include "../pog/build.hpp"
 #include "../quack/build.hpp"
 #include "../silog/build.hpp"
 #include "../stubby/build.hpp"
+#include "../yoyo/build.hpp"
 
 using namespace ecow;
 
 auto base_app(const char *name) {
   auto a = unit::create<app>(name);
   a->add_wsdep("casein", casein());
+  a->add_wsdep("jute", jute());
   a->add_wsdep("missingno", missingno());
   a->add_wsdep("pog", pog());
   a->add_wsdep("quack", quack());
   a->add_wsdep("silog", silog());
   a->add_wsdep("stubby", stubby());
+  a->add_wsdep("yoyo", yoyo_libc());
   a->add_resource("11_Camping_16x16.png");
 
   // Components
