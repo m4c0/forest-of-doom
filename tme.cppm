@@ -38,6 +38,7 @@ class game {
   ecs::ec m_ec{};
   qsu::main *m_q{};
   tilemap::map m_map = prefab;
+  tilemap::map m_undo_map = prefab;
   tile m_brush{};
 
   palette<8> m_island_pal{island_tl, island_t, island_tr, island_r,
@@ -119,6 +120,7 @@ public:
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();
+    m_undo_map = m_map;
     m_map.set(x, y, m_brush);
     cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
     update_sprites();
@@ -127,9 +129,17 @@ public:
   void flood_fill() {
     auto [x, y] = m_q->mouse_pos();
     auto _ = m_map.get(x, y).map([this, x, y](auto t) {
+      if (t == m_brush)
+        return;
+      m_undo_map = m_map;
       flood_fill(x, y, t);
       update_sprites();
     });
+  }
+
+  void undo() {
+    m_map = m_undo_map;
+    update_sprites();
   }
 
   void dump_map() {
@@ -176,6 +186,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::K_S] = [](auto) { gg.next_lake_brush(); };
     res[casein::K_E] = [](auto) { gg.next_land_brush(); };
     res[casein::K_D] = [](auto) { gg.flood_fill(); };
+    res[casein::K_U] = [](auto) { gg.undo(); };
     res[casein::K_Z] = [](auto) { gg.dump_map(); };
     res[casein::K_SPACE] = [](auto) { gg.set_brush(blank); };
     return res;
