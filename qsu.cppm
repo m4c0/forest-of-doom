@@ -41,22 +41,22 @@ export class main {
   }
 
   void fill(auto *batch, const sprite::compo &set) {
-    batch->colours().map([&](auto *cs) {
+    batch->map_colours([&](auto *cs) {
       for (auto _ : set) {
         *cs++ = {};
       }
     });
-    batch->multipliers().map([&](auto *ms) {
+    batch->map_multipliers([&](auto *ms) {
       for (auto [spr, _] : set) {
         *ms++ = {1, 1, 1, 1};
       }
     });
-    batch->positions().map([&](auto *ps) {
+    batch->map_positions([&](auto *ps) {
       for (auto [spr, _] : set) {
         *ps++ = quack::rect{spr.pos.x, spr.pos.y, spr.pos.w, spr.pos.h};
       }
     });
-    batch->uvs().map([&](auto *uvs) {
+    batch->map_uvs([&](auto *uvs) {
       for (auto [spr, _] : set) {
         *uvs++ = quack::uv{
             spr.uv.x * sprite_sz / m_atlas_w,
