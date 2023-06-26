@@ -12,6 +12,6 @@ export struct ec {
   cursor::compo cursor{};
   chunk::compo chunks{max_entities};
   sprite::compo sprites{max_entities};
-  sprite::compo ui_sprites{max_entities};
+  sprite::compo player_sprites{16, max_entities};
 };
 } // namespace ecs

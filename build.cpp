@@ -21,6 +21,7 @@ auto base_app(const char *name) {
   a->add_wsdep("stubby", stubby());
   a->add_wsdep("yoyo", yoyo_libc());
   a->add_resource("11_Camping_16x16.png");
+  a->add_resource("Modern_Exteriors_Characters_Scout_16x16_1.png");
 
   // Components
   a->add_unit<mod>("chunk");

@@ -16,9 +16,16 @@ public:
     tilemap::map map = prefabs::island_0;
     map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 1, 0, 0);
 
+    sprite spr{
+        .pos = {8, 8, 1, 2},
+        .uv = {0, 0, 1, 2},
+    };
+    m_ec.player_sprites.add(m_ec.e.alloc(), spr);
+
     q->center_at(8, 8);
     q->set_grid(6, 6);
     q->fill_sprites(m_ec.sprites);
+    q->fill_player_sprites(m_ec.player_sprites);
   }
 };
 
