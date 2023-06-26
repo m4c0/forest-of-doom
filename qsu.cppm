@@ -14,19 +14,17 @@ export class main {
 
   quack::renderer m_r{2};
   quack::ilayout m_spr{&m_r, max_sprites};
-  quack::ilayout m_ui_spr{&m_r, max_sprites};
   quack::mouse_tracker m_mouse{};
   float m_atlas_w;
   float m_atlas_h;
 
   void setup() {
     m_spr.set_grid(4, 4);
-    m_ui_spr.set_grid(800, 600);
     stbi::load_from_resource("11_Camping_16x16.png")
         .map([this](const auto &img) {
           m_atlas_w = img.width;
           m_atlas_h = img.height;
-          m_r.load_atlas(img.width, img.height, [&img](auto *p) {
+          m_spr.batch()->load_atlas(img.width, img.height, [&img](auto *p) {
             const auto pixies = img.width * img.height;
             const auto data = reinterpret_cast<const decltype(p)>(*img.data);
             for (auto i = 0; i < pixies; i++) {
@@ -73,7 +71,6 @@ public:
   void process_event(const casein::event &e) {
     m_r.process_event(e);
     m_spr.process_event(e);
-    m_ui_spr.process_event(e);
     m_mouse.process_event(e);
 
     if (e.type() == casein::CREATE_WINDOW)
@@ -86,13 +83,7 @@ public:
   [[nodiscard]] auto mouse_pos() const noexcept {
     return m_mouse.current_mouse_pos(m_spr.batch());
   }
-  [[nodiscard]] auto ui_mouse_pos() const noexcept {
-    return m_mouse.current_mouse_pos(m_ui_spr.batch());
-  }
 
   void fill_sprites(const sprite::compo &set) { fill(m_spr.batch(), set); }
-  void fill_ui_sprites(const sprite::compo &set) {
-    fill(m_ui_spr.batch(), set);
-  }
 };
 } // namespace qsu
