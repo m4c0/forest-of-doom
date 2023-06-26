@@ -22,8 +22,8 @@ public:
     };
     m_ec.player_sprites.add(m_ec.e.alloc(), spr);
 
-    q->center_at(8, 8);
-    q->set_grid(6, 6);
+    q->center_at(8.5, 9.25);
+    q->set_grid(8, 8);
     q->fill_sprites(m_ec.sprites);
     q->fill_player_sprites(m_ec.player_sprites);
   }

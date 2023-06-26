@@ -20,7 +20,7 @@ export constexpr const tilemap::map island_0 = [] {
   res.set(12, 0, static_cast<tile>(0x05030101));
   res.set(13, 0, static_cast<tile>(0x05030101));
   res.set(14, 0, static_cast<tile>(0x05030101));
-  res.set(15, 0, static_cast<tile>(0x05030101));
+  res.set(15, 0, static_cast<tile>(0x00000000));
   res.set(0, 1, static_cast<tile>(0x05030101));
   res.set(1, 1, static_cast<tile>(0x05030101));
   res.set(2, 1, static_cast<tile>(0x00010101));
@@ -98,7 +98,7 @@ export constexpr const tilemap::map island_0 = [] {
   res.set(10, 5, static_cast<tile>(0x01020101));
   res.set(11, 5, static_cast<tile>(0x01020101));
   res.set(12, 5, static_cast<tile>(0x00000000));
-  res.set(13, 5, static_cast<tile>(0x05030101));
+  res.set(13, 5, static_cast<tile>(0x00000000));
   res.set(14, 5, static_cast<tile>(0x05030101));
   res.set(15, 5, static_cast<tile>(0x05030101));
   res.set(0, 6, static_cast<tile>(0x05030101));
@@ -159,7 +159,7 @@ export constexpr const tilemap::map island_0 = [] {
   res.set(7, 9, static_cast<tile>(0x01020101));
   res.set(8, 9, static_cast<tile>(0x01020101));
   res.set(9, 9, static_cast<tile>(0x00000000));
-  res.set(10, 9, static_cast<tile>(0x05030101));
+  res.set(10, 9, static_cast<tile>(0x00000000));
   res.set(11, 9, static_cast<tile>(0x00000000));
   res.set(12, 9, static_cast<tile>(0x02020101));
   res.set(13, 9, static_cast<tile>(0x01020101));
@@ -227,7 +227,7 @@ export constexpr const tilemap::map island_0 = [] {
   res.set(11, 13, static_cast<tile>(0x01020101));
   res.set(12, 13, static_cast<tile>(0x02020101));
   res.set(13, 13, static_cast<tile>(0x00000000));
-  res.set(14, 13, static_cast<tile>(0x05030101));
+  res.set(14, 13, static_cast<tile>(0x00000000));
   res.set(15, 13, static_cast<tile>(0x05030101));
   res.set(0, 14, static_cast<tile>(0x05030101));
   res.set(1, 14, static_cast<tile>(0x05030101));
