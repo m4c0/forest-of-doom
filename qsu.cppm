@@ -1,5 +1,6 @@
 export module qsu;
 import casein;
+import jute;
 import pog;
 import quack;
 import silog;
@@ -17,8 +18,8 @@ class layer {
 public:
   layer(quack::renderer *m_r, unsigned max_sprites) : m_spr{m_r, max_sprites} {}
 
-  void setup() {
-    stbi::load_from_resource("11_Camping_16x16.png")
+  void setup(jute::view atlas) {
+    stbi::load_from_resource(atlas)
         .map([this](const auto &img) {
           m_atlas_w = img.width;
           m_atlas_h = img.height;
@@ -69,32 +70,42 @@ public:
   [[nodiscard]] constexpr auto &operator*() const noexcept { return m_spr; }
 };
 export class main {
+  static constexpr const auto max_player_sprites = 16;
   static constexpr const auto max_sprites = 1024;
   static constexpr const auto no_sprite = max_sprites + 1;
 
   quack::renderer m_r{2};
   layer m_spr{&m_r, max_sprites};
+  layer m_player{&m_r, max_player_sprites};
   quack::mouse_tracker m_mouse{};
-
-  void setup() { m_spr.setup(); }
 
 public:
   void process_event(const casein::event &e) {
     m_r.process_event(e);
     (*m_spr).process_event(e);
+    (*m_player).process_event(e);
     m_mouse.process_event(e);
 
-    if (e.type() == casein::CREATE_WINDOW)
-      setup();
+    if (e.type() == casein::CREATE_WINDOW) {
+      m_spr.setup("11_Camping_16x16.png");
+      m_player.setup("Modern_Exteriors_Characters_Scout_16x16_1.png");
+    }
   }
 
-  void center_at(float x, float y) { (*m_spr)->center_at(x, y); }
-  void set_grid(float w, float h) { (*m_spr)->set_grid(w, h); }
+  void center_at(float x, float y) {
+    (*m_spr)->center_at(x, y);
+    (*m_player)->center_at(x, y);
+  }
+  void set_grid(float w, float h) {
+    (*m_spr)->set_grid(w, h);
+    (*m_player)->set_grid(w, h);
+  }
 
   [[nodiscard]] auto mouse_pos() const noexcept {
     return m_mouse.current_mouse_pos(&**m_spr);
   }
 
   void fill_sprites(const sprite::compo &set) { m_spr.fill(set); }
+  void fill_player_sprites(const sprite::compo &set) { m_player.fill(set); }
 };
 } // namespace qsu
