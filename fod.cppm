@@ -2,6 +2,7 @@ export module fod;
 
 import casein;
 import ecs;
+import prefabs;
 import qsu;
 import sprite;
 import tile;
@@ -12,10 +13,11 @@ class game {
 
 public:
   void setup(qsu::main *q) {
-    tilemap::map map{};
+    tilemap::map map = prefabs::island_0;
     map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 1, 0, 0);
 
-    q->center_at(2, 2);
+    q->center_at(8, 8);
+    q->set_grid(6, 6);
     q->fill_sprites(m_ec.sprites);
   }
 };
