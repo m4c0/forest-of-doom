@@ -9,9 +9,15 @@ export enum side {
   p_left,
   p_down,
 };
+export struct anim {
+  unsigned start_x;
+  unsigned y;
+  unsigned num_frames;
+  unsigned ticks{};
+};
 export struct c {
   side side;
-  unsigned anim_ticks{};
+  anim anim;
 };
 
 export using compo = pog::singleton<c>;
@@ -26,18 +32,23 @@ export void add_entity(compos *ec) {
       .pos = {8, 8, 1, 2},
       .uv = {0, 2, 1, 2},
   };
+  anim a{
+      .start_x = 0,
+      .y = 0,
+      .num_frames = 1,
+  };
   auto pid = ec->e().alloc();
-  ec->player().set(pid, {});
+  ec->player().set(pid, {.anim = a});
   ec->player_sprites().add(pid, spr);
 }
 
 void update_sprite(pog::eid pid, const c &p, sprite::compo &sprites) {
   constexpr const auto ticks_per_frame = 10;
-  constexpr const auto anim_frames = 6;
 
   auto spr = sprites.get(pid);
-  spr.uv.x = static_cast<int>(p.side) * anim_frames +
-             ((p.anim_ticks / ticks_per_frame) % anim_frames);
+  spr.uv.x =
+      p.anim.start_x + ((p.anim.ticks / ticks_per_frame) % p.anim.num_frames);
+  spr.uv.y = p.anim.y;
   sprites.update(pid, spr);
 }
 
@@ -45,6 +56,12 @@ export void set_side(compos *ec, side s) {
   auto pid = ec->player().get_id();
   auto p = ec->player().get(pid);
   p.side = s;
+  p.anim = {
+      .start_x = static_cast<unsigned>(p.side) * 6,
+      .y = 2,
+      .num_frames = 6,
+      .ticks = 0,
+  };
   ec->player().set(pid, p);
 
   update_sprite(pid, p, ec->player_sprites());
@@ -53,7 +70,7 @@ export void set_side(compos *ec, side s) {
 export void update_animation(compos *ec) {
   auto pid = ec->player().get_id();
   auto p = ec->player().get(pid);
-  p.anim_ticks++;
+  p.anim.ticks++;
   ec->player().set(pid, p);
 
   update_sprite(pid, p, ec->player_sprites());
