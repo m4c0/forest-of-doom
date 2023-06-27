@@ -11,6 +11,7 @@ export enum side {
 };
 export struct c {
   side side;
+  unsigned anim_ticks{};
 };
 
 export using compo = pog::singleton<c>;
@@ -23,11 +24,21 @@ export struct compos {
 export void add_entity(compos *ec) {
   sprite spr{
       .pos = {8, 8, 1, 2},
-      .uv = {0, 0, 1, 2},
+      .uv = {0, 2, 1, 2},
   };
   auto pid = ec->e().alloc();
   ec->player().set(pid, {});
   ec->player_sprites().add(pid, spr);
+}
+
+void update_sprite(pog::eid pid, const c &p, sprite::compo &sprites) {
+  constexpr const auto ticks_per_frame = 10;
+  constexpr const auto anim_frames = 6;
+
+  auto spr = sprites.get(pid);
+  spr.uv.x = static_cast<int>(p.side) * anim_frames +
+             ((p.anim_ticks / ticks_per_frame) % anim_frames);
+  sprites.update(pid, spr);
 }
 
 export void set_side(compos *ec, side s) {
@@ -36,15 +47,15 @@ export void set_side(compos *ec, side s) {
   p.side = s;
   ec->player().set(pid, p);
 
-  auto spr = ec->player_sprites().get(pid);
-  spr.uv.x = static_cast<int>(p.side);
-  ec->player_sprites().update(pid, spr);
+  update_sprite(pid, p, ec->player_sprites());
 }
 
 export void update_animation(compos *ec) {
   auto pid = ec->player().get_id();
   auto p = ec->player().get(pid);
-  auto s = static_cast<side>((p.side + 1) % 4);
-  set_side(ec, s);
+  p.anim_ticks++;
+  ec->player().set(pid, p);
+
+  update_sprite(pid, p, ec->player_sprites());
 }
 } // namespace player
