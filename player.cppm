@@ -34,8 +34,8 @@ export void add_entity(compos *ec) {
   };
   anim a{
       .start_x = 0,
-      .y = 0,
-      .num_frames = 1,
+      .y = 2,
+      .num_frames = 6,
   };
   auto pid = ec->e().alloc();
   ec->player().set(pid, {.anim = a});
@@ -56,12 +56,7 @@ export void set_side(compos *ec, side s) {
   auto pid = ec->player().get_id();
   auto p = ec->player().get(pid);
   p.side = s;
-  p.anim = {
-      .start_x = static_cast<unsigned>(p.side) * 6,
-      .y = 2,
-      .num_frames = 6,
-      .ticks = 0,
-  };
+  p.anim.start_x = static_cast<unsigned>(p.side) * p.anim.num_frames;
   ec->player().set(pid, p);
 
   update_sprite(pid, p, ec->player_sprites());
