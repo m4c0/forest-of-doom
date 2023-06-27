@@ -13,8 +13,8 @@ class game {
   qsu::main *m_q;
   ecs::ec m_ec{};
 
-  void update_player_sprite(float x) {
-    player::update_sprite(&m_ec, x);
+  void update_player_sprite(player::side x) {
+    player::set_side(&m_ec, x);
     m_q->fill_player_sprites(m_ec.player_sprites());
   }
 
@@ -33,10 +33,10 @@ public:
     m_q = q;
   }
 
-  void right() { update_player_sprite(0); }
-  void up() { update_player_sprite(1); }
-  void left() { update_player_sprite(2); }
-  void down() { update_player_sprite(3); }
+  void right() { update_player_sprite(player::p_right); }
+  void up() { update_player_sprite(player::p_up); }
+  void left() { update_player_sprite(player::p_left); }
+  void down() { update_player_sprite(player::p_down); }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
