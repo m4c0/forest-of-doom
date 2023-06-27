@@ -2,6 +2,7 @@ export module fod;
 
 import casein;
 import ecs;
+import player;
 import prefabs;
 import qsu;
 import sprite;
@@ -13,10 +14,7 @@ class game {
   ecs::ec m_ec{};
 
   void update_player_sprite(float x) {
-    auto pid = m_ec.player.get_id();
-    auto spr = m_ec.player_sprites.get(pid);
-    spr.uv.x = x;
-    m_ec.player_sprites.update(pid, spr);
+    player::update_sprite(&m_ec.player, &m_ec.player_sprites, x);
     m_q->fill_player_sprites(m_ec.player_sprites);
   }
 
@@ -25,13 +23,7 @@ public:
     tilemap::map map = prefabs::island_0;
     map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 1, 0, 0);
 
-    sprite spr{
-        .pos = {8, 8, 1, 2},
-        .uv = {0, 0, 1, 2},
-    };
-    auto pid = m_ec.e.alloc();
-    m_ec.player.set(pid, {});
-    m_ec.player_sprites.add(pid, spr);
+    player::add_entity(&m_ec.e, &m_ec.player, &m_ec.player_sprites);
 
     q->center_at(8.5, 9.25);
     q->set_grid(8, 8);
