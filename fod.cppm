@@ -19,18 +19,18 @@ class game {
   }
 
 public:
-  void setup(qsu::main *q) {
+  explicit constexpr game(qsu::main *q) : m_q{q} {}
+
+  void setup() {
     tilemap::map map = prefabs::island_0;
     map.add_entities(&m_ec, 1, 0, 0);
 
     player::add_entity(&m_ec);
 
-    q->center_at(8.5, 9.25);
-    q->set_grid(8, 8);
-    q->fill_sprites(m_ec.sprites());
-    q->fill_player_sprites(m_ec.player_sprites());
-
-    m_q = q;
+    m_q->center_at(8.5, 9.25);
+    m_q->set_grid(8, 8);
+    m_q->fill_sprites(m_ec.sprites());
+    m_q->fill_player_sprites(m_ec.player_sprites());
   }
 
   void right() { update_player_sprite(player::p_right); }
@@ -41,7 +41,7 @@ public:
 
 extern "C" void casein_handle(const casein::event &e) {
   static qsu::main q{};
-  static game gg{};
+  static game gg{&q};
 
   static constexpr const auto k_map = [] {
     casein::key_map res{};
@@ -53,7 +53,7 @@ extern "C" void casein_handle(const casein::event &e) {
   }();
   static constexpr const auto map = [] {
     casein::event_map res{};
-    res[casein::CREATE_WINDOW] = [](auto) { gg.setup(&q); };
+    res[casein::CREATE_WINDOW] = [](auto) { gg.setup(); };
     res[casein::KEY_DOWN] = [](auto e) { k_map.handle(e); };
     return res;
   }();
