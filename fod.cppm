@@ -14,7 +14,7 @@ class game {
   ecs::ec m_ec{};
 
   void update_player_sprite(float x) {
-    player::update_sprite(&m_ec.player(), &m_ec.player_sprites(), x);
+    player::update_sprite(&m_ec, x);
     m_q->fill_player_sprites(m_ec.player_sprites());
   }
 
@@ -23,7 +23,7 @@ public:
     tilemap::map map = prefabs::island_0;
     map.add_entities(&m_ec, 1, 0, 0);
 
-    player::add_entity(&m_ec.e(), &m_ec.player(), &m_ec.player_sprites());
+    player::add_entity(&m_ec);
 
     q->center_at(8.5, 9.25);
     q->set_grid(8, 8);
