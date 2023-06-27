@@ -33,6 +33,11 @@ public:
     m_q->fill_player_sprites(m_ec.player_sprites());
   }
 
+  void tick() {
+    player::update_animation(&m_ec);
+    m_q->fill_player_sprites(m_ec.player_sprites());
+  }
+
   void right() { update_player_sprite(player::p_right); }
   void up() { update_player_sprite(player::p_up); }
   void left() { update_player_sprite(player::p_left); }
@@ -55,6 +60,7 @@ extern "C" void casein_handle(const casein::event &e) {
     casein::event_map res{};
     res[casein::CREATE_WINDOW] = [](auto) { gg.setup(); };
     res[casein::KEY_DOWN] = [](auto e) { k_map.handle(e); };
+    res[casein::REPAINT] = [](auto) { gg.tick(); };
     return res;
   }();
 

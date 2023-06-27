@@ -40,4 +40,11 @@ export void set_side(compos *ec, side s) {
   spr.uv.x = static_cast<int>(p.side);
   ec->player_sprites().update(pid, spr);
 }
+
+export void update_animation(compos *ec) {
+  auto pid = ec->player().get_id();
+  auto p = ec->player().get(pid);
+  auto s = static_cast<side>((p.side + 1) % 4);
+  set_side(ec, s);
+}
 } // namespace player
