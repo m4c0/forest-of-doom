@@ -8,6 +8,10 @@ export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
+struct compos : tiles::compos {
+  virtual chunk::compo &chunks() noexcept = 0;
+};
+
 class map {
   tile m_data[height][width]{};
 
@@ -32,16 +36,16 @@ public:
     m_data[y][x] = t;
   }
 
-  void add_entities(tiles::builder tb, chunk::compo *c, chunk::c chunk,
-                    float dx, float dy) const noexcept {
+  void add_entities(compos *ec, chunk::c chunk, float dx,
+                    float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto t = m_data[y][x];
         if (t == blank)
           continue;
 
-        auto e = tiles::add_tile(tb, t, x + dx, y + dy);
-        c->add(e, chunk);
+        auto e = tiles::add_tile(ec, t, x + dx, y + dy);
+        ec->chunks().add(e, chunk);
       }
     }
   }

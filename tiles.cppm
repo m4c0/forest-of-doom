@@ -5,6 +5,11 @@ import sprite;
 import tile;
 
 namespace tiles {
+export struct compos {
+  virtual pog::entity_list &e() noexcept = 0;
+  virtual sprite::compo &sprites() noexcept = 0;
+};
+
 export constexpr rect tile_uv(tile t) {
   auto ut = static_cast<unsigned>(t);
   return rect{
@@ -15,30 +20,26 @@ export constexpr rect tile_uv(tile t) {
   };
 }
 
-export struct builder {
-  pog::entity_list *e;
-  sprite::compo *sprites;
-};
-export pog::eid add_tile(tiles::builder b, tile t, float x, float y) {
+export pog::eid add_tile(compos *ec, tile t, float x, float y) {
   auto uv = tile_uv(t);
   sprite spr{
       .pos = {x, y, uv.w, uv.h},
       .uv = uv,
   };
 
-  auto id = b.e->alloc();
-  b.sprites->add(id, spr);
+  auto id = ec->e().alloc();
+  ec->sprites().add(id, spr);
   return id;
 }
-export void update_tile(pog::eid id, sprite::compo *sprites, tile t) {
-  auto spr = sprites->get(id);
+export void update_tile(pog::eid id, compos *ec, tile t) {
+  auto spr = ec->sprites().get(id);
   spr.uv = tile_uv(t);
   spr.pos.w = spr.uv.w;
   spr.pos.h = spr.uv.h;
-  sprites->update(id, spr);
+  ec->sprites().update(id, spr);
 }
-export void remove_tile(pog::eid id, tiles::builder b) {
-  b.sprites->remove(id);
-  b.e->dealloc(id);
+export void remove_tile(pog::eid id, compos *ec) {
+  ec->sprites().remove(id);
+  ec->e().dealloc(id);
 }
 } // namespace tiles

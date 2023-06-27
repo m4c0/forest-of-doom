@@ -48,17 +48,17 @@ class game {
   palette<3> m_land_pal{grass_0, grass_1, water};
 
   void update_sprites() {
-    m_ec.chunks.remove_if([this](auto cid, auto eid) {
+    m_ec.chunks().remove_if([this](auto cid, auto eid) {
       if (cid != 1)
         return false;
 
-      tiles::remove_tile(eid, {&m_ec.e, &m_ec.sprites});
+      tiles::remove_tile(eid, &m_ec);
       return true;
     });
-    m_map.add_entities({&m_ec.e, &m_ec.sprites}, &m_ec.chunks, 1, 0, 0);
+    m_map.add_entities(&m_ec, 1, 0, 0);
 
-    sort_sprites(m_ec.sprites);
-    m_q->fill_sprites(m_ec.sprites);
+    sort_sprites(m_ec.sprites());
+    m_q->fill_sprites(m_ec.sprites());
   }
 
   void flood_fill(auto x, auto y, tile old) {
@@ -81,15 +81,15 @@ public:
     q->set_grid(tilemap::width, tilemap::height);
     q->center_at(tilemap::width / 2, tilemap::height / 2);
 
-    cursor::add_entity(&m_ec.e, &m_ec.cursor, &m_ec.sprites);
+    cursor::add_entity(&m_ec.e(), &m_ec.cursor(), &m_ec.sprites());
     set_brush(grass_0);
     update_sprites();
   }
 
   void set_brush(tile t) {
     m_brush = t;
-    tiles::update_tile(m_ec.cursor.get_id(), &m_ec.sprites, t);
-    m_q->fill_sprites(m_ec.sprites);
+    tiles::update_tile(m_ec.cursor().get_id(), &m_ec, t);
+    m_q->fill_sprites(m_ec.sprites());
   }
 
   void next_island_brush() {
@@ -115,8 +115,8 @@ public:
 
   void mouse_moved() {
     auto [x, y] = m_q->mouse_pos();
-    cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
-    m_q->fill_sprites(m_ec.sprites);
+    cursor::update(&m_ec.cursor(), &m_ec.sprites(), x, y);
+    m_q->fill_sprites(m_ec.sprites());
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();
@@ -130,7 +130,7 @@ public:
         m_map.set(x + dx, y + dy, blank);
       }
     }
-    cursor::update(&m_ec.cursor, &m_ec.sprites, x, y);
+    cursor::update(&m_ec.cursor(), &m_ec.sprites(), x, y);
     update_sprites();
   }
 
