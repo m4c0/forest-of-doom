@@ -81,7 +81,7 @@ public:
     q->set_grid(tilemap::width, tilemap::height);
     q->center_at(tilemap::width / 2, tilemap::height / 2);
 
-    cursor::add_entity(&m_ec.e(), &m_ec.cursor(), &m_ec.sprites());
+    cursor::add_entity(&m_ec);
     set_brush(grass_0);
     update_sprites();
   }
@@ -115,7 +115,7 @@ public:
 
   void mouse_moved() {
     auto [x, y] = m_q->mouse_pos();
-    cursor::update(&m_ec.cursor(), &m_ec.sprites(), x, y);
+    cursor::update(&m_ec, x, y);
     m_q->fill_sprites(m_ec.sprites());
   }
   void mouse_down() {
@@ -130,7 +130,7 @@ public:
         m_map.set(x + dx, y + dy, blank);
       }
     }
-    cursor::update(&m_ec.cursor(), &m_ec.sprites(), x, y);
+    cursor::update(&m_ec, x, y);
     update_sprites();
   }
 
