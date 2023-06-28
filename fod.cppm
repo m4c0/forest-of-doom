@@ -34,13 +34,11 @@ public:
   }
 
   void idle(player::side s) {
-    player::set_side(&m_ec, s);
-    player::set_idle_animation(&m_ec);
+    player::set_idle_animation(&m_ec, s);
     m_q->fill_player_sprites(m_ec.player_sprites());
   }
   void walk(player::side s) {
-    player::set_side(&m_ec, s);
-    player::set_walk_animation(&m_ec);
+    player::set_walk_animation(&m_ec, s);
     m_q->fill_player_sprites(m_ec.player_sprites());
   }
 };

@@ -42,48 +42,38 @@ export void add_entity(compos *ec) {
   ec->player_sprites().add(pid, spr);
 }
 
-void update_sprite(pog::eid pid, const c &p, sprite::compo &sprites) {
+void update_sprite(pog::eid pid, const anim &a, sprite::compo &sprites) {
   constexpr const auto ticks_per_frame = 10;
 
   auto spr = sprites.get(pid);
-  spr.uv.x =
-      p.anim.start_x + ((p.anim.ticks / ticks_per_frame) % p.anim.num_frames);
-  spr.uv.y = p.anim.y;
+  spr.uv.x = a.start_x + ((a.ticks / ticks_per_frame) % a.num_frames);
+  spr.uv.y = a.y;
   sprites.update(pid, spr);
 }
 
-export void set_side(compos *ec, side s) {
+void update_compo(compos *ec, side s, anim a) {
   auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-  p.side = s;
-  p.anim.start_x = static_cast<unsigned>(p.side) * p.anim.num_frames;
-  ec->player().set(pid, p);
-
-  update_sprite(pid, p, ec->player_sprites());
+  ec->player().set(pid, {s, a});
+  update_sprite(pid, a, ec->player_sprites());
 }
-export void set_idle_animation(compos *ec) {
-  constexpr const auto num_frames = 6;
 
-  auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-  p.anim = {
-      .start_x = static_cast<unsigned>(p.side) * num_frames,
-      .y = 2,
-      .num_frames = num_frames,
-  };
-  ec->player().set(pid, p);
+export void set_idle_animation(compos *ec, side s) {
+  constexpr const auto num_frames = 6;
+  update_compo(ec, s,
+               {
+                   .start_x = static_cast<unsigned>(s) * num_frames,
+                   .y = 2,
+                   .num_frames = num_frames,
+               });
 }
-export void set_walk_animation(compos *ec) {
+export void set_walk_animation(compos *ec, side s) {
   constexpr const auto num_frames = 6;
-
-  auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-  p.anim = {
-      .start_x = static_cast<unsigned>(p.side) * num_frames,
-      .y = 4,
-      .num_frames = num_frames,
-  };
-  ec->player().set(pid, p);
+  update_compo(ec, s,
+               {
+                   .start_x = static_cast<unsigned>(s) * num_frames,
+                   .y = 4,
+                   .num_frames = num_frames,
+               });
 }
 
 export void update_animation(compos *ec) {
@@ -92,6 +82,6 @@ export void update_animation(compos *ec) {
   p.anim.ticks++;
   ec->player().set(pid, p);
 
-  update_sprite(pid, p, ec->player_sprites());
+  update_sprite(pid, p.anim, ec->player_sprites());
 }
 } // namespace player
