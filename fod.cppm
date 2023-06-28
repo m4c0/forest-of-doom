@@ -4,6 +4,7 @@ import animation;
 import casein;
 import ecs;
 import input;
+import movement;
 import player;
 import prefabs;
 import qsu;
@@ -27,6 +28,7 @@ public:
 
   void tick() {
     animation::update_animes(m_ec.animations(), m_ec.player_sprites());
+    movement::update_sprites(m_ec.movements(), m_ec.player_sprites());
     m_q.fill_player_sprites(m_ec.player_sprites());
   }
 
