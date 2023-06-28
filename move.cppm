@@ -1,7 +1,7 @@
 export module move;
 import pog;
 
-namespace move {
+export namespace move {
 struct c {
   float sx;
   float sy;

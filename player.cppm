@@ -1,6 +1,7 @@
 export module player;
 import anime;
 import input;
+import move;
 import pog;
 import sprite;
 
@@ -20,6 +21,7 @@ export struct compos {
   virtual pog::entity_list &e() noexcept = 0;
   virtual compo &player() noexcept = 0;
   virtual anime::compo &animations() noexcept = 0;
+  virtual move::compo &movements() noexcept = 0;
   virtual sprite::compo &player_sprites() noexcept = 0;
 };
 
@@ -37,6 +39,7 @@ export void add_entity(compos *ec) {
   ec->player().set(pid, {});
   ec->player_sprites().add(pid, spr);
   ec->animations().add(pid, a);
+  ec->movements().add(pid, {});
 }
 
 void update_compo(compos *ec, side s, unsigned y, unsigned num_frames) {
@@ -64,6 +67,9 @@ void set_walk_animation(compos *ec, side s) {
 }
 
 export void process_input(input::dual_axis in, compos *ec) {
+  constexpr const auto speed = 1.0f;
+
+  auto pid = ec->player().get_id();
   auto h = in.h_value();
   auto v = in.v_value();
   if (v != 0) {
@@ -73,5 +79,6 @@ export void process_input(input::dual_axis in, compos *ec) {
   } else {
     set_idle_animation(ec);
   }
+  ec->movements().update(pid, {h * speed, v * speed});
 }
 } // namespace player
