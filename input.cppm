@@ -1,7 +1,7 @@
 export module input;
 import casein;
 
-namespace input {
+export namespace input {
 template <casein::keys N, casein::keys P> class axis {
   bool m_n{};
   bool m_p{};

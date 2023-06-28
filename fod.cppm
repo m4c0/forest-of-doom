@@ -2,6 +2,7 @@ export module fod;
 
 import casein;
 import ecs;
+import input;
 import player;
 import prefabs;
 import qsu;
@@ -10,11 +11,8 @@ class game {
   qsu::main m_q{};
   ecs::ec m_ec{};
   input::dual_axis m_input;
-  unsigned m_arrows_down{};
 
 public:
-  explicit constexpr game() {}
-
   void setup() {
     prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
 
@@ -31,16 +29,17 @@ public:
     m_q.fill_player_sprites(m_ec.player_sprites());
   }
 
-  void key_up(player::side s) {
-    if (--m_arrows_down > 0)
-      return;
-
-    player::set_idle_animation(&m_ec, s);
-    m_q.fill_player_sprites(m_ec.player_sprites());
-  }
-  void key_down(player::side s) {
-    ++m_arrows_down;
-    player::set_walk_animation(&m_ec, s);
+  void key_changed() {
+    auto h = m_input.h_value();
+    auto v = m_input.v_value();
+    if (v != 0) {
+      player::set_walk_animation(&m_ec, v > 0 ? player::p_down : player::p_up);
+    } else if (h != 0) {
+      player::set_walk_animation(&m_ec,
+                                 h > 0 ? player::p_right : player::p_left);
+    } else {
+      player::set_idle_animation(&m_ec, player::p_down);
+    }
     m_q.fill_player_sprites(m_ec.player_sprites());
   }
 
@@ -55,6 +54,10 @@ public:
     case casein::REPAINT:
       tick();
       break;
+    case casein::KEY_DOWN:
+    case casein::KEY_UP:
+      key_changed();
+      break;
     default:
       break;
     }
@@ -63,30 +66,5 @@ public:
 
 extern "C" void casein_handle(const casein::event &e) {
   static game gg{};
-
-  static constexpr const auto kd_map = [] {
-    casein::key_map res{};
-    res[casein::K_DOWN] = [](auto) { gg.key_down(player::p_down); };
-    res[casein::K_LEFT] = [](auto) { gg.key_down(player::p_left); };
-    res[casein::K_RIGHT] = [](auto) { gg.key_down(player::p_right); };
-    res[casein::K_UP] = [](auto) { gg.key_down(player::p_up); };
-    return res;
-  }();
-  static constexpr const auto ku_map = [] {
-    casein::key_map res{};
-    res[casein::K_DOWN] = [](auto) { gg.key_up(player::p_down); };
-    res[casein::K_LEFT] = [](auto) { gg.key_up(player::p_left); };
-    res[casein::K_RIGHT] = [](auto) { gg.key_up(player::p_right); };
-    res[casein::K_UP] = [](auto) { gg.key_up(player::p_up); };
-    return res;
-  }();
-  static constexpr const auto map = [] {
-    casein::event_map res{};
-    res[casein::KEY_DOWN] = [](auto e) { kd_map.handle(e); };
-    res[casein::KEY_UP] = [](auto e) { ku_map.handle(e); };
-    return res;
-  }();
-
   gg.process_event(e);
-  map.handle(e);
 }
