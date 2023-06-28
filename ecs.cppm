@@ -1,4 +1,5 @@
 export module ecs;
+import anime;
 import chunk;
 import cursor;
 import pog;
@@ -14,6 +15,7 @@ export class ec : public cursor::compos,
                   public tilemap::compos {
   pog::entity_list m_e{max_entities};
 
+  anime::compo m_animations{16, max_entities};
   chunk::compo m_chunks{max_entities};
   cursor::compo m_cursor{};
   player::compo m_player{};
@@ -23,6 +25,7 @@ export class ec : public cursor::compos,
 public:
   pog::entity_list &e() noexcept override { return m_e; }
 
+  anime::compo &animations() noexcept override { return m_animations; }
   chunk::compo &chunks() noexcept override { return m_chunks; }
   cursor::compo &cursor() noexcept override { return m_cursor; }
   player::compo &player() noexcept override { return m_player; }

@@ -1,4 +1,5 @@
 export module player;
+import anime;
 import pog;
 import sprite;
 
@@ -9,21 +10,15 @@ export enum side {
   p_left,
   p_down,
 };
-export struct anim {
-  unsigned start_x;
-  unsigned y;
-  unsigned num_frames;
-  unsigned ticks{};
-};
 export struct c {
   side side;
-  anim anim;
 };
 
 export using compo = pog::singleton<c>;
 export struct compos {
   virtual pog::entity_list &e() noexcept = 0;
   virtual compo &player() noexcept = 0;
+  virtual anime::compo &animations() noexcept = 0;
   virtual sprite::compo &player_sprites() noexcept = 0;
 };
 
@@ -32,29 +27,21 @@ export void add_entity(compos *ec) {
       .pos = {8, 8, 1, 2},
       .uv = {0, 2, 1, 2},
   };
-  anim a{
+  anime::c a{
       .start_x = 0,
       .y = 0,
       .num_frames = 1,
   };
   auto pid = ec->e().alloc();
-  ec->player().set(pid, {.anim = a});
+  ec->player().set(pid, {});
   ec->player_sprites().add(pid, spr);
+  ec->animations().add(pid, a);
 }
 
-void update_sprite(pog::eid pid, const anim &a, sprite::compo &sprites) {
-  constexpr const auto ticks_per_frame = 10;
-
-  auto spr = sprites.get(pid);
-  spr.uv.x = a.start_x + ((a.ticks / ticks_per_frame) % a.num_frames);
-  spr.uv.y = a.y;
-  sprites.update(pid, spr);
-}
-
-void update_compo(compos *ec, side s, anim a) {
+void update_compo(compos *ec, side s, anime::c a) {
   auto pid = ec->player().get_id();
-  ec->player().set(pid, {s, a});
-  update_sprite(pid, a, ec->player_sprites());
+  ec->player().set(pid, {s});
+  ec->animations().update(pid, a);
 }
 
 export void set_idle_animation(compos *ec, side s) {
@@ -74,14 +61,5 @@ export void set_walk_animation(compos *ec, side s) {
                    .y = 4,
                    .num_frames = num_frames,
                });
-}
-
-export void update_animation(compos *ec) {
-  auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-  p.anim.ticks++;
-  ec->player().set(pid, p);
-
-  update_sprite(pid, p.anim, ec->player_sprites());
 }
 } // namespace player

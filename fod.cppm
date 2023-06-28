@@ -1,5 +1,6 @@
 export module fod;
 
+import animation;
 import casein;
 import ecs;
 import input;
@@ -25,7 +26,7 @@ public:
   }
 
   void tick() {
-    player::update_animation(&m_ec);
+    animation::update_animes(m_ec.animations(), m_ec.player_sprites());
     m_q.fill_player_sprites(m_ec.player_sprites());
   }
 

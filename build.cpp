@@ -24,6 +24,7 @@ auto base_app(const char *name) {
   a->add_resource("Modern_Exteriors_Characters_Scout_16x16_1.png");
 
   // Components
+  a->add_unit<mod>("anime");
   a->add_unit<mod>("chunk");
   a->add_unit<mod>("rect");
   a->add_unit<mod>("tile");
@@ -32,6 +33,7 @@ auto base_app(const char *name) {
   a->add_unit<mod>("sprite");
 
   // Systems
+  a->add_unit<mod>("animation");
   a->add_unit<mod>("cursor");
   a->add_unit<mod>("player");
   a->add_unit<mod>("qsu");
