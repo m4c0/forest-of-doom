@@ -13,12 +13,6 @@ class game {
   qsu::main *m_q;
   ecs::ec m_ec{};
 
-  void update_player_sprite(player::side x) {
-    player::set_side(&m_ec, x);
-    player::set_idle_animation(&m_ec);
-    m_q->fill_player_sprites(m_ec.player_sprites());
-  }
-
 public:
   explicit constexpr game(qsu::main *q) : m_q{q} {}
 
@@ -39,28 +33,43 @@ public:
     m_q->fill_player_sprites(m_ec.player_sprites());
   }
 
-  void right() { update_player_sprite(player::p_right); }
-  void up() { update_player_sprite(player::p_up); }
-  void left() { update_player_sprite(player::p_left); }
-  void down() { update_player_sprite(player::p_down); }
+  void idle(player::side s) {
+    player::set_side(&m_ec, s);
+    player::set_idle_animation(&m_ec);
+    m_q->fill_player_sprites(m_ec.player_sprites());
+  }
+  void walk(player::side s) {
+    player::set_side(&m_ec, s);
+    player::set_walk_animation(&m_ec);
+    m_q->fill_player_sprites(m_ec.player_sprites());
+  }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
   static qsu::main q{};
   static game gg{&q};
 
-  static constexpr const auto k_map = [] {
+  static constexpr const auto kd_map = [] {
     casein::key_map res{};
-    res[casein::K_DOWN] = [](auto) { gg.down(); };
-    res[casein::K_LEFT] = [](auto) { gg.left(); };
-    res[casein::K_RIGHT] = [](auto) { gg.right(); };
-    res[casein::K_UP] = [](auto) { gg.up(); };
+    res[casein::K_DOWN] = [](auto) { gg.walk(player::p_down); };
+    res[casein::K_LEFT] = [](auto) { gg.walk(player::p_left); };
+    res[casein::K_RIGHT] = [](auto) { gg.walk(player::p_right); };
+    res[casein::K_UP] = [](auto) { gg.walk(player::p_up); };
+    return res;
+  }();
+  static constexpr const auto ku_map = [] {
+    casein::key_map res{};
+    res[casein::K_DOWN] = [](auto) { gg.idle(player::p_down); };
+    res[casein::K_LEFT] = [](auto) { gg.idle(player::p_left); };
+    res[casein::K_RIGHT] = [](auto) { gg.idle(player::p_right); };
+    res[casein::K_UP] = [](auto) { gg.idle(player::p_up); };
     return res;
   }();
   static constexpr const auto map = [] {
     casein::event_map res{};
     res[casein::CREATE_WINDOW] = [](auto) { gg.setup(); };
-    res[casein::KEY_DOWN] = [](auto e) { k_map.handle(e); };
+    res[casein::KEY_DOWN] = [](auto e) { kd_map.handle(e); };
+    res[casein::KEY_UP] = [](auto e) { ku_map.handle(e); };
     res[casein::REPAINT] = [](auto) { gg.tick(); };
     return res;
   }();

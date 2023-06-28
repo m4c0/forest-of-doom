@@ -71,6 +71,7 @@ export void set_idle_animation(compos *ec) {
       .y = 2,
       .num_frames = num_frames,
   };
+  ec->player().set(pid, p);
 }
 export void set_walk_animation(compos *ec) {
   constexpr const auto num_frames = 6;
@@ -82,6 +83,7 @@ export void set_walk_animation(compos *ec) {
       .y = 4,
       .num_frames = num_frames,
   };
+  ec->player().set(pid, p);
 }
 
 export void update_animation(compos *ec) {
