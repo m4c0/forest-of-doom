@@ -9,6 +9,7 @@ import qsu;
 class game {
   qsu::main m_q{};
   ecs::ec m_ec{};
+  input::dual_axis m_input;
   unsigned m_arrows_down{};
 
 public:
@@ -45,6 +46,7 @@ public:
 
   void process_event(const casein::event &e) {
     m_q.process_event(e);
+    m_input.process_event(e);
 
     switch (e.type()) {
     case casein::CREATE_WINDOW:

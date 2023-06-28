@@ -44,8 +44,9 @@ auto base_app(const char *name) {
   auto pf = a->add_unit<mod>("prefabs");
   pf->add_part("island_0");
 
-  // ECS + App
+  // ECS + Input + App
   a->add_unit<mod>("ecs");
+  a->add_unit<mod>("input");
   a->add_unit<mod>(name);
   return a;
 }
