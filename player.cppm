@@ -45,8 +45,11 @@ void update_compo(compos *ec, side s, anime::c a) {
   ec->animations().update(pid, a);
 }
 
-void set_idle_animation(compos *ec, side s) {
+void set_idle_animation(compos *ec) {
   constexpr const auto num_frames = 6;
+  auto pid = ec->player().get_id();
+  auto s = ec->player().get(pid).side;
+
   update_compo(ec, s,
                {
                    .start_x = static_cast<unsigned>(s) * num_frames,
@@ -72,7 +75,7 @@ export void process_input(input::dual_axis in, compos *ec) {
   } else if (h != 0) {
     player::set_walk_animation(ec, h > 0 ? p_right : p_left);
   } else {
-    player::set_idle_animation(ec, p_down);
+    player::set_idle_animation(ec);
   }
 }
 } // namespace player
