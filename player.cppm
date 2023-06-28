@@ -1,5 +1,6 @@
 export module player;
 import anime;
+import input;
 import pog;
 import sprite;
 
@@ -44,7 +45,7 @@ void update_compo(compos *ec, side s, anime::c a) {
   ec->animations().update(pid, a);
 }
 
-export void set_idle_animation(compos *ec, side s) {
+void set_idle_animation(compos *ec, side s) {
   constexpr const auto num_frames = 6;
   update_compo(ec, s,
                {
@@ -53,7 +54,7 @@ export void set_idle_animation(compos *ec, side s) {
                    .num_frames = num_frames,
                });
 }
-export void set_walk_animation(compos *ec, side s) {
+void set_walk_animation(compos *ec, side s) {
   constexpr const auto num_frames = 6;
   update_compo(ec, s,
                {
@@ -61,5 +62,17 @@ export void set_walk_animation(compos *ec, side s) {
                    .y = 4,
                    .num_frames = num_frames,
                });
+}
+
+export void process_input(input::dual_axis in, compos *ec) {
+  auto h = in.h_value();
+  auto v = in.v_value();
+  if (v != 0) {
+    player::set_walk_animation(ec, v > 0 ? p_down : p_up);
+  } else if (h != 0) {
+    player::set_walk_animation(ec, h > 0 ? p_right : p_left);
+  } else {
+    player::set_idle_animation(ec, p_down);
+  }
 }
 } // namespace player

@@ -31,16 +31,7 @@ public:
   }
 
   void key_changed() {
-    auto h = m_input.h_value();
-    auto v = m_input.v_value();
-    if (v != 0) {
-      player::set_walk_animation(&m_ec, v > 0 ? player::p_down : player::p_up);
-    } else if (h != 0) {
-      player::set_walk_animation(&m_ec,
-                                 h > 0 ? player::p_right : player::p_left);
-    } else {
-      player::set_idle_animation(&m_ec, player::p_down);
-    }
+    player::process_input(m_input, &m_ec);
     m_q.fill_player_sprites(m_ec.player_sprites());
   }
 
