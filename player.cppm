@@ -67,11 +67,11 @@ export void process_input(input::dual_axis in, compos *ec) {
   auto h = in.h_value();
   auto v = in.v_value();
   if (v != 0) {
-    player::set_walk_animation(ec, v > 0 ? p_down : p_up);
+    set_walk_animation(ec, v > 0 ? p_down : p_up);
   } else if (h != 0) {
-    player::set_walk_animation(ec, h > 0 ? p_right : p_left);
+    set_walk_animation(ec, h > 0 ? p_right : p_left);
   } else {
-    player::set_idle_animation(ec);
+    set_idle_animation(ec);
   }
 }
 } // namespace player
