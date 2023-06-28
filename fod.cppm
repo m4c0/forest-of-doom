@@ -5,9 +5,6 @@ import ecs;
 import player;
 import prefabs;
 import qsu;
-import sprite;
-import tile;
-import tilemap;
 
 class game {
   qsu::main *m_q;
@@ -18,8 +15,7 @@ public:
   explicit constexpr game(qsu::main *q) : m_q{q} {}
 
   void setup() {
-    tilemap::map map = prefabs::island_0;
-    map.add_entities(&m_ec, 1, 0, 0);
+    prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
 
     player::add_entity(&m_ec);
 
