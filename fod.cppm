@@ -15,6 +15,7 @@ class game {
 
   void update_player_sprite(player::side x) {
     player::set_side(&m_ec, x);
+    player::set_idle_animation(&m_ec);
     m_q->fill_player_sprites(m_ec.player_sprites());
   }
 

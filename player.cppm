@@ -34,8 +34,8 @@ export void add_entity(compos *ec) {
   };
   anim a{
       .start_x = 0,
-      .y = 2,
-      .num_frames = 6,
+      .y = 0,
+      .num_frames = 1,
   };
   auto pid = ec->e().alloc();
   ec->player().set(pid, {.anim = a});
@@ -60,6 +60,28 @@ export void set_side(compos *ec, side s) {
   ec->player().set(pid, p);
 
   update_sprite(pid, p, ec->player_sprites());
+}
+export void set_idle_animation(compos *ec) {
+  constexpr const auto num_frames = 6;
+
+  auto pid = ec->player().get_id();
+  auto p = ec->player().get(pid);
+  p.anim = {
+      .start_x = static_cast<unsigned>(p.side) * num_frames,
+      .y = 2,
+      .num_frames = num_frames,
+  };
+}
+export void set_walk_animation(compos *ec) {
+  constexpr const auto num_frames = 6;
+
+  auto pid = ec->player().get_id();
+  auto p = ec->player().get(pid);
+  p.anim = {
+      .start_x = static_cast<unsigned>(p.side) * num_frames,
+      .y = 4,
+      .num_frames = num_frames,
+  };
 }
 
 export void update_animation(compos *ec) {
