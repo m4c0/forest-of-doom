@@ -5,6 +5,8 @@ import move;
 import pog;
 import sprite;
 
+extern "C" float sqrtf(float);
+
 namespace player {
 export enum side {
   p_right = 0,
@@ -79,6 +81,11 @@ export void process_input(input::dual_axis in, compos *ec) {
   } else {
     set_idle_animation(ec);
   }
-  ec->movements().update(pid, {h * speed, v * speed});
+
+  float d = sqrtf(h * h + v * v);
+  float sx = h * speed / d;
+  float sy = v * speed / d;
+
+  ec->movements().update(pid, {sx, sy});
 }
 } // namespace player
