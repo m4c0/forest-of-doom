@@ -7,27 +7,27 @@ import prefabs;
 import qsu;
 
 class game {
-  qsu::main *m_q;
+  qsu::main m_q{};
   ecs::ec m_ec{};
   unsigned m_arrows_down{};
 
 public:
-  explicit constexpr game(qsu::main *q) : m_q{q} {}
+  explicit constexpr game() {}
 
   void setup() {
     prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
 
     player::add_entity(&m_ec);
 
-    m_q->center_at(8.5, 9.25);
-    m_q->set_grid(8, 8);
-    m_q->fill_sprites(m_ec.sprites());
-    m_q->fill_player_sprites(m_ec.player_sprites());
+    m_q.center_at(8.5, 9.25);
+    m_q.set_grid(8, 8);
+    m_q.fill_sprites(m_ec.sprites());
+    m_q.fill_player_sprites(m_ec.player_sprites());
   }
 
   void tick() {
     player::update_animation(&m_ec);
-    m_q->fill_player_sprites(m_ec.player_sprites());
+    m_q.fill_player_sprites(m_ec.player_sprites());
   }
 
   void key_up(player::side s) {
@@ -35,18 +35,32 @@ public:
       return;
 
     player::set_idle_animation(&m_ec, s);
-    m_q->fill_player_sprites(m_ec.player_sprites());
+    m_q.fill_player_sprites(m_ec.player_sprites());
   }
   void key_down(player::side s) {
     ++m_arrows_down;
     player::set_walk_animation(&m_ec, s);
-    m_q->fill_player_sprites(m_ec.player_sprites());
+    m_q.fill_player_sprites(m_ec.player_sprites());
+  }
+
+  void process_event(const casein::event &e) {
+    m_q.process_event(e);
+
+    switch (e.type()) {
+    case casein::CREATE_WINDOW:
+      setup();
+      break;
+    case casein::REPAINT:
+      tick();
+      break;
+    default:
+      break;
+    }
   }
 };
 
 extern "C" void casein_handle(const casein::event &e) {
-  static qsu::main q{};
-  static game gg{&q};
+  static game gg{};
 
   static constexpr const auto kd_map = [] {
     casein::key_map res{};
@@ -66,13 +80,11 @@ extern "C" void casein_handle(const casein::event &e) {
   }();
   static constexpr const auto map = [] {
     casein::event_map res{};
-    res[casein::CREATE_WINDOW] = [](auto) { gg.setup(); };
     res[casein::KEY_DOWN] = [](auto e) { kd_map.handle(e); };
     res[casein::KEY_UP] = [](auto e) { ku_map.handle(e); };
-    res[casein::REPAINT] = [](auto) { gg.tick(); };
     return res;
   }();
 
-  q.process_event(e);
+  gg.process_event(e);
   map.handle(e);
 }
