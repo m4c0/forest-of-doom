@@ -1,12 +1,14 @@
 export module main;
 
-import cursor;
 import casein;
-import ecs;
+import chunk;
+import cursor;
 import jute;
+import pog;
 import prefabs;
 import qsu;
 import silog;
+import sprite;
 import tile;
 import tiles;
 import tilemap;
@@ -30,12 +32,29 @@ static void fail(const char *msg) {
   throw 0;
 }
 
+class ec : public cursor::compos, public tilemap::compos {
+  static constexpr const auto max_entities = 1000U;
+
+  pog::entity_list m_e{max_entities};
+
+  chunk::compo m_chunks{max_entities};
+  cursor::compo m_cursor{};
+  sprite::compo m_sprites{max_entities};
+
+public:
+  pog::entity_list &e() noexcept override { return m_e; }
+
+  chunk::compo &chunks() noexcept override { return m_chunks; }
+  cursor::compo &cursor() noexcept override { return m_cursor; }
+  sprite::compo &sprites() noexcept override { return m_sprites; }
+};
+
 class game {
   static constexpr const auto prefab = prefabs::island_0;
   static constexpr const auto fname = "prefabs-island_0.cppm";
   static constexpr const auto mname = "prefabs:island_0";
 
-  ecs::ec m_ec{};
+  ec m_ec{};
   qsu::main *m_q{};
   tilemap::map m_map = prefab;
   tilemap::map m_undo_map = prefab;
