@@ -82,6 +82,11 @@ export void process_input(input::dual_axis in, compos *ec) {
     set_idle_animation(ec);
   }
 
+  if (v == 0 && h == 0) {
+    ec->movements().update(pid, {});
+    return;
+  }
+
   float d = sqrtf(h * h + v * v);
   float sx = h * speed / d;
   float sy = v * speed / d;
