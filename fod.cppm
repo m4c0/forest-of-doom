@@ -4,6 +4,7 @@ import animation;
 import casein;
 import ecs;
 import input;
+import misc;
 import movement;
 import player;
 import prefabs;
@@ -19,8 +20,8 @@ public:
     prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
 
     player::add_entity(&m_ec);
+    misc::follow_player(&m_q, &m_ec);
 
-    m_q.center_at(8.5, 9.25);
     m_q.set_grid(8, 8);
     m_q.fill_sprites(m_ec.sprites());
     m_q.fill_player_sprites(m_ec.player_sprites());
@@ -29,6 +30,7 @@ public:
   void tick() {
     animation::update_animes(m_ec.animations(), m_ec.player_sprites());
     movement::update_sprites(m_ec.movements(), m_ec.player_sprites());
+    misc::follow_player(&m_q, &m_ec);
     m_q.fill_player_sprites(m_ec.player_sprites());
   }
 

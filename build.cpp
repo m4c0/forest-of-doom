@@ -42,6 +42,7 @@ auto base_app(const char *name) {
   a->add_unit<mod>("tiles");
 
   // Second-order systems
+  a->add_unit<mod>("misc");
   a->add_unit<mod>("tilemap");
 
   // Third-order systems

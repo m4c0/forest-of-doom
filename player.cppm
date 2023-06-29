@@ -88,4 +88,10 @@ export void process_input(input::dual_axis in, compos *ec) {
 
   ec->movements().update(pid, {sx, sy});
 }
+
+export rect get_area(compos *ec) {
+  auto pid = ec->player().get_id();
+  auto spr = ec->player_sprites().get(pid);
+  return spr.pos;
+}
 } // namespace player
