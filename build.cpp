@@ -36,22 +36,23 @@ auto base_app(const char *name) {
   // Systems
   a->add_unit<mod>("animation");
   a->add_unit<mod>("cursor");
+  a->add_unit<mod>("input");
   a->add_unit<mod>("movement");
-  a->add_unit<mod>("player");
   a->add_unit<mod>("qsu");
   a->add_unit<mod>("tiles");
 
   // Second-order systems
-  a->add_unit<mod>("misc");
+  a->add_unit<mod>("player");
   a->add_unit<mod>("tilemap");
 
   // Third-order systems
+  a->add_unit<mod>("misc");
+
   auto pf = a->add_unit<mod>("prefabs");
   pf->add_part("island_0");
 
-  // ECS + Input + App
+  // ECS + App
   a->add_unit<mod>("ecs");
-  a->add_unit<mod>("input");
   a->add_unit<mod>(name);
   return a;
 }
