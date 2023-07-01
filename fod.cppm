@@ -9,11 +9,13 @@ import movement;
 import player;
 import prefabs;
 import qsu;
+import sitime;
 
 class game {
   qsu::main m_q{};
   ecs::ec m_ec{};
   input::dual_axis m_input;
+  sitime::stopwatch m_watch;
 
 public:
   void setup() {
@@ -25,13 +27,19 @@ public:
     m_q.set_grid(8, 8);
     m_q.fill_sprites(m_ec.sprites());
     m_q.fill_player_sprites(m_ec.player_sprites());
+
+    m_watch = {};
   }
 
   void tick() {
-    animation::update_animes(m_ec.animations(), m_ec.player_sprites());
-    movement::update_sprites(m_ec.movements(), m_ec.player_sprites());
+    animation::update_animes(m_ec.animations(), m_ec.player_sprites(),
+                             m_watch.millis());
+    movement::update_sprites(m_ec.movements(), m_ec.player_sprites(),
+                             m_watch.millis());
     misc::follow_player(&m_q, &m_ec);
     m_q.fill_player_sprites(m_ec.player_sprites());
+
+    m_watch = {};
   }
 
   void key_changed() {

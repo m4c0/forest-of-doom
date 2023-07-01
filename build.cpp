@@ -5,6 +5,7 @@
 #include "../pog/build.hpp"
 #include "../quack/build.hpp"
 #include "../silog/build.hpp"
+#include "../sitime/build.hpp"
 #include "../stubby/build.hpp"
 #include "../yoyo/build.hpp"
 
@@ -18,6 +19,7 @@ auto base_app(const char *name) {
   a->add_wsdep("pog", pog());
   a->add_wsdep("quack", quack());
   a->add_wsdep("silog", silog());
+  a->add_wsdep("sitime", sitime());
   a->add_wsdep("stubby", stubby());
   a->add_wsdep("yoyo", yoyo_libc());
   a->add_resource("11_Camping_16x16.png");
