@@ -1,5 +1,6 @@
 export module qsu;
 import casein;
+import collision;
 import jute;
 import pog;
 import quack;
@@ -69,14 +70,58 @@ public:
   [[nodiscard]] constexpr auto &operator*() noexcept { return m_spr; }
   [[nodiscard]] constexpr auto &operator*() const noexcept { return m_spr; }
 };
+
+class debug_layer {
+  quack::ilayout m_spr;
+
+public:
+  debug_layer(quack::renderer *m_r, unsigned max_sprites)
+      : m_spr{m_r, max_sprites} {}
+
+  void fill(const collision::compo &set) {
+    // TODO: center this based on current player pos
+    constexpr const pog::aabb area{{-100, -100}, {100, 100}};
+
+    auto size = 0;
+    set.for_each_in(area, [&](auto, auto) { size++; });
+    m_spr->set_count(size);
+
+    m_spr->map_colours([&](auto *cs) {
+      for (auto i = 0; i < size; i++) {
+        cs[i] = {1, 1, 1, 0.8};
+      }
+    });
+    m_spr->map_multipliers([&](auto *ms) {
+      for (auto i = 0; i < size; i++) {
+        ms[i] = {};
+      }
+    });
+    m_spr->map_positions([&](auto *ps) {
+      set.for_each_in(area, [&](auto, auto aabb) {
+        *ps++ = quack::rect{aabb.aa.x, aabb.aa.y, aabb.bb.x - aabb.aa.x,
+                            aabb.bb.y - aabb.aa.x};
+      });
+    });
+    m_spr->map_uvs([&](auto *uvs) {
+      for (auto i = 0; i < size; i++) {
+        uvs[i] = {};
+      }
+    });
+  }
+
+  [[nodiscard]] constexpr auto &operator*() noexcept { return m_spr; }
+  [[nodiscard]] constexpr auto &operator*() const noexcept { return m_spr; }
+}; // namespace qsu
+
 export class main {
   static constexpr const auto max_player_sprites = 16;
   static constexpr const auto max_sprites = 1024;
   static constexpr const auto no_sprite = max_sprites + 1;
 
-  quack::renderer m_r{2};
+  quack::renderer m_r{3};
   layer m_spr{&m_r, max_sprites};
   layer m_player{&m_r, max_player_sprites};
+  debug_layer m_debug{&m_r, max_sprites};
   quack::mouse_tracker m_mouse{};
 
 public:
@@ -84,6 +129,7 @@ public:
     m_r.process_event(e);
     (*m_spr).process_event(e);
     (*m_player).process_event(e);
+    (*m_debug).process_event(e);
     m_mouse.process_event(e);
 
     if (e.type() == casein::CREATE_WINDOW) {
@@ -95,16 +141,19 @@ public:
   void center_at(float x, float y) {
     (*m_spr)->center_at(x, y);
     (*m_player)->center_at(x, y);
+    (*m_debug)->center_at(x, y);
   }
   void set_grid(float w, float h) {
     (*m_spr)->set_grid(w, h);
     (*m_player)->set_grid(w, h);
+    (*m_debug)->set_grid(w, h);
   }
 
   [[nodiscard]] auto mouse_pos() const noexcept {
     return m_mouse.current_mouse_pos(&**m_spr);
   }
 
+  void fill_debug(const collision::compo &set) { m_debug.fill(set); }
   void fill_sprites(const sprite::compo &set) { m_spr.fill(set); }
   void fill_player_sprites(const sprite::compo &set) { m_player.fill(set); }
 };
