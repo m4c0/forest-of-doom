@@ -88,7 +88,7 @@ public:
 
     m_spr->map_colours([&](auto *cs) {
       for (auto i = 0; i < size; i++) {
-        cs[i] = {1, 1, 1, 0.8};
+        cs[i] = {1, 1, 1, 0.5};
       }
     });
     m_spr->map_multipliers([&](auto *ms) {
@@ -99,7 +99,7 @@ public:
     m_spr->map_positions([&](auto *ps) {
       set.for_each_in(area, [&](auto, auto aabb) {
         *ps++ = quack::rect{aabb.aa.x, aabb.aa.y, aabb.bb.x - aabb.aa.x,
-                            aabb.bb.y - aabb.aa.x};
+                            aabb.bb.y - aabb.aa.y};
       });
     });
     m_spr->map_uvs([&](auto *uvs) {
