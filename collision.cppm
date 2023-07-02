@@ -16,4 +16,14 @@ export auto add_entity(compos *c, float x, float y) {
   add_to_entity(c, e, x, y);
   return e;
 }
+
+export void move_by(compos *c, pog::eid id, float dx, float dy) {
+  auto aabb = c->bodies().get(id);
+  aabb.aa.x += dx;
+  aabb.aa.y += dy;
+  aabb.bb.x += dx;
+  aabb.bb.y += dy;
+  c->bodies().remove(id);
+  c->bodies().add(id, aabb);
+}
 } // namespace collision
