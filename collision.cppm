@@ -2,7 +2,8 @@ export module collision;
 import pog;
 
 namespace collision {
-struct compos {
-  virtual pog::quadtree bodies() const = 0;
+export using compo = pog::quadtree;
+export struct compos {
+  virtual compo &bodies() noexcept = 0;
 };
 } // namespace collision

@@ -1,5 +1,6 @@
 export module tilemap;
 import chunk;
+import collision;
 import missingno;
 import tile;
 import tiles;
@@ -8,7 +9,7 @@ export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
-struct compos : tiles::compos {
+struct compos : collision::compos, tiles::compos {
   virtual chunk::compo &chunks() noexcept = 0;
 };
 

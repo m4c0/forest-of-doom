@@ -2,6 +2,7 @@ export module main;
 
 import casein;
 import chunk;
+import collision;
 import cursor;
 import jute;
 import pog;
@@ -38,6 +39,7 @@ class ec : public cursor::compos, public tilemap::compos {
   pog::entity_list m_e{max_entities};
 
   chunk::compo m_chunks{max_entities};
+  collision::compo m_bodies{};
   cursor::compo m_cursor{};
   sprite::compo m_sprites{max_entities};
 
@@ -45,6 +47,7 @@ public:
   pog::entity_list &e() noexcept override { return m_e; }
 
   chunk::compo &chunks() noexcept override { return m_chunks; }
+  collision::compo &bodies() noexcept override { return m_bodies; }
   cursor::compo &cursor() noexcept override { return m_cursor; }
   sprite::compo &sprites() noexcept override { return m_sprites; }
 };
