@@ -52,6 +52,11 @@ void update_compo(compos *ec, side s, unsigned y, unsigned num_frames) {
   };
 
   auto pid = ec->player().get_id();
+
+  auto cur_a = ec->animations().get(pid);
+  if (a.start_x == cur_a.start_x && a.y == cur_a.y)
+    return;
+
   ec->player().set(pid, {s});
   ec->animations().update(pid, a);
 }
