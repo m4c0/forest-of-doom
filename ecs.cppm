@@ -4,6 +4,7 @@ import chunk;
 import collision;
 import cursor;
 import move;
+import movement;
 import pog;
 import player;
 import sprite;
@@ -13,7 +14,9 @@ namespace ecs {
 static constexpr const auto max_chars = 16U;
 static constexpr const auto max_entities = 1000U;
 
-export class ec : public player::compos, public tilemap::compos {
+export class ec : public movement::compos,
+                  public player::compos,
+                  public tilemap::compos {
   pog::entity_list m_e{max_entities};
 
   anime::compo m_animations{max_chars, max_entities};

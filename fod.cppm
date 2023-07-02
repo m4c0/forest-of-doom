@@ -34,8 +34,7 @@ public:
   void tick() {
     animation::update_animes(m_ec.animations(), m_ec.player_sprites(),
                              m_watch.millis());
-    movement::update_sprites(m_ec.movements(), m_ec.player_sprites(),
-                             m_watch.millis());
+    movement::update_sprites(m_ec, m_ec.player_sprites(), m_watch.millis());
     misc::follow_player(&m_q, &m_ec);
     m_q.fill_player_sprites(m_ec.player_sprites());
 
