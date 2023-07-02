@@ -44,14 +44,8 @@ export void add_entity(compos *ec) {
   ec->movements().add(pid, {});
 }
 
-void update_compo(compos *ec, side s, unsigned y, unsigned num_frames,
-                  unsigned fps) {
-  anime::c a{
-      .start_x = static_cast<unsigned>(s) * num_frames,
-      .y = y,
-      .num_frames = num_frames,
-      .frames_per_sec = fps,
-  };
+void update_compo(compos *ec, side s, anime::c a) {
+  a.start_x = static_cast<unsigned>(s) * a.num_frames;
 
   auto pid = ec->player().get_id();
 
@@ -65,14 +59,28 @@ void update_compo(compos *ec, side s, unsigned y, unsigned num_frames,
 
 void set_idle_animation(compos *ec) {
   constexpr const auto num_frames = 6;
+  constexpr const auto frames_per_sec = 6;
+
   auto pid = ec->player().get_id();
   auto s = ec->player().get(pid).side;
 
-  update_compo(ec, s, 2, num_frames, 6);
+  update_compo(ec, s,
+               {
+                   .y = 2,
+                   .num_frames = num_frames,
+                   .frames_per_sec = fps,
+               });
 }
 void set_walk_animation(compos *ec, side s) {
   constexpr const auto num_frames = 6;
-  update_compo(ec, s, 4, num_frames, 24);
+  constexpr const auto frames_per_sec = 24;
+
+  update_compo(ec, s,
+               {
+                   .y = 4,
+                   .num_frames = num_frames,
+                   .frames_per_sec = fps,
+               });
 }
 
 export void process_input(input::dual_axis in, compos *ec) {
