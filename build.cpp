@@ -37,6 +37,7 @@ auto base_app(const char *name) {
 
   // Systems
   a->add_unit<mod>("animation");
+  a->add_unit<mod>("collision");
   a->add_unit<mod>("cursor");
   a->add_unit<mod>("input");
   a->add_unit<mod>("movement");
