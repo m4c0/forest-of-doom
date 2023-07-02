@@ -46,7 +46,7 @@ export void add_entity(compos *ec) {
   ec->player_sprites().add(pid, spr);
   ec->animations().add(pid, a);
   ec->movements().add(pid, {});
-  collision::add_to_entity(ec, pid, sx, sy + 0.5f);
+  collision::add_to_entity(ec, pid, sx, sy + 0.9f);
 }
 
 void update_compo(compos *ec, side s, anime::c a) {
