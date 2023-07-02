@@ -69,7 +69,8 @@ void set_walk_animation(compos *ec, side s) {
 }
 
 export void process_input(input::dual_axis in, compos *ec) {
-  constexpr const auto speed = 1e-5f;
+  constexpr const auto blocks_per_sec = 4.0f;
+  constexpr const auto speed = blocks_per_sec / 1000.0f;
 
   auto pid = ec->player().get_id();
   auto h = in.h_value();
