@@ -13,14 +13,22 @@ export void update_sprites(compos *c, sprite::compo &sprites, int millis) {
     auto dx = m.sx * ms;
     auto dy = m.sy * ms;
 
+    if (c->bodies().has(id)) {
+      if (collision::move_by(c, id, dx, dy)) {
+      } else if (collision::move_by(c, id, 0, dy)) {
+        dx = 0;
+      } else if (collision::move_by(c, id, dx, 0)) {
+        dy = 0;
+      } else {
+        // TODO: do something
+        continue;
+      }
+    }
+
     auto spr = sprites.get(id);
     spr.pos.x += dx;
     spr.pos.y += dy;
     sprites.update(id, spr);
-
-    if (c->bodies().has(id)) {
-      collision::move_by(c, id, dx, dy);
-    }
   }
 }
 } // namespace movement
