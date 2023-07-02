@@ -68,7 +68,7 @@ void set_idle_animation(compos *ec) {
                {
                    .y = 2,
                    .num_frames = num_frames,
-                   .frames_per_sec = fps,
+                   .frames_per_sec = frames_per_sec,
                });
 }
 void set_walk_animation(compos *ec, side s) {
@@ -79,7 +79,7 @@ void set_walk_animation(compos *ec, side s) {
                {
                    .y = 4,
                    .num_frames = num_frames,
-                   .frames_per_sec = fps,
+                   .frames_per_sec = frames_per_sec,
                });
 }
 
