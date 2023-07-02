@@ -6,6 +6,7 @@ export struct c {
   unsigned start_x;
   unsigned y;
   unsigned num_frames;
+  unsigned frames_per_sec;
   unsigned ticks{};
 };
 
