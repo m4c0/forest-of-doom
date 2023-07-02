@@ -41,11 +41,17 @@ public:
                     float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
-        auto t = m_data[y][x];
-        if (t == blank)
-          continue;
+        auto px = x + dx;
+        auto py = y + dy;
 
-        auto e = tiles::add_tile(ec, t, x + dx, y + dy);
+        auto t = m_data[y][x];
+        if (t == blank) {
+          collision::add_entity(ec, px, py);
+          continue;
+        }
+
+        auto e = tiles::add_tile(ec, t, px, py);
+        // collision::add_to_entity(ec, e, px, py);
         ec->chunks().add(e, chunk);
       }
     }
