@@ -1,6 +1,5 @@
 export module tilemap;
 import chunk;
-import collision;
 import missingno;
 import tile;
 import tiles;
@@ -9,7 +8,7 @@ export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
-struct compos : collision::compos, tiles::compos {
+struct compos : tiles::compos {
   virtual chunk::compo &chunks() noexcept = 0;
 };
 
@@ -45,13 +44,10 @@ public:
         auto py = y + dy;
 
         auto t = m_data[y][x];
-        if (t == blank) {
-          collision::add_entity(ec, px, py);
+        if (t == blank)
           continue;
-        }
 
         auto e = tiles::add_tile(ec, t, px, py);
-        // collision::add_to_entity(ec, e, px, py);
         ec->chunks().add(e, chunk);
       }
     }

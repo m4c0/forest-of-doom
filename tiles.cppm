@@ -1,11 +1,12 @@
 export module tiles;
+import collision;
 import pog;
 import rect;
 import sprite;
 import tile;
 
 namespace tiles {
-export struct compos {
+export struct compos : collision::compos {
   virtual pog::entity_list &e() noexcept = 0;
   virtual sprite::compo &sprites() noexcept = 0;
 };
@@ -29,6 +30,20 @@ export pog::eid add_tile(compos *ec, tile t, float x, float y) {
 
   auto id = ec->e().alloc();
   ec->sprites().add(id, spr);
+
+  switch (t) {
+  case water:
+    collision::add(ec, id, x, y, 1, 1);
+    break;
+  case island_bl:
+  case island_b:
+  case island_br:
+    collision::add(ec, id, x, y + 0.7, 1, 1.3);
+    break;
+  default:
+    break;
+  }
+
   return id;
 }
 export void update_tile(pog::eid id, compos *ec, tile t) {

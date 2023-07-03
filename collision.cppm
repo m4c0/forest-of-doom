@@ -8,13 +8,8 @@ export struct compos {
   virtual compo &bodies() noexcept = 0;
 };
 
-export void add_to_entity(compos *c, pog::eid id, float x, float y) {
-  c->bodies().add(id, {{x, y}, {x + 1, y + 1}});
-}
-export auto add_entity(compos *c, float x, float y) {
-  auto e = c->e().alloc();
-  add_to_entity(c, e, x, y);
-  return e;
+export void add(compos *c, pog::eid id, float x, float y, float w, float h) {
+  c->bodies().add(id, {{x, y}, {x + w, y + h}});
 }
 
 export bool move_by(compos *c, pog::eid id, float dx, float dy) {
