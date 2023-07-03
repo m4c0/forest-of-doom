@@ -37,6 +37,7 @@ public:
     movement::update_sprites(&m_ec, m_ec.player_sprites(), m_watch.millis());
     misc::follow_player(&m_q, &m_ec);
     m_q.fill_player_sprites(m_ec.player_sprites());
+    // m_q.fill_debug(m_ec.bodies());
 
     m_watch = {};
   }
