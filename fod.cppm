@@ -9,6 +9,7 @@ import movement;
 import player;
 import prefabs;
 import qsu;
+import silog;
 import sitime;
 
 class game {
@@ -17,7 +18,6 @@ class game {
   input::dual_axis m_input;
   sitime::stopwatch m_watch;
 
-public:
   void setup() {
     prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
 
@@ -47,6 +47,16 @@ public:
     m_q.fill_player_sprites(m_ec.player_sprites());
   }
 
+  void dump_stats() {
+    silog::log(silog::debug, "Max entities: %d", m_ec.e().max_elements());
+    silog::log(silog::debug, "Animations: %d", m_ec.animations().size());
+    silog::log(silog::debug, "Chunks: %d", m_ec.chunks().size());
+    silog::log(silog::debug, "Movements: %d", m_ec.movements().size());
+    silog::log(silog::debug, "P Sprites: %d", m_ec.player_sprites().size());
+    silog::log(silog::debug, "Sprites: %d", m_ec.sprites().size());
+  }
+
+public:
   void process_event(const casein::event &e) {
     m_q.process_event(e);
     m_input.process_event(e);
@@ -61,6 +71,9 @@ public:
     case casein::KEY_DOWN:
     case casein::KEY_UP:
       key_changed();
+      break;
+    case casein::QUIT:
+      dump_stats();
       break;
     default:
       break;
