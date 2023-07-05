@@ -19,13 +19,13 @@ export class ec : public movement::compos,
                   public tilemap::compos {
   pog::entity_list m_e{max_entities};
 
-  anime::compo m_animations{max_chars, max_entities};
+  anime::compo m_animations{};
   collision::compo m_bodies{};
-  chunk::compo m_chunks{max_entities};
-  move::compo m_movements{max_chars, max_entities};
+  chunk::compo m_chunks{};
+  move::compo m_movements{};
   player::compo m_player{};
-  sprite::compo m_player_sprites{max_chars, max_entities};
-  sprite::compo m_sprites{max_entities};
+  sprite::compo m_player_sprites{};
+  sprite::compo m_sprites{};
 
 public:
   pog::entity_list &e() noexcept override { return m_e; }

@@ -38,10 +38,10 @@ class ec : public cursor::compos, public tilemap::compos {
 
   pog::entity_list m_e{max_entities};
 
-  chunk::compo m_chunks{max_entities};
+  chunk::compo m_chunks{};
   collision::compo m_bodies{};
   cursor::compo m_cursor{};
-  sprite::compo m_sprites{max_entities};
+  sprite::compo m_sprites{};
 
 public:
   pog::entity_list &e() noexcept override { return m_e; }
