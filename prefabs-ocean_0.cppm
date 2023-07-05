@@ -3,7 +3,7 @@ import tile;
 import tilemap;
 
 namespace prefabs {
-export constexpr const tilemap::map island_0 = [] {
+export constexpr const tilemap::map ocean_0 = [] {
   tilemap::map res{};
   res.set(0, 0, static_cast<tile>(0x05030101));
   res.set(1, 0, static_cast<tile>(0x05030101));

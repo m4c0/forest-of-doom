@@ -51,9 +51,9 @@ public:
 };
 
 class game {
-  static constexpr const auto prefab = prefabs::island_0;
-  static constexpr const auto fname = "prefabs-island_0.cppm";
-  static constexpr const auto mname = "prefabs:island_0";
+  static constexpr const auto prefab = prefabs::ocean_0;
+  static constexpr const auto fname = "prefabs-ocean_0.cppm";
+  static constexpr const auto mname = "ocean_0";
 
   ec m_ec{};
   qsu::main *m_q{};
@@ -175,12 +175,12 @@ public:
 
     try {
       yoyo::file_writer out{fname};
-      out.writef("export module %s;\n", mname).take(fail);
+      out.writef("export module prefabs:%s;\n", mname).take(fail);
       out.write("import tile;\n"_s).take(fail);
       out.write("import tilemap;\n"_s).take(fail);
       out.write("\n"_s).take(fail);
       out.write("namespace prefabs {\n"_s).take(fail);
-      out.write("export constexpr const tilemap::map island_0 = [] {\n"_s)
+      out.writef("export constexpr const tilemap::map %s = [] {\n", mname)
           .take(fail);
       out.write("  tilemap::map res{};\n"_s).take(fail);
       for (auto y = 0; y < tilemap::height; y++) {
