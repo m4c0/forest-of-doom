@@ -34,9 +34,7 @@ static void fail(const char *msg) {
 }
 
 class ec : public cursor::compos, public tilemap::compos {
-  static constexpr const auto max_entities = 1000U;
-
-  pog::entity_list m_e{max_entities};
+  pog::entity_list m_e{};
 
   chunk::compo m_chunks{};
   collision::compo m_bodies{};

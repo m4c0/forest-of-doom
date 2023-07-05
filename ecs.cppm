@@ -11,13 +11,10 @@ import sprite;
 import tilemap;
 
 namespace ecs {
-static constexpr const auto max_chars = 16U;
-static constexpr const auto max_entities = 1000U;
-
 export class ec : public movement::compos,
                   public player::compos,
                   public tilemap::compos {
-  pog::entity_list m_e{max_entities};
+  pog::entity_list m_e{};
 
   anime::compo m_animations{};
   collision::compo m_bodies{};
