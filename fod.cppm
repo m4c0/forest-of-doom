@@ -21,6 +21,13 @@ class game {
   void setup() {
     prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
     prefabs::ocean_0.add_entities(&m_ec, 2, -16, 0);
+    // prefabs::ocean_0.add_entities(&m_ec, 3, 16, 0);
+    // prefabs::ocean_0.add_entities(&m_ec, 4, -16, -16);
+    // prefabs::ocean_0.add_entities(&m_ec, 5, 0, -16);
+    // prefabs::ocean_0.add_entities(&m_ec, 6, 16, -16);
+    // prefabs::ocean_0.add_entities(&m_ec, 7, -16, 16);
+    // prefabs::ocean_0.add_entities(&m_ec, 8, 0, 16);
+    // prefabs::ocean_0.add_entities(&m_ec, 9, 16, 16);
 
     player::add_entity(&m_ec);
     misc::follow_player(&m_q, &m_ec);
