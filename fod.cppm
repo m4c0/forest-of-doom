@@ -20,6 +20,7 @@ class game {
 
   void setup() {
     prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
+    prefabs::ocean_0.add_entities(&m_ec, 2, -16, 0);
 
     player::add_entity(&m_ec);
     misc::follow_player(&m_q, &m_ec);
