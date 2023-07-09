@@ -78,7 +78,7 @@ public:
   debug_layer(quack::renderer *m_r, unsigned max_sprites)
       : m_spr{m_r, max_sprites} {}
 
-  void fill(const collision::compo &set) {
+  void fill(pog::rtree &set) {
     // TODO: center this based on current player pos
     constexpr const pog::aabb area{{-100, -100}, {100, 100}};
 
@@ -98,8 +98,8 @@ public:
     });
     m_spr->map_positions([&](auto *ps) {
       set.for_each_in(area, [&](auto, auto aabb) {
-        *ps++ = quack::rect{aabb.aa.x, aabb.aa.y, aabb.bb.x - aabb.aa.x,
-                            aabb.bb.y - aabb.aa.y};
+        *ps++ = quack::rect{aabb.a.x, aabb.a.y, aabb.b.x - aabb.a.x,
+                            aabb.b.y - aabb.a.y};
       });
     });
     m_spr->map_uvs([&](auto *uvs) {
@@ -153,7 +153,7 @@ public:
     return m_mouse.current_mouse_pos(&**m_spr);
   }
 
-  void fill_debug(const collision::compo &set) { m_debug.fill(set); }
+  void fill_debug(pog::rtree &set) { m_debug.fill(set); }
   void fill_sprites(const sprite::compo &set) { m_spr.fill(set); }
   void fill_player_sprites(const sprite::compo &set) { m_player.fill(set); }
 };
