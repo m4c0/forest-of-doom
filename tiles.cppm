@@ -28,8 +28,7 @@ export pog::eid add_tile(compos *ec, tile::camping::c t, float x, float y) {
       .uv = uv,
   };
 
-  auto id = ec->e().alloc();
-  tile::camping::add_tile(ec, id, t, x, y);
+  auto id = tile::camping::add_tile(ec, t, x, y);
   ec->sprites().add(id, spr);
   return id;
 }

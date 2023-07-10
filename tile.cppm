@@ -29,6 +29,8 @@ class compos : public area::compos, public collision::compos {
   compo m_camping_tiles{};
 
 public:
+  virtual pog::entity_list &e() noexcept = 0;
+
   compo &camping_tiles() noexcept { return m_camping_tiles; }
 };
 
@@ -42,11 +44,12 @@ constexpr rect uv(c t) {
   };
 }
 
-auto add_tile(compos *ec, pog::eid id, c t, float x, float y) {
-  rect r = uv_of(t);
+auto add_tile(compos *ec, c t, float x, float y) {
+  rect r = uv(t);
   r.x = x;
   r.y = y;
 
+  auto id = ec->e().alloc();
   area::add(ec, id, r);
   ec->camping_tiles().add(id, t);
 
