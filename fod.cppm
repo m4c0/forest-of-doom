@@ -32,11 +32,10 @@ class game {
     prefabs::ocean_0.add_entities(&m_ec, 9, 16, 16);
 
     player::add_entity(&m_ec);
-    misc::follow_player(&m_q, &m_ec);
+    misc::follow_player(&m_q, &m_ec, &m_ec);
 
     m_q.set_grid(8, 8);
     m_q.fill_player_sprites(m_ec.player_sprites());
-    fill_tiles();
 
     m_watch = {};
   }
@@ -45,9 +44,8 @@ class game {
     animation::update_animes(m_ec.animations(), m_ec.player_sprites(),
                              m_watch.millis());
     movement::update_sprites(&m_ec, m_ec.player_sprites(), m_watch.millis());
-    misc::follow_player(&m_q, &m_ec);
+    misc::follow_player(&m_q, &m_ec, &m_ec);
     m_q.fill_player_sprites(m_ec.player_sprites());
-    fill_tiles();
     // m_q.fill_debug(m_ec.bodies());
 
     m_watch = {};
@@ -64,15 +62,6 @@ class game {
     silog::log(silog::debug, "Chunks: %d", m_ec.chunks().size());
     silog::log(silog::debug, "Movements: %d", m_ec.movements().size());
     silog::log(silog::debug, "P Sprites: %d", m_ec.player_sprites().size());
-  }
-
-  void fill_tiles() {
-    sprite::compo spr{};
-    auto area = player::get_area(&m_ec);
-    auto x = area.x + area.w / 2;
-    auto y = area.y + area.h / 2;
-    tile::camping::populate(&m_ec, &spr, x, y);
-    m_q.fill_sprites(spr);
   }
 
 public:
