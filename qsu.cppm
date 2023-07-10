@@ -78,7 +78,7 @@ public:
   debug_layer(quack::renderer *m_r, unsigned max_sprites)
       : m_spr{m_r, max_sprites} {}
 
-  void fill(pog::rtree &set) {
+  void fill(collision::compo &set) {
     // TODO: center this based on current player pos
     constexpr const pog::aabb area{{-100, -100}, {100, 100}};
 
