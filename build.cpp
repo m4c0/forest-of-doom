@@ -27,6 +27,7 @@ auto base_app(const char *name) {
 
   // Components
   a->add_unit<mod>("anime");
+  a->add_unit<mod>("area");
   a->add_unit<mod>("chunk");
   a->add_unit<mod>("collision");
   a->add_unit<mod>("move");

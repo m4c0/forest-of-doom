@@ -1,6 +1,8 @@
 export module tile;
+import area;
 import collision;
 import pog;
+import rect;
 
 export namespace tile::camping {
 enum c : unsigned {
@@ -23,14 +25,25 @@ enum c : unsigned {
 };
 using compo = pog::sparse_set<c>;
 
-class compos : public collision::compos {
+class compos : public area::compos, public collision::compos {
   compo m_camping_tiles{};
 
 public:
   compo &camping_tiles() noexcept { return m_camping_tiles; }
 };
 
+constexpr rect rect_of(c t) {
+  auto ut = static_cast<unsigned>(t);
+  return rect{
+      .x = static_cast<float>((t >> 24) & 0xFFU),
+      .y = static_cast<float>((t >> 16) & 0xFFU),
+      .w = static_cast<float>((t >> 8) & 0xFFU),
+      .h = static_cast<float>((t >> 0) & 0xFFU),
+  };
+}
+
 auto add_tile(compos *ec, pog::eid id, c t, float x, float y) {
+  area::add(ec, id, rect_of(t));
   ec->camping_tiles().add(id, t);
 
   switch (t) {
@@ -52,5 +65,6 @@ auto add_tile(compos *ec, pog::eid id, c t, float x, float y) {
 void remove_tile(compos *ec, pog::eid id) {
   ec->camping_tiles().remove(id);
   collision::remove(ec, id);
+  area::remove(ec, id);
 }
 } // namespace tile::camping
