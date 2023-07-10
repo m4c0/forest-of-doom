@@ -37,8 +37,7 @@ class ec : public cursor::compos, public tilemap::compos {
   pog::entity_list m_e{};
 
   chunk::compo m_chunks{};
-  pog::btree<pog::aabb> m_body_index{};
-  pog::rtree m_bodies{};
+  collision::compo m_bodies{};
   cursor::compo m_cursor{};
   sprite::compo m_sprites{};
 
@@ -46,8 +45,7 @@ public:
   pog::entity_list &e() noexcept override { return m_e; }
 
   chunk::compo &chunks() noexcept override { return m_chunks; }
-  pog::btree<pog::aabb> &body_index() noexcept override { return m_body_index; }
-  pog::rtree &bodies() noexcept override { return m_bodies; }
+  collision::compo &bodies() noexcept override { return m_bodies; }
   cursor::compo &cursor() noexcept override { return m_cursor; }
   sprite::compo &sprites() noexcept override { return m_sprites; }
 };
