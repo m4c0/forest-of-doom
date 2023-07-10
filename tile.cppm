@@ -1,6 +1,8 @@
 export module tile;
+import pog;
 
-export enum tile : unsigned {
+export namespace tile::camping {
+enum c : unsigned {
   blank = 0,
   island_tl = 0x00010101,
   island_t = 0x01010101,
@@ -18,3 +20,5 @@ export enum tile : unsigned {
   lake_br = 0x07040101,
   water = 0x05030101,
 };
+using compo = pog::sparse_set<c>;
+} // namespace tile::camping

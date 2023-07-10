@@ -8,6 +8,7 @@ import movement;
 import pog;
 import player;
 import sprite;
+import tile;
 import tilemap;
 
 namespace ecs {
@@ -23,6 +24,7 @@ export class ec : public movement::compos,
   player::compo m_player{};
   sprite::compo m_player_sprites{};
   sprite::compo m_sprites{};
+  tile::camping::compo m_tiles{};
 
 public:
   pog::entity_list &e() noexcept override { return m_e; }
@@ -34,5 +36,12 @@ public:
   player::compo &player() noexcept override { return m_player; }
   sprite::compo &player_sprites() noexcept override { return m_player_sprites; }
   sprite::compo &sprites() noexcept override { return m_sprites; }
+  tile::camping::compo &tiles() noexcept override { return m_tiles; }
 };
 } // namespace ecs
+
+static_assert([] {
+  // can we instantiate ecs?
+  ecs::ec x{};
+  return true;
+}());

@@ -16,7 +16,7 @@ import tilemap;
 import yoyo_libc;
 
 template <unsigned N> class palette {
-  tile m_tiles[N];
+  tile::camping::c m_tiles[N];
   unsigned m_index{};
 
 public:
@@ -40,6 +40,7 @@ class ec : public cursor::compos, public tilemap::compos {
   collision::compo m_bodies{};
   cursor::compo m_cursor{};
   sprite::compo m_sprites{};
+  tile::camping::compo m_tiles{};
 
 public:
   pog::entity_list &e() noexcept override { return m_e; }
@@ -48,6 +49,7 @@ public:
   collision::compo &bodies() noexcept override { return m_bodies; }
   cursor::compo &cursor() noexcept override { return m_cursor; }
   sprite::compo &sprites() noexcept override { return m_sprites; }
+  tile::camping::compo &tiles() noexcept override { return m_tiles; }
 };
 
 class game {
@@ -59,13 +61,18 @@ class game {
   qsu::main *m_q{};
   tilemap::map m_map = prefab;
   tilemap::map m_undo_map = prefab;
-  tile m_brush{};
+  tile::camping::c m_brush{};
 
-  palette<8> m_island_pal{island_tl, island_t, island_tr, island_r,
-                          island_br, island_b, island_bl, island_l};
-  palette<8> m_lake_pal{lake_tl, island_b, lake_tr, island_l,
-                        lake_br, island_t, lake_bl, island_r};
-  palette<3> m_land_pal{grass_0, grass_1, water};
+  palette<8> m_island_pal{tile::camping::island_tl, tile::camping::island_t,
+                          tile::camping::island_tr, tile::camping::island_r,
+                          tile::camping::island_br, tile::camping::island_b,
+                          tile::camping::island_bl, tile::camping::island_l};
+  palette<8> m_lake_pal{tile::camping::lake_tl, tile::camping::island_b,
+                        tile::camping::lake_tr, tile::camping::island_l,
+                        tile::camping::lake_br, tile::camping::island_t,
+                        tile::camping::lake_bl, tile::camping::island_r};
+  palette<3> m_land_pal{tile::camping::grass_0, tile::camping::grass_1,
+                        tile::camping::water};
 
   void update_sprites() {
     m_ec.chunks().remove_if([this](auto cid, auto eid) {
@@ -81,7 +88,7 @@ class game {
     m_q->fill_sprites(m_ec.sprites());
   }
 
-  void flood_fill(auto x, auto y, tile old) {
+  void flood_fill(auto x, auto y, tile::camping::c old) {
     auto _ = m_map.get(x, y).map([this, x, y, old](auto t) {
       if (t != old)
         return;
@@ -102,11 +109,11 @@ public:
     q->center_at(tilemap::width / 2, tilemap::height / 2);
 
     cursor::add_entity(&m_ec);
-    set_brush(grass_0);
+    set_brush(tile::camping::grass_0);
     update_sprites();
   }
 
-  void set_brush(tile t) {
+  void set_brush(tile::camping::c t) {
     m_brush = t;
     tiles::update_tile(m_ec.cursor().get_id(), &m_ec, t);
     m_q->fill_sprites(m_ec.sprites());
@@ -147,7 +154,7 @@ public:
       for (auto dx = 0; dx < tw; dx++) {
         if (dx == 0 && dy == 0)
           continue;
-        m_map.set(x + dx, y + dy, blank);
+        m_map.set(x + dx, y + dy, tile::camping::blank);
       }
     }
     cursor::update(&m_ec, x, y);
@@ -187,8 +194,9 @@ public:
         for (auto x = 0; x < tilemap::width; x++) {
           m_map.get(x, y)
               .fmap([&](auto t) {
-                return out.writef(
-                    "  res.set(%d, %d, static_cast<tile>(0x%08x));\n", x, y, t);
+                return out.writef("  res.set(%d, %d, "
+                                  "static_cast<tile::camping::c>(0x%08x));\n",
+                                  x, y, t);
               })
               .take(fail);
         }
@@ -216,7 +224,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::K_D] = [](auto) { gg.flood_fill(); };
     res[casein::K_U] = [](auto) { gg.undo(); };
     res[casein::K_Z] = [](auto) { gg.dump_map(); };
-    res[casein::K_SPACE] = [](auto) { gg.set_brush(blank); };
+    res[casein::K_SPACE] = [](auto) { gg.set_brush(tile::camping::blank); };
     return res;
   }();
   static constexpr const auto map = [] {

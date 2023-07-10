@@ -8,10 +8,11 @@ import tile;
 namespace tiles {
 export struct compos : collision::compos {
   virtual pog::entity_list &e() noexcept = 0;
+  virtual tile::camping::compo &tiles() noexcept = 0;
   virtual sprite::compo &sprites() noexcept = 0;
 };
 
-export constexpr rect tile_uv(tile t) {
+export constexpr rect tile_uv(tile::camping::c t) {
   auto ut = static_cast<unsigned>(t);
   return rect{
       .x = static_cast<float>((t >> 24) & 0xFFU),
@@ -21,7 +22,7 @@ export constexpr rect tile_uv(tile t) {
   };
 }
 
-export pog::eid add_tile(compos *ec, tile t, float x, float y) {
+export pog::eid add_tile(compos *ec, tile::camping::c t, float x, float y) {
   auto uv = tile_uv(t);
   sprite spr{
       .pos = {x, y, uv.w, uv.h},
@@ -30,14 +31,15 @@ export pog::eid add_tile(compos *ec, tile t, float x, float y) {
 
   auto id = ec->e().alloc();
   ec->sprites().add(id, spr);
+  ec->tiles().add(id, t);
 
   switch (t) {
-  case water:
+  case tile::camping::water:
     collision::add(ec, id, x, y, 1, 1);
     break;
-  case island_bl:
-  case island_b:
-  case island_br:
+  case tile::camping::island_bl:
+  case tile::camping::island_b:
+  case tile::camping::island_br:
     collision::add(ec, id, x, y + 0.7, 1, 1.3);
     break;
   default:
@@ -46,7 +48,7 @@ export pog::eid add_tile(compos *ec, tile t, float x, float y) {
 
   return id;
 }
-export void update_tile(pog::eid id, compos *ec, tile t) {
+export void update_tile(pog::eid id, compos *ec, tile::camping::c t) {
   auto spr = ec->sprites().get(id);
   spr.uv = tile_uv(t);
   spr.pos.w = spr.uv.w;

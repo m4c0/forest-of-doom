@@ -13,23 +13,24 @@ struct compos : tiles::compos {
 };
 
 class map {
-  tile m_data[height][width]{};
+  tile::camping::c m_data[height][width]{};
 
 public:
-  constexpr void fill(tile t) noexcept {
+  constexpr void fill(tile::camping::c t) noexcept {
     for (auto &row : m_data) {
       for (auto &tile : row) {
         tile = t;
       }
     }
   }
-  constexpr mno::req<tile> get(unsigned x, unsigned y) const noexcept {
+  constexpr mno::req<tile::camping::c> get(unsigned x,
+                                           unsigned y) const noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
-      return mno::req<tile>::failed("out-of-bounds");
+      return mno::req<tile::camping::c>::failed("out-of-bounds");
 
-    return mno::req<tile>{m_data[y][x]};
+    return mno::req<tile::camping::c>{m_data[y][x]};
   }
-  constexpr void set(unsigned x, unsigned y, tile t) noexcept {
+  constexpr void set(unsigned x, unsigned y, tile::camping::c t) noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
       return;
 
@@ -44,7 +45,7 @@ public:
         auto py = y + dy;
 
         auto t = m_data[y][x];
-        if (t == blank)
+        if (t == tile::camping::blank)
           continue;
 
         auto e = tiles::add_tile(ec, t, px, py);
