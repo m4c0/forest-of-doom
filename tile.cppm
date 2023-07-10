@@ -32,7 +32,7 @@ public:
   compo &camping_tiles() noexcept { return m_camping_tiles; }
 };
 
-constexpr rect rect_of(c t) {
+constexpr rect uv(c t) {
   auto ut = static_cast<unsigned>(t);
   return rect{
       .x = static_cast<float>((t >> 24) & 0xFFU),
@@ -43,7 +43,11 @@ constexpr rect rect_of(c t) {
 }
 
 auto add_tile(compos *ec, pog::eid id, c t, float x, float y) {
-  area::add(ec, id, rect_of(t));
+  rect r = uv_of(t);
+  r.x = x;
+  r.y = y;
+
+  area::add(ec, id, r);
   ec->camping_tiles().add(id, t);
 
   switch (t) {
