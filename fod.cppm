@@ -68,7 +68,10 @@ class game {
 
   void fill_tiles() {
     sprite::compo spr{};
-    tile::camping::populate(&m_ec, &spr, 0, 0);
+    auto area = player::get_area(&m_ec);
+    auto x = area.x + area.w / 2;
+    auto y = area.y + area.h / 2;
+    tile::camping::populate(&m_ec, &spr, x, y);
     m_q.fill_sprites(spr);
   }
 
