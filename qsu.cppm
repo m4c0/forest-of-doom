@@ -115,7 +115,7 @@ public:
 
 export class main {
   static constexpr const auto max_player_sprites = 16;
-  static constexpr const auto max_sprites = 1024;
+  static constexpr const auto max_sprites = 4096;
   static constexpr const auto no_sprite = max_sprites + 1;
 
   quack::renderer m_r{3};
