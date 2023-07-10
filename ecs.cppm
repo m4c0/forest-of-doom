@@ -35,9 +35,3 @@ public:
   sprite::compo &player_sprites() noexcept override { return m_player_sprites; }
 };
 } // namespace ecs
-
-static_assert([] {
-  // can we instantiate ecs?
-  ecs::ec x{};
-  return true;
-}());

@@ -1,26 +1,28 @@
 export module cursor;
 import pog;
-import sprite;
+import tile;
 
 export namespace cursor {
 using compo = pog::singleton<>;
-struct compos {
+struct compos : virtual tile::camping::compos {
   virtual pog::entity_list &e() noexcept = 0;
   virtual compo &cursor() noexcept = 0;
-  virtual sprite::compo &sprites() noexcept = 0;
 };
 
 void add_entity(compos *ec) {
-  auto id = ec->e().alloc();
+  auto id = tile::camping::add_tile(ec, {}, 0, 0);
   ec->cursor().set(id, {});
-  ec->sprites().add(id, {.layer = 100});
+  // ec->sprites().add(id, {.layer = 100});
 }
 
-void update(compos *ec, float x, float y) {
+void update_tile(compos *ec, tile::camping::c t) {
   auto id = ec->cursor().get_id();
-  auto spr = ec->sprites().get(id);
-  spr.pos.x = static_cast<int>(x);
-  spr.pos.y = static_cast<int>(y);
-  ec->sprites().update(id, spr);
+  ec->camping_tiles().update(id, t);
+}
+
+void update_pos(compos *ec, float x, float y) {
+  auto id = ec->cursor().get_id();
+  tile::camping::update_tile_pos(ec, id, static_cast<int>(x),
+                                 static_cast<int>(y));
 }
 } // namespace cursor

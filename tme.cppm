@@ -38,7 +38,6 @@ class ec : public cursor::compos, public tilemap::compos {
   chunk::compo m_chunks{};
   collision::compo m_bodies{};
   cursor::compo m_cursor{};
-  sprite::compo m_sprites{};
   tile::camping::compo m_tiles{};
 
 public:
@@ -47,7 +46,6 @@ public:
   chunk::compo &chunks() noexcept override { return m_chunks; }
   collision::compo &bodies() noexcept override { return m_bodies; }
   cursor::compo &cursor() noexcept override { return m_cursor; }
-  sprite::compo &sprites() noexcept override { return m_sprites; }
 };
 
 class game {
@@ -81,9 +79,14 @@ class game {
       return true;
     });
     m_map.add_entities(&m_ec, 1, 0, 0);
-
-    sort_sprites(m_ec.sprites());
-    m_q->fill_sprites(m_ec.sprites());
+    fill_sprites();
+  }
+  void fill_sprites() {
+    sprite::compo spr{};
+    sort_sprites(spr);
+    tile::camping::populate(&m_ec, &spr, tilemap::width / 2,
+                            tilemap::height / 2);
+    m_q->fill_sprites(spr);
   }
 
   void flood_fill(auto x, auto y, tile::camping::c old) {
@@ -113,8 +116,8 @@ public:
 
   void set_brush(tile::camping::c t) {
     m_brush = t;
-    tile::camping::update_tile(&m_ec, m_ec.cursor().get_id(), t);
-    m_q->fill_sprites(m_ec.sprites());
+    cursor::update_tile(&m_ec, t);
+    fill_sprites();
   }
 
   void next_island_brush() {
@@ -140,8 +143,8 @@ public:
 
   void mouse_moved() {
     auto [x, y] = m_q->mouse_pos();
-    cursor::update(&m_ec, x, y);
-    m_q->fill_sprites(m_ec.sprites());
+    cursor::update_pos(&m_ec, x, y);
+    fill_sprites();
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();
@@ -155,7 +158,7 @@ public:
         m_map.set(x + dx, y + dy, tile::camping::blank);
       }
     }
-    cursor::update(&m_ec, x, y);
+    cursor::update_pos(&m_ec, x, y);
     update_sprites();
   }
 

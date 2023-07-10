@@ -70,15 +70,22 @@ auto add_tile(compos *ec, c t, float x, float y) {
   return id;
 }
 
-void update_tile(compos *ec, pog::eid id, c t) {
-  ec->camping_tiles().update(id, t);
-  // TODO: update area/collider?
+void update_tile_pos(compos *ec, pog::eid id, float x, float y) {
+  auto t = ec->camping_tiles().get(id);
+  rect r = uv(t);
+  r.x = x;
+  r.y = y;
+
+  // TODO: update collisor?
+  area::remove(ec, id);
+  area::add(ec, id, r);
 }
 
 void remove_tile(compos *ec, pog::eid id) {
-  ec->camping_tiles().remove(id);
   collision::remove(ec, id);
   area::remove(ec, id);
+  ec->camping_tiles().remove(id);
+  ec->e().dealloc(id);
 }
 
 void populate(compos *ec, sprite::compo *spr, float cx, float cy) {

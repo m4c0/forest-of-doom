@@ -7,7 +7,7 @@ export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
-struct compos : tile::camping::compos {
+struct compos : virtual tile::camping::compos {
   virtual chunk::compo &chunks() noexcept = 0;
 };
 
