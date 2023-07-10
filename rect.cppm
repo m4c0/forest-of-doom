@@ -12,6 +12,6 @@ export rect rect_of(pog::aabb area) {
       .x = area.a.x,
       .y = area.a.y,
       .w = area.b.x - area.a.x,
-      .h = area.b.y - area.b.y,
+      .h = area.b.y - area.a.y,
   };
 }
