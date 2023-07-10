@@ -11,7 +11,6 @@ import qsu;
 import silog;
 import sprite;
 import tile;
-import tiles;
 import tilemap;
 import yoyo_libc;
 
@@ -78,7 +77,7 @@ class game {
       if (cid != 1)
         return false;
 
-      tiles::remove_tile(eid, &m_ec);
+      tile::camping::remove_tile(&m_ec, eid);
       return true;
     });
     m_map.add_entities(&m_ec, 1, 0, 0);
@@ -114,7 +113,7 @@ public:
 
   void set_brush(tile::camping::c t) {
     m_brush = t;
-    tiles::update_tile(m_ec.cursor().get_id(), &m_ec, t);
+    tile::camping::update_tile(&m_ec, m_ec.cursor().get_id(), t);
     m_q->fill_sprites(m_ec.sprites());
   }
 
@@ -148,7 +147,7 @@ public:
     auto [x, y] = m_q->mouse_pos();
     m_undo_map = m_map;
     m_map.set(x, y, m_brush);
-    auto [tx, ty, tw, th] = tiles::tile_uv(m_brush);
+    auto [tx, ty, tw, th] = tile::camping::uv(m_brush);
     for (auto dy = 0; dy < th; dy++) {
       for (auto dx = 0; dx < tw; dx++) {
         if (dx == 0 && dy == 0)

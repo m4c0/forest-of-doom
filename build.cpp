@@ -27,14 +27,16 @@ auto base_app(const char *name) {
 
   // Components
   a->add_unit<mod>("anime");
-  a->add_unit<mod>("area");
   a->add_unit<mod>("chunk");
   a->add_unit<mod>("collision");
   a->add_unit<mod>("move");
   a->add_unit<mod>("rect");
 
   // Second-order components
+  a->add_unit<mod>("area");
   a->add_unit<mod>("sprite");
+
+  // Third-order components
   a->add_unit<mod>("tile");
 
   // Systems
@@ -43,7 +45,6 @@ auto base_app(const char *name) {
   a->add_unit<mod>("input");
   a->add_unit<mod>("movement");
   a->add_unit<mod>("qsu");
-  a->add_unit<mod>("tiles");
 
   // Second-order systems
   a->add_unit<mod>("player");

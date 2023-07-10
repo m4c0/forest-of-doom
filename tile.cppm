@@ -3,6 +3,7 @@ import area;
 import collision;
 import pog;
 import rect;
+import sprite;
 
 export namespace tile::camping {
 enum c : unsigned {
@@ -67,6 +68,11 @@ auto add_tile(compos *ec, c t, float x, float y) {
   }
 
   return id;
+}
+
+void update_tile(compos *ec, pog::eid id, c t) {
+  ec->camping_tiles().update(id, t);
+  // TODO: update area/collider?
 }
 
 void remove_tile(compos *ec, pog::eid id) {

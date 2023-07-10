@@ -2,13 +2,12 @@ export module tilemap;
 import chunk;
 import missingno;
 import tile;
-import tiles;
 
 export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
-struct compos : tiles::compos {
+struct compos : tile::camping::compos {
   virtual chunk::compo &chunks() noexcept = 0;
 };
 
@@ -48,7 +47,7 @@ public:
         if (t == tile::camping::blank)
           continue;
 
-        auto e = tiles::add_tile(ec, t, px, py);
+        auto e = tile::camping::add_tile(ec, t, px, py);
         ec->chunks().add(e, chunk);
       }
     }

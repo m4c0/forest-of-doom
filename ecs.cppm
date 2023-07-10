@@ -34,7 +34,7 @@ public:
   move::compo &movements() noexcept override { return m_movements; }
   player::compo &player() noexcept override { return m_player; }
   sprite::compo &player_sprites() noexcept override { return m_player_sprites; }
-  sprite::compo &sprites() noexcept override { return m_sprites; }
+  sprite::compo &sprites() noexcept { return m_sprites; }
 };
 } // namespace ecs
 
