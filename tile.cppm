@@ -1,4 +1,5 @@
 export module tile;
+import collision;
 import pog;
 
 export namespace tile::camping {
@@ -21,4 +22,35 @@ enum c : unsigned {
   water = 0x05030101,
 };
 using compo = pog::sparse_set<c>;
+
+class compos : public collision::compos {
+  compo m_camping_tiles{};
+
+public:
+  compo &camping_tiles() noexcept { return m_camping_tiles; }
+};
+
+auto add_tile(compos *ec, pog::eid id, c t, float x, float y) {
+  ec->camping_tiles().add(id, t);
+
+  switch (t) {
+  case water:
+    collision::add(ec, id, x, y, 1, 1);
+    break;
+  case island_bl:
+  case island_b:
+  case island_br:
+    collision::add(ec, id, x, y + 0.7, 1, 1.3);
+    break;
+  default:
+    break;
+  }
+
+  return id;
+}
+
+void remove_tile(compos *ec, pog::eid id) {
+  ec->camping_tiles().remove(id);
+  collision::remove(ec, id);
+}
 } // namespace tile::camping

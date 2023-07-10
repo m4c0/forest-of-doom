@@ -6,9 +6,8 @@ import sprite;
 import tile;
 
 namespace tiles {
-export struct compos : collision::compos {
+export struct compos : tile::camping::compos {
   virtual pog::entity_list &e() noexcept = 0;
-  virtual tile::camping::compo &tiles() noexcept = 0;
   virtual sprite::compo &sprites() noexcept = 0;
 };
 
@@ -30,22 +29,8 @@ export pog::eid add_tile(compos *ec, tile::camping::c t, float x, float y) {
   };
 
   auto id = ec->e().alloc();
+  tile::camping::add_tile(ec, id, t, x, y);
   ec->sprites().add(id, spr);
-  ec->tiles().add(id, t);
-
-  switch (t) {
-  case tile::camping::water:
-    collision::add(ec, id, x, y, 1, 1);
-    break;
-  case tile::camping::island_bl:
-  case tile::camping::island_b:
-  case tile::camping::island_br:
-    collision::add(ec, id, x, y + 0.7, 1, 1.3);
-    break;
-  default:
-    break;
-  }
-
   return id;
 }
 export void update_tile(pog::eid id, compos *ec, tile::camping::c t) {
@@ -56,6 +41,7 @@ export void update_tile(pog::eid id, compos *ec, tile::camping::c t) {
   ec->sprites().update(id, spr);
 }
 export void remove_tile(pog::eid id, compos *ec) {
+  tile::camping::remove_tile(ec, id);
   ec->sprites().remove(id);
   ec->e().dealloc(id);
 }

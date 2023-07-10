@@ -49,7 +49,6 @@ public:
   collision::compo &bodies() noexcept override { return m_bodies; }
   cursor::compo &cursor() noexcept override { return m_cursor; }
   sprite::compo &sprites() noexcept override { return m_sprites; }
-  tile::camping::compo &tiles() noexcept override { return m_tiles; }
 };
 
 class game {
