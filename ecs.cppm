@@ -23,7 +23,6 @@ export class ec : public movement::compos,
   move::compo m_movements{};
   player::compo m_player{};
   sprite::compo m_player_sprites{};
-  sprite::compo m_sprites{};
 
 public:
   pog::entity_list &e() noexcept override { return m_e; }
@@ -34,7 +33,6 @@ public:
   move::compo &movements() noexcept override { return m_movements; }
   player::compo &player() noexcept override { return m_player; }
   sprite::compo &player_sprites() noexcept override { return m_player_sprites; }
-  sprite::compo &sprites() noexcept { return m_sprites; }
 };
 } // namespace ecs
 

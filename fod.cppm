@@ -11,6 +11,8 @@ import prefabs;
 import qsu;
 import silog;
 import sitime;
+import sprite;
+import tile;
 
 class game {
   qsu::main m_q{};
@@ -21,20 +23,20 @@ class game {
   void setup() {
     prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
     prefabs::ocean_0.add_entities(&m_ec, 2, -16, 0);
-    // prefabs::ocean_0.add_entities(&m_ec, 3, 16, 0);
-    // prefabs::ocean_0.add_entities(&m_ec, 4, -16, -16);
-    // prefabs::ocean_0.add_entities(&m_ec, 5, 0, -16);
-    // prefabs::ocean_0.add_entities(&m_ec, 6, 16, -16);
-    // prefabs::ocean_0.add_entities(&m_ec, 7, -16, 16);
-    // prefabs::ocean_0.add_entities(&m_ec, 8, 0, 16);
-    // prefabs::ocean_0.add_entities(&m_ec, 9, 16, 16);
+    prefabs::ocean_0.add_entities(&m_ec, 3, 16, 0);
+    prefabs::ocean_0.add_entities(&m_ec, 4, -16, -16);
+    prefabs::ocean_0.add_entities(&m_ec, 5, 0, -16);
+    prefabs::ocean_0.add_entities(&m_ec, 6, 16, -16);
+    prefabs::ocean_0.add_entities(&m_ec, 7, -16, 16);
+    prefabs::ocean_0.add_entities(&m_ec, 8, 0, 16);
+    prefabs::ocean_0.add_entities(&m_ec, 9, 16, 16);
 
     player::add_entity(&m_ec);
     misc::follow_player(&m_q, &m_ec);
 
     m_q.set_grid(8, 8);
-    m_q.fill_sprites(m_ec.sprites());
     m_q.fill_player_sprites(m_ec.player_sprites());
+    fill_tiles();
 
     m_watch = {};
   }
@@ -45,6 +47,7 @@ class game {
     movement::update_sprites(&m_ec, m_ec.player_sprites(), m_watch.millis());
     misc::follow_player(&m_q, &m_ec);
     m_q.fill_player_sprites(m_ec.player_sprites());
+    fill_tiles();
     // m_q.fill_debug(m_ec.bodies());
 
     m_watch = {};
@@ -61,7 +64,12 @@ class game {
     silog::log(silog::debug, "Chunks: %d", m_ec.chunks().size());
     silog::log(silog::debug, "Movements: %d", m_ec.movements().size());
     silog::log(silog::debug, "P Sprites: %d", m_ec.player_sprites().size());
-    silog::log(silog::debug, "Sprites: %d", m_ec.sprites().size());
+  }
+
+  void fill_tiles() {
+    sprite::compo spr{};
+    tile::camping::populate(&m_ec, &spr, 0, 0);
+    m_q.fill_sprites(spr);
   }
 
 public:

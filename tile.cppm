@@ -80,4 +80,21 @@ void remove_tile(compos *ec, pog::eid id) {
   collision::remove(ec, id);
   area::remove(ec, id);
 }
+
+void populate(compos *ec, sprite::compo *spr, float cx, float cy) {
+  constexpr const auto radius = 16;
+  area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
+  ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
+    auto t = ec->camping_tiles().get(id);
+    if (t == blank)
+      return;
+
+    sprite s{
+        .pos = rect_of(area),
+        .uv = uv(t),
+    };
+    spr->add(id, s);
+  });
+}
+
 } // namespace tile::camping
