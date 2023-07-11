@@ -17,7 +17,6 @@ export class ec : public movement::compos,
   pog::entity_list m_e{};
 
   anime::compo m_animations{};
-  collision::compo m_bodies{};
   move::compo m_movements{};
   player::compo m_player{};
   sprite::compo m_player_sprites{};
@@ -26,7 +25,6 @@ public:
   pog::entity_list &e() noexcept override { return m_e; }
 
   anime::compo &animations() noexcept override { return m_animations; }
-  collision::compo &bodies() noexcept override { return m_bodies; }
   move::compo &movements() noexcept override { return m_movements; }
   player::compo &player() noexcept override { return m_player; }
   sprite::compo &player_sprites() noexcept override { return m_player_sprites; }

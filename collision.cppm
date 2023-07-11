@@ -4,8 +4,12 @@ import pog;
 namespace collision {
 export using compo = pog::rtree;
 export struct compos {
+  collision::compo m_bodies{};
+
+public:
   virtual pog::entity_list &e() noexcept = 0;
-  virtual compo &bodies() noexcept = 0;
+
+  collision::compo &bodies() noexcept { return m_bodies; }
 };
 
 export void add(compos *c, pog::eid id, float x, float y, float w, float h) {

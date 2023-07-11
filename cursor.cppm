@@ -4,9 +4,12 @@ import tile;
 
 export namespace cursor {
 using compo = pog::singleton<>;
-struct compos : virtual tile::camping::compos {
+class compos : public virtual tile::camping::compos {
+  cursor::compo m_cursor{};
+
+public:
   virtual pog::entity_list &e() noexcept = 0;
-  virtual compo &cursor() noexcept = 0;
+  cursor::compo &cursor() noexcept { return m_cursor; }
 };
 
 void add_entity(compos *ec) {

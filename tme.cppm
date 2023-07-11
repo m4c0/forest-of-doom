@@ -34,15 +34,8 @@ static void fail(const char *msg) {
 class ec : public cursor::compos {
   pog::entity_list m_e{};
 
-  collision::compo m_bodies{};
-  cursor::compo m_cursor{};
-  tile::camping::compo m_tiles{};
-
 public:
   pog::entity_list &e() noexcept override { return m_e; }
-
-  collision::compo &bodies() noexcept override { return m_bodies; }
-  cursor::compo &cursor() noexcept override { return m_cursor; }
 };
 
 class game {
