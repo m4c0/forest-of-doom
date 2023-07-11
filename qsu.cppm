@@ -162,7 +162,6 @@ public:
 
     sprite::compo spr{};
     tile::camping::populate(ec, &spr, x, y);
-    sort_sprites(spr);
     m_spr.fill(spr);
   }
 };

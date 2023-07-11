@@ -60,7 +60,6 @@ class game {
     silog::log(silog::debug, "Max entities: %d", m_ec.e().max_elements());
     silog::log(silog::debug, "Animations: %d", m_ec.animations().size());
     silog::log(silog::debug, "Movements: %d", m_ec.movements().size());
-    silog::log(silog::debug, "P Sprites: %d", m_ec.player_sprites().size());
   }
 
 public:
