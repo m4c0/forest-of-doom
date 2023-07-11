@@ -1,5 +1,4 @@
 export module tilemap;
-import chunk;
 import missingno;
 import tile;
 
@@ -7,9 +6,7 @@ export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
-struct compos : virtual tile::camping::compos {
-  virtual chunk::compo &chunks() noexcept = 0;
-};
+using compos = tile::camping::compos;
 
 class map {
   tile::camping::c m_data[height][width]{};
@@ -36,8 +33,7 @@ public:
     m_data[y][x] = t;
   }
 
-  void add_entities(compos *ec, chunk::c chunk, float dx,
-                    float dy) const noexcept {
+  void add_entities(compos *ec, float dx, float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto px = x + dx;
@@ -47,8 +43,7 @@ public:
         if (t == tile::camping::blank)
           continue;
 
-        auto e = tile::camping::add_tile(ec, t, px, py);
-        ec->chunks().add(e, chunk);
+        tile::camping::add_tile(ec, t, px, py);
       }
     }
   }

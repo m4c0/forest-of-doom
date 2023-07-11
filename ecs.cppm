@@ -1,6 +1,5 @@
 export module ecs;
 import anime;
-import chunk;
 import collision;
 import cursor;
 import move;
@@ -19,7 +18,6 @@ export class ec : public movement::compos,
 
   anime::compo m_animations{};
   collision::compo m_bodies{};
-  chunk::compo m_chunks{};
   move::compo m_movements{};
   player::compo m_player{};
   sprite::compo m_player_sprites{};
@@ -29,7 +27,6 @@ public:
 
   anime::compo &animations() noexcept override { return m_animations; }
   collision::compo &bodies() noexcept override { return m_bodies; }
-  chunk::compo &chunks() noexcept override { return m_chunks; }
   move::compo &movements() noexcept override { return m_movements; }
   player::compo &player() noexcept override { return m_player; }
   sprite::compo &player_sprites() noexcept override { return m_player_sprites; }

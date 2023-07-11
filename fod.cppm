@@ -21,15 +21,15 @@ class game {
   sitime::stopwatch m_watch;
 
   void setup() {
-    prefabs::island_0.add_entities(&m_ec, 1, 0, 0);
-    prefabs::ocean_0.add_entities(&m_ec, 2, -16, 0);
-    prefabs::ocean_0.add_entities(&m_ec, 3, 16, 0);
-    prefabs::ocean_0.add_entities(&m_ec, 4, -16, -16);
-    prefabs::ocean_0.add_entities(&m_ec, 5, 0, -16);
-    prefabs::ocean_0.add_entities(&m_ec, 6, 16, -16);
-    prefabs::ocean_0.add_entities(&m_ec, 7, -16, 16);
-    prefabs::ocean_0.add_entities(&m_ec, 8, 0, 16);
-    prefabs::ocean_0.add_entities(&m_ec, 9, 16, 16);
+    prefabs::island_0.add_entities(&m_ec, 0, 0);
+    prefabs::ocean_0.add_entities(&m_ec, -16, 0);
+    prefabs::ocean_0.add_entities(&m_ec, 16, 0);
+    prefabs::ocean_0.add_entities(&m_ec, -16, -16);
+    prefabs::ocean_0.add_entities(&m_ec, 0, -16);
+    prefabs::ocean_0.add_entities(&m_ec, 16, -16);
+    prefabs::ocean_0.add_entities(&m_ec, -16, 16);
+    prefabs::ocean_0.add_entities(&m_ec, 0, 16);
+    prefabs::ocean_0.add_entities(&m_ec, 16, 16);
 
     player::add_entity(&m_ec);
     misc::follow_player(&m_q, &m_ec, &m_ec);
@@ -59,7 +59,6 @@ class game {
   void dump_stats() {
     silog::log(silog::debug, "Max entities: %d", m_ec.e().max_elements());
     silog::log(silog::debug, "Animations: %d", m_ec.animations().size());
-    silog::log(silog::debug, "Chunks: %d", m_ec.chunks().size());
     silog::log(silog::debug, "Movements: %d", m_ec.movements().size());
     silog::log(silog::debug, "P Sprites: %d", m_ec.player_sprites().size());
   }

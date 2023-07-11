@@ -1,7 +1,6 @@
 export module main;
 
 import casein;
-import chunk;
 import collision;
 import cursor;
 import jute;
@@ -32,10 +31,9 @@ static void fail(const char *msg) {
   throw 0;
 }
 
-class ec : public cursor::compos, public tilemap::compos {
+class ec : public cursor::compos {
   pog::entity_list m_e{};
 
-  chunk::compo m_chunks{};
   collision::compo m_bodies{};
   cursor::compo m_cursor{};
   tile::camping::compo m_tiles{};
@@ -43,7 +41,6 @@ class ec : public cursor::compos, public tilemap::compos {
 public:
   pog::entity_list &e() noexcept override { return m_e; }
 
-  chunk::compo &chunks() noexcept override { return m_chunks; }
   collision::compo &bodies() noexcept override { return m_bodies; }
   cursor::compo &cursor() noexcept override { return m_cursor; }
 };
@@ -76,7 +73,7 @@ class game {
         return;
       tile::camping::remove_tile(&m_ec, eid);
     });
-    m_map.add_entities(&m_ec, 1, 0, 0);
+    m_map.add_entities(&m_ec, 0, 0);
     m_q->fill_sprites(&m_ec);
   }
 
