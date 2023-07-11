@@ -161,8 +161,8 @@ public:
     auto [x, y] = (*m_spr)->center();
 
     sprite::compo spr{};
-    sort_sprites(spr);
     tile::camping::populate(ec, &spr, x, y);
+    sort_sprites(spr);
     m_spr.fill(spr);
   }
 };
