@@ -20,7 +20,7 @@ export struct c {
 };
 
 export using compo = pog::singleton<c>;
-export struct compos : collision::compos {
+export struct compos : virtual collision::compos {
   virtual pog::entity_list &e() noexcept = 0;
   virtual compo &player() noexcept = 0;
   virtual anime::compo &animations() noexcept = 0;

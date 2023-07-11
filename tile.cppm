@@ -26,7 +26,7 @@ enum c : unsigned {
 };
 using compo = pog::sparse_set<c>;
 
-class compos : public area::compos, public collision::compos {
+class compos : public area::compos, public virtual collision::compos {
   compo m_camping_tiles{};
   pog::sparse_set<unsigned> m_sprite_layer{};
 

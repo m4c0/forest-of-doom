@@ -4,7 +4,7 @@ import move;
 import sprite;
 
 namespace movement {
-export struct compos : collision::compos {
+export struct compos : virtual collision::compos {
   virtual move::compo &movements() noexcept = 0;
 };
 export void update_sprites(compos *c, sprite::compo &sprites, int millis) {
