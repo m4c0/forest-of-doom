@@ -79,14 +79,7 @@ class game {
       return true;
     });
     m_map.add_entities(&m_ec, 1, 0, 0);
-    fill_sprites();
-  }
-  void fill_sprites() {
-    sprite::compo spr{};
-    sort_sprites(spr);
-    tile::camping::populate(&m_ec, &spr, tilemap::width / 2,
-                            tilemap::height / 2);
-    m_q->fill_sprites(spr);
+    m_q->fill_sprites(&m_ec);
   }
 
   void flood_fill(auto x, auto y, tile::camping::c old) {
@@ -117,7 +110,7 @@ public:
   void set_brush(tile::camping::c t) {
     m_brush = t;
     cursor::update_tile(&m_ec, t);
-    fill_sprites();
+    m_q->fill_sprites(&m_ec);
   }
 
   void next_island_brush() {
@@ -144,7 +137,7 @@ public:
   void mouse_moved() {
     auto [x, y] = m_q->mouse_pos();
     cursor::update_pos(&m_ec, x, y);
-    fill_sprites();
+    m_q->fill_sprites(&m_ec);
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();

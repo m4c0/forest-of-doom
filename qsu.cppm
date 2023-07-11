@@ -7,6 +7,7 @@ import quack;
 import silog;
 import sprite;
 import stubby;
+import tile;
 
 namespace qsu {
 class layer {
@@ -154,7 +155,15 @@ public:
   }
 
   void fill_debug(pog::rtree &set) { m_debug.fill(set); }
-  void fill_sprites(const sprite::compo &set) { m_spr.fill(set); }
   void fill_player_sprites(const sprite::compo &set) { m_player.fill(set); }
+
+  void fill_sprites(tile::camping::compos *ec) {
+    auto [x, y] = (*m_spr)->center();
+
+    sprite::compo spr{};
+    sort_sprites(spr);
+    tile::camping::populate(ec, &spr, x, y);
+    m_spr.fill(spr);
+  }
 };
 } // namespace qsu
