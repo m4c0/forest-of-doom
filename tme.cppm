@@ -71,12 +71,10 @@ class game {
                         tile::camping::water};
 
   void update_sprites() {
-    m_ec.chunks().remove_if([this](auto cid, auto eid) {
-      if (cid != 1)
-        return false;
-
+    m_ec.camping_tiles().for_each_r([this](auto t, auto eid) {
+      if (eid == m_ec.cursor().get_id())
+        return;
       tile::camping::remove_tile(&m_ec, eid);
-      return true;
     });
     m_map.add_entities(&m_ec, 1, 0, 0);
     m_q->fill_sprites(&m_ec);
