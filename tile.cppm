@@ -28,11 +28,13 @@ using compo = pog::sparse_set<c>;
 
 class compos : public area::compos, public collision::compos {
   compo m_camping_tiles{};
+  pog::sparse_set<unsigned> m_sprite_layer{};
 
 public:
   virtual pog::entity_list &e() noexcept = 0;
 
   compo &camping_tiles() noexcept { return m_camping_tiles; }
+  auto &sprite_layer() noexcept { return m_sprite_layer; }
 };
 
 constexpr rect uv(c t) {
@@ -99,6 +101,7 @@ void populate(compos *ec, sprite::compo *spr, float cx, float cy) {
     sprite s{
         .pos = rect_of(area),
         .uv = uv(t),
+        .layer = ec->sprite_layer().get(id),
     };
     spr->add(id, s);
   });
