@@ -11,7 +11,6 @@ import prefabs;
 import qsu;
 import silog;
 import sitime;
-import sprite;
 import tile;
 
 class game {

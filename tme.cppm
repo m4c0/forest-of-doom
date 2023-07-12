@@ -8,7 +8,6 @@ import pog;
 import prefabs;
 import qsu;
 import silog;
-import sprite;
 import tile;
 import tilemap;
 import yoyo_libc;

@@ -1,7 +1,6 @@
 export module misc;
 import player;
 import qsu;
-import sprite;
 import tile;
 
 namespace misc {
