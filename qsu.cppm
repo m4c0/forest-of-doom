@@ -1,4 +1,5 @@
 export module qsu;
+import area;
 import casein;
 import collision;
 import jute;
@@ -158,10 +159,24 @@ public:
   void fill_player_sprites(const sprite::compo &set) { m_player.fill(set); }
 
   void fill_sprites(tile::camping::compos *ec) {
-    auto [x, y] = (*m_spr)->center();
+    auto [cx, cy] = (*m_spr)->center();
+
+    constexpr const auto radius = 16;
+    area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
 
     sprite::compo spr{};
-    tile::camping::populate(ec, &spr, x, y);
+    ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
+      auto t = ec->camping_tiles().get(id);
+      if (t == tile::camping::blank)
+        return;
+
+      sprite s{
+          .pos = rect_of(area),
+          .uv = uv(t),
+          .layer = ec->sprite_layer().get(id),
+      };
+      spr.add(id, s);
+    });
     m_spr.fill(spr);
   }
 };
