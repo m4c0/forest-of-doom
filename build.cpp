@@ -39,7 +39,10 @@ auto base_app(const char *name) {
   // Systems
   a->add_unit<mod>("cursor");
   a->add_unit<mod>("input");
-  a->add_unit<mod>("qsu");
+
+  // Quack Sprite Unit
+  auto qsu = a->add_unit<mod>("qsu");
+  qsu->add_part("debug");
 
   // Second-order systems
   a->add_unit<mod>("player");
