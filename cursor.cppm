@@ -20,7 +20,7 @@ void add_entity(compos *ec) {
 
 void update_tile(compos *ec, tile::camping::c t) {
   auto id = ec->cursor().get_id();
-  ec->camping_tiles().update(id, t);
+  ec->tiles().update(id, t);
 }
 
 void update_pos(compos *ec, float x, float y) {

@@ -43,8 +43,10 @@ class game {
     tile::camping::populate(&m_ec, cx, cy);
     tile::terrain::populate(&m_ec, cx, cy);
     m_q.fill_player_sprites(m_ec.player_sprites());
-    m_q.fill_camping_sprites(m_ec.camping_sprites());
-    m_q.fill_terrain_sprites(m_ec.terrain_sprites());
+    m_q.fill_camping_sprites(
+        static_cast<tile::camping::compos &>(m_ec).sprites());
+    m_q.fill_terrain_sprites(
+        static_cast<tile::terrain::compos &>(m_ec).sprites());
     // m_q.fill_debug(m_ec.bodies());
   }
 

@@ -60,13 +60,14 @@ class game {
                         tile::camping::water};
 
   void update_sprites() {
-    m_ec.camping_tiles().for_each_r([this](auto t, auto eid) {
+    auto &ec = static_cast<tile::camping::compos &>(m_ec);
+    ec.tiles().for_each_r([this](auto t, auto eid) {
       if (eid == m_ec.cursor().get_id())
         return;
       tile::camping::remove_tile(&m_ec, eid);
     });
     m_map.add_entities(&m_ec, 0, 0);
-    m_q->fill_camping_sprites(m_ec.camping_sprites());
+    m_q->fill_camping_sprites(ec.sprites());
   }
 
   void flood_fill(auto x, auto y, tile::camping::c old) {
@@ -95,9 +96,10 @@ public:
   }
 
   void set_brush(tile::camping::c t) {
+    auto &ec = static_cast<tile::camping::compos &>(m_ec);
     m_brush = t;
     cursor::update_tile(&m_ec, t);
-    m_q->fill_camping_sprites(m_ec.camping_sprites());
+    m_q->fill_camping_sprites(ec.sprites());
   }
 
   void next_island_brush() {
@@ -122,9 +124,10 @@ public:
   }
 
   void mouse_moved() {
+    auto &ec = static_cast<tile::camping::compos &>(m_ec);
     auto [x, y] = m_q->mouse_pos();
     cursor::update_pos(&m_ec, x, y);
-    m_q->fill_camping_sprites(m_ec.camping_sprites());
+    m_q->fill_camping_sprites(ec.sprites());
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();
