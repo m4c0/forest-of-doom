@@ -14,10 +14,11 @@ export class main {
   static constexpr const auto max_sprites = 4096;
   static constexpr const auto no_sprite = max_sprites + 1;
 
-  enum layers { camping, scout, last };
+  enum layers { terrain, camping, scout, last };
 
-  quack::renderer m_r{3};
+  quack::renderer m_r{last + 1};
   layer m_layers[last] = {
+      {&m_r, max_sprites, "1_Terrains_and_Fences_16x16.png"},
       {&m_r, max_sprites, "11_Camping_16x16.png"},
       {&m_r, max_player_sprites,
        "Modern_Exteriors_Characters_Scout_16x16_1.png"},
