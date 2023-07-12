@@ -41,6 +41,10 @@ public:
     }
     (*m_debug)->center_at(x, y);
   }
+  [[nodiscard]] auto center() const noexcept {
+    return (*m_layers[0])->center();
+  }
+
   void set_grid(float w, float h) {
     for (auto &l : m_layers) {
       (*l)->set_grid(w, h);
@@ -53,30 +57,11 @@ public:
   }
 
   void fill_debug(pog::rtree &set) { m_debug.fill(set); }
+  void fill_camping_sprites(const sprite::compo &set) {
+    m_layers[camping].fill(set);
+  }
   void fill_player_sprites(const sprite::compo &set) {
     m_layers[scout].fill(set);
-  }
-
-  void fill_sprites(tile::camping::compos *ec) {
-    auto [cx, cy] = (*m_layers[camping])->center();
-
-    constexpr const auto radius = 16;
-    area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
-
-    sprite::compo spr{};
-    ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
-      auto t = ec->camping_tiles().get(id);
-      if (t == tile::camping::blank)
-        return;
-
-      sprite s{
-          .pos = rect_of(area),
-          .uv = uv(t),
-          .layer = ec->sprite_layer().get(id),
-      };
-      spr.add(id, s);
-    });
-    m_layers[camping].fill(spr);
   }
 }; // namespace qsu
 } // namespace qsu

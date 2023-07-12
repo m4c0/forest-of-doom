@@ -31,29 +31,31 @@ class game {
     prefabs::ocean_0.add_entities(&m_ec, 16, 16);
 
     player::add_entity(&m_ec);
-    misc::follow_player(&m_q, &m_ec, &m_ec);
 
     m_q.set_grid(8, 8);
-    m_q.fill_player_sprites(m_ec.player_sprites());
+    repaint();
 
     m_watch = {};
+  }
+
+  void repaint() {
+    auto [cx, cy] = misc::follow_player(&m_q, &m_ec);
+    tile::camping::populate(&m_ec, cx, cy);
+    m_q.fill_player_sprites(m_ec.player_sprites());
+    m_q.fill_camping_sprites(m_ec.camping_sprites());
+    // m_q.fill_debug(m_ec.bodies());
   }
 
   void tick() {
     animation::update_animes(m_ec.animations(), m_ec.player_sprites(),
                              m_watch.millis());
     movement::update_sprites(&m_ec, m_ec.player_sprites(), m_watch.millis());
-    misc::follow_player(&m_q, &m_ec, &m_ec);
-    m_q.fill_player_sprites(m_ec.player_sprites());
-    // m_q.fill_debug(m_ec.bodies());
+    repaint();
 
     m_watch = {};
   }
 
-  void key_changed() {
-    player::process_input(m_input, &m_ec);
-    m_q.fill_player_sprites(m_ec.player_sprites());
-  }
+  void key_changed() { player::process_input(m_input, &m_ec); }
 
   void dump_stats() {
     silog::log(silog::debug, "Max entities: %d", m_ec.e().max_elements());

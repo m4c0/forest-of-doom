@@ -15,7 +15,7 @@ public:
 void add_entity(compos *ec) {
   auto id = tile::camping::add_tile(ec, {}, 0, 0);
   ec->cursor().set(id, {});
-  ec->sprite_layer().add(id, 100);
+  // ec->sprite_layer().add(id, 100);
 }
 
 void update_tile(compos *ec, tile::camping::c t) {

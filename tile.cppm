@@ -3,6 +3,7 @@ import area;
 import collision;
 import pog;
 import rect;
+import sprite;
 
 export namespace tile::camping {
 enum c : unsigned {
@@ -23,17 +24,16 @@ enum c : unsigned {
   lake_br = 0x07040101,
   water = 0x05030101,
 };
-using compo = pog::sparse_set<c>;
 
 class compos : public area::compos, public virtual collision::compos {
-  compo m_camping_tiles{};
-  pog::sparse_set<unsigned> m_sprite_layer{};
+  pog::sparse_set<c> m_camping_tiles{};
+  pog::sparse_set<sprite> m_camping_sprites{};
 
 public:
   virtual pog::entity_list &e() noexcept = 0;
 
-  compo &camping_tiles() noexcept { return m_camping_tiles; }
-  auto &sprite_layer() noexcept { return m_sprite_layer; }
+  auto &camping_tiles() noexcept { return m_camping_tiles; }
+  auto &camping_sprites() noexcept { return m_camping_sprites; }
 };
 
 constexpr rect uv(c t) {
@@ -87,5 +87,24 @@ void remove_tile(compos *ec, pog::eid id) {
   area::remove(ec, id);
   ec->camping_tiles().remove(id);
   ec->e().dealloc(id);
+}
+
+void populate(compos *ec, float cx, float cy) {
+  constexpr const auto radius = 16;
+  area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
+
+  ec->camping_sprites().remove_if([](auto, auto) { return true; });
+  ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
+    auto t = ec->camping_tiles().get(id);
+    if (t == tile::camping::blank)
+      return;
+
+    sprite s{
+        .pos = rect_of(area),
+        .uv = uv(t),
+    };
+
+    ec->camping_sprites().add(id, s);
+  });
 }
 } // namespace tile::camping
