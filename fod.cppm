@@ -41,8 +41,10 @@ class game {
   void repaint() {
     auto [cx, cy] = misc::follow_player(&m_q, &m_ec);
     tile::camping::populate(&m_ec, cx, cy);
+    tile::terrain::populate(&m_ec, cx, cy);
     m_q.fill_player_sprites(m_ec.player_sprites());
     m_q.fill_camping_sprites(m_ec.camping_sprites());
+    m_q.fill_terrain_sprites(m_ec.terrain_sprites());
     // m_q.fill_debug(m_ec.bodies());
   }
 

@@ -6,7 +6,7 @@ export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
-using compos = tile::camping::compos;
+struct compos : virtual tile::camping::compos, virtual tile::terrain::compos {};
 
 class map {
   tile::camping::c m_data[height][width]{};

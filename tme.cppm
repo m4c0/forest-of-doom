@@ -30,7 +30,7 @@ static void fail(const char *msg) {
   throw 0;
 }
 
-class ec : public cursor::compos {
+class ec : public cursor::compos, public tilemap::compos {
   pog::entity_list m_e{};
 
 public:
@@ -130,7 +130,7 @@ public:
     auto [x, y] = m_q->mouse_pos();
     m_undo_map = m_map;
     m_map.set(x, y, m_brush);
-    auto [tx, ty, tw, th] = tile::camping::uv(m_brush);
+    auto [tx, ty, tw, th] = tile::uv(m_brush);
     for (auto dy = 0; dy < th; dy++) {
       for (auto dx = 0; dx < tw; dx++) {
         if (dx == 0 && dy == 0)

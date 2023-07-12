@@ -5,6 +5,17 @@ import pog;
 import rect;
 import sprite;
 
+namespace tile {
+export constexpr rect uv(unsigned t) {
+  return rect{
+      .x = static_cast<float>((t >> 24) & 0xFFU),
+      .y = static_cast<float>((t >> 16) & 0xFFU),
+      .w = static_cast<float>((t >> 8) & 0xFFU),
+      .h = static_cast<float>((t >> 0) & 0xFFU),
+  };
+}
+} // namespace tile
+
 export namespace tile::camping {
 enum c : unsigned {
   blank = 0,
@@ -25,26 +36,14 @@ enum c : unsigned {
   water = 0x05030101,
 };
 
-class compos : public area::compos, public virtual collision::compos {
+class compos : public virtual area::compos, public virtual collision::compos {
   pog::sparse_set<c> m_camping_tiles{};
   pog::sparse_set<sprite> m_camping_sprites{};
 
 public:
-  virtual pog::entity_list &e() noexcept = 0;
-
   auto &camping_tiles() noexcept { return m_camping_tiles; }
   auto &camping_sprites() noexcept { return m_camping_sprites; }
 };
-
-constexpr rect uv(c t) {
-  auto ut = static_cast<unsigned>(t);
-  return rect{
-      .x = static_cast<float>((t >> 24) & 0xFFU),
-      .y = static_cast<float>((t >> 16) & 0xFFU),
-      .w = static_cast<float>((t >> 8) & 0xFFU),
-      .h = static_cast<float>((t >> 0) & 0xFFU),
-  };
-}
 
 auto add_tile(compos *ec, c t, float x, float y) {
   rect r = uv(t);
@@ -108,3 +107,95 @@ void populate(compos *ec, float cx, float cy) {
   });
 }
 } // namespace tile::camping
+
+export namespace tile::terrain {
+enum c : unsigned {
+  blank = 0,
+  island_tl = 0x05060101,
+  island_t = 0x06060101,
+  island_tr = 0x07060101,
+  island_l = 0x05070101,
+  grass_0 = 0x08080101,
+  grass_1 = 0x06080101,
+  island_r = 0x07080101,
+  island_bl = 0x05090101,
+  island_b = 0x06090101,
+  island_br = 0x07090101,
+  lake_tl = 0x080a0101,
+  lake_tr = 0x090a0101,
+  lake_bl = 0x080a0101,
+  lake_br = 0x090a0101,
+  water = 0x09080101,
+};
+
+class compos : public virtual area::compos, public virtual collision::compos {
+  pog::sparse_set<c> m_terrain_tiles{};
+  pog::sparse_set<sprite> m_terrain_sprites{};
+
+public:
+  auto &terrain_tiles() noexcept { return m_terrain_tiles; }
+  auto &terrain_sprites() noexcept { return m_terrain_sprites; }
+};
+
+auto add_tile(compos *ec, c t, float x, float y) {
+  rect r = uv(t);
+  r.x = x;
+  r.y = y;
+
+  auto id = ec->e().alloc();
+  area::add(ec, id, r);
+  ec->terrain_tiles().add(id, t);
+
+  switch (t) {
+  case water:
+    collision::add(ec, id, x, y, 1, 1);
+    break;
+  case island_bl:
+  case island_b:
+  case island_br:
+    // collision::add(ec, id, x, y + 0.7, 1, 1.3);
+    break;
+  default:
+    break;
+  }
+
+  return id;
+}
+
+void update_tile_pos(compos *ec, pog::eid id, float x, float y) {
+  auto t = ec->terrain_tiles().get(id);
+  rect r = uv(t);
+  r.x = x;
+  r.y = y;
+
+  // TODO: update collisor?
+  area::remove(ec, id);
+  area::add(ec, id, r);
+}
+
+void remove_tile(compos *ec, pog::eid id) {
+  collision::remove(ec, id);
+  area::remove(ec, id);
+  ec->terrain_tiles().remove(id);
+  ec->e().dealloc(id);
+}
+
+void populate(compos *ec, float cx, float cy) {
+  constexpr const auto radius = 16;
+  area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
+
+  ec->terrain_sprites().remove_if([](auto, auto) { return true; });
+  ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
+    auto t = ec->terrain_tiles().get(id);
+    if (t == tile::terrain::blank)
+      return;
+
+    sprite s{
+        .pos = rect_of(area),
+        .uv = uv(t),
+    };
+
+    ec->terrain_sprites().add(id, s);
+  });
+}
+} // namespace tile::terrain

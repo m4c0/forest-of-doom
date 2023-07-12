@@ -64,5 +64,8 @@ public:
   void fill_player_sprites(const sprite::compo &set) {
     m_layers[scout].fill(set);
   }
+  void fill_terrain_sprites(const sprite::compo &set) {
+    m_layers[terrain].fill(set);
+  }
 }; // namespace qsu
 } // namespace qsu
