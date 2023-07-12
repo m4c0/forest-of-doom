@@ -14,17 +14,9 @@ class layer {
   jute::view m_atlas_name;
   float m_atlas_w;
   float m_atlas_h;
+  unsigned m_max_sprites{};
 
-public:
-  layer(quack::renderer *m_r, unsigned max_sprites, jute::view atlas)
-      : m_spr{m_r, max_sprites}, m_atlas_name{atlas} {}
-
-  void process_event(const casein::event &e) {
-    m_spr.process_event(e);
-
-    if (e.type() != casein::CREATE_WINDOW)
-      return;
-
+  void create_window() {
     stbi::load_from_resource(m_atlas_name)
         .map([this](const auto &img) {
           m_atlas_w = img.width;
@@ -41,6 +33,29 @@ public:
         .take([](auto err) {
           silog::log(silog::error, "Error loading atlas: %s", err);
         });
+  }
+  void quit() {
+    silog::log(silog::info, "[qsu] %d sprites for %s", m_max_sprites,
+               m_atlas_name.cstr().data());
+  }
+
+public:
+  layer(quack::renderer *m_r, unsigned max_sprites, jute::view atlas)
+      : m_spr{m_r, max_sprites}, m_atlas_name{atlas} {}
+
+  void process_event(const casein::event &e) {
+    m_spr.process_event(e);
+
+    switch (e.type()) {
+    case casein::CREATE_WINDOW:
+      create_window();
+      break;
+    case casein::QUIT:
+      quit();
+      break;
+    default:
+      break;
+    }
   }
 
   void fill(const sprite::compo &set) {
@@ -70,6 +85,9 @@ public:
       }
     });
     m_spr->set_count(set.size());
+    if (set.size() > m_max_sprites) {
+      m_max_sprites = set.size();
+    }
   }
 
   [[nodiscard]] constexpr auto &operator*() noexcept { return m_spr; }
