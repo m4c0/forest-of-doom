@@ -24,6 +24,54 @@ public:
   auto &sprites() noexcept { return m_sprites; }
 };
 
+template <typename C> auto add_tile(compos<C> *ec, C t, float x, float y) {
+  rect r = uv(t);
+  r.x = x;
+  r.y = y;
+
+  auto id = ec->e().alloc();
+  area::add(ec, id, r);
+  ec->tiles().add(id, t);
+  return id;
+}
+
+template <typename C>
+void update_tile_pos(compos<C> *ec, pog::eid id, float x, float y) {
+  auto t = ec->tiles().get(id);
+  rect r = uv(t);
+  r.x = x;
+  r.y = y;
+
+  // TODO: update collisor?
+  area::remove(ec, id);
+  area::add(ec, id, r);
+}
+
+template <typename C> void remove_tile(compos<C> *ec, pog::eid id) {
+  collision::remove(ec, id);
+  area::remove(ec, id);
+  ec->tiles().remove(id);
+  ec->e().dealloc(id);
+}
+
+template <typename C> void populate(compos<C> *ec, float cx, float cy) {
+  constexpr const auto radius = 16;
+  area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
+
+  ec->sprites().remove_if([](auto, auto) { return true; });
+  ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
+    auto t = ec->tiles().get(id);
+    if (t == 0)
+      return;
+
+    sprite s{
+        .pos = rect_of(area),
+        .uv = uv(t),
+    };
+
+    ec->sprites().add(id, s);
+  });
+}
 } // namespace tile
 
 export namespace tile::camping {
@@ -48,13 +96,7 @@ enum c : unsigned {
 using compos = tile::compos<c>;
 
 auto add_tile(compos *ec, c t, float x, float y) {
-  rect r = uv(t);
-  r.x = x;
-  r.y = y;
-
-  auto id = ec->e().alloc();
-  area::add(ec, id, r);
-  ec->tiles().add(id, t);
+  auto id = tile::add_tile(ec, t, x, y);
 
   switch (t) {
   case water:
@@ -71,43 +113,11 @@ auto add_tile(compos *ec, c t, float x, float y) {
 
   return id;
 }
-
 void update_tile_pos(compos *ec, pog::eid id, float x, float y) {
-  auto t = ec->tiles().get(id);
-  rect r = uv(t);
-  r.x = x;
-  r.y = y;
-
-  // TODO: update collisor?
-  area::remove(ec, id);
-  area::add(ec, id, r);
+  tile::update_tile_pos(ec, id, x, y);
 }
-
-void remove_tile(compos *ec, pog::eid id) {
-  collision::remove(ec, id);
-  area::remove(ec, id);
-  ec->tiles().remove(id);
-  ec->e().dealloc(id);
-}
-
-void populate(compos *ec, float cx, float cy) {
-  constexpr const auto radius = 16;
-  area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
-
-  ec->sprites().remove_if([](auto, auto) { return true; });
-  ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
-    auto t = ec->tiles().get(id);
-    if (t == tile::camping::blank)
-      return;
-
-    sprite s{
-        .pos = rect_of(area),
-        .uv = uv(t),
-    };
-
-    ec->sprites().add(id, s);
-  });
-}
+void remove_tile(compos *ec, pog::eid id) { tile::remove_tile(ec, id); }
+void populate(compos *ec, float cx, float cy) { tile::populate(ec, cx, cy); }
 } // namespace tile::camping
 
 export namespace tile::terrain {
@@ -132,13 +142,7 @@ enum c : unsigned {
 using compos = tile::compos<c>;
 
 auto add_tile(compos *ec, c t, float x, float y) {
-  rect r = uv(t);
-  r.x = x;
-  r.y = y;
-
-  auto id = ec->e().alloc();
-  area::add(ec, id, r);
-  ec->tiles().add(id, t);
+  auto id = tile::add_tile(ec, t, x, y);
 
   switch (t) {
   case water:
@@ -155,41 +159,9 @@ auto add_tile(compos *ec, c t, float x, float y) {
 
   return id;
 }
-
 void update_tile_pos(compos *ec, pog::eid id, float x, float y) {
-  auto t = ec->tiles().get(id);
-  rect r = uv(t);
-  r.x = x;
-  r.y = y;
-
-  // TODO: update collisor?
-  area::remove(ec, id);
-  area::add(ec, id, r);
+  tile::update_tile_pos(ec, id, x, y);
 }
-
-void remove_tile(compos *ec, pog::eid id) {
-  collision::remove(ec, id);
-  area::remove(ec, id);
-  ec->tiles().remove(id);
-  ec->e().dealloc(id);
-}
-
-void populate(compos *ec, float cx, float cy) {
-  constexpr const auto radius = 16;
-  area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
-
-  ec->sprites().remove_if([](auto, auto) { return true; });
-  ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
-    auto t = ec->tiles().get(id);
-    if (t == tile::terrain::blank)
-      return;
-
-    sprite s{
-        .pos = rect_of(area),
-        .uv = uv(t),
-    };
-
-    ec->sprites().add(id, s);
-  });
-}
+void remove_tile(compos *ec, pog::eid id) { tile::remove_tile(ec, id); }
+void populate(compos *ec, float cx, float cy) { tile::populate(ec, cx, cy); }
 } // namespace tile::terrain
