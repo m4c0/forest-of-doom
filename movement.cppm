@@ -1,11 +1,19 @@
 export module movement;
 import collision;
-import move;
+import pog;
 import sprite;
 
 namespace movement {
-export struct compos : virtual collision::compos {
-  virtual move::compo &movements() noexcept = 0;
+export struct c {
+  float sx;
+  float sy;
+};
+export using compo = pog::sparse_set<c>;
+export class compos : public virtual collision::compos {
+  compo m_movements{};
+
+public:
+  compo &movements() noexcept { return m_movements; }
 };
 export void update_sprites(compos *c, sprite::compo &sprites, int millis) {
   float ms = millis;

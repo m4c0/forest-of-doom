@@ -2,7 +2,7 @@ export module player;
 import animation;
 import collision;
 import input;
-import move;
+import movement;
 import pog;
 import sprite;
 
@@ -20,11 +20,10 @@ export struct c {
 };
 
 export using compo = pog::singleton<c>;
-export struct compos : virtual collision::compos {
+export struct compos : virtual movement::compos {
   virtual pog::entity_list &e() noexcept = 0;
   virtual compo &player() noexcept = 0;
   virtual animation::compo &animations() noexcept = 0;
-  virtual move::compo &movements() noexcept = 0;
   virtual sprite::compo &player_sprites() noexcept = 0;
 };
 

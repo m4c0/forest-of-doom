@@ -27,7 +27,6 @@ auto base_app(const char *name) {
 
   // Components
   a->add_unit<mod>("collision");
-  a->add_unit<mod>("move");
   a->add_unit<mod>("rect");
   a->add_unit<mod>("area");
   a->add_unit<mod>("sprite");
@@ -35,11 +34,11 @@ auto base_app(const char *name) {
   // Components + Systems
   a->add_unit<mod>("tile");
   a->add_unit<mod>("animation");
+  a->add_unit<mod>("movement");
 
   // Systems
   a->add_unit<mod>("cursor");
   a->add_unit<mod>("input");
-  a->add_unit<mod>("movement");
   a->add_unit<mod>("qsu");
 
   // Second-order systems
