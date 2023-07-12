@@ -1,12 +1,7 @@
 export module ecs;
 import animation;
-import collision;
-import cursor;
-import movement;
 import pog;
 import player;
-import sprite;
-import tile;
 import tilemap;
 
 namespace ecs {
