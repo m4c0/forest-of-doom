@@ -1,11 +1,18 @@
 export module animation;
-import anime;
 import pog;
 import sprite;
 
 namespace animation {
-export void update_animes(anime::compo &set, sprite::compo &sprites,
-                          int millis) {
+export struct c {
+  unsigned start_x;
+  unsigned y;
+  unsigned num_frames;
+  unsigned frames_per_sec;
+  unsigned ticks{};
+};
+export using compo = pog::sparse_set<c>;
+
+export void update_animes(compo &set, sprite::compo &sprites, int millis) {
   for (auto &[a, id] : set) {
     a.ticks += millis;
 

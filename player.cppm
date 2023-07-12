@@ -1,5 +1,5 @@
 export module player;
-import anime;
+import animation;
 import collision;
 import input;
 import move;
@@ -23,7 +23,7 @@ export using compo = pog::singleton<c>;
 export struct compos : virtual collision::compos {
   virtual pog::entity_list &e() noexcept = 0;
   virtual compo &player() noexcept = 0;
-  virtual anime::compo &animations() noexcept = 0;
+  virtual animation::compo &animations() noexcept = 0;
   virtual move::compo &movements() noexcept = 0;
   virtual sprite::compo &player_sprites() noexcept = 0;
 };
@@ -36,7 +36,7 @@ export void add_entity(compos *ec) {
       .pos = {sx, sy, 1, 2},
       .uv = {0, 2, 1, 2},
   };
-  anime::c a{
+  animation::c a{
       .start_x = 0,
       .y = 0,
       .num_frames = 1,
@@ -49,7 +49,7 @@ export void add_entity(compos *ec) {
   collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
 }
 
-void update_compo(compos *ec, side s, anime::c a) {
+void update_compo(compos *ec, side s, animation::c a) {
   a.start_x = static_cast<unsigned>(s) * a.num_frames;
 
   auto pid = ec->player().get_id();
