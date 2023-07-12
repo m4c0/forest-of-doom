@@ -43,6 +43,7 @@ auto base_app(const char *name) {
   // Quack Sprite Unit
   auto qsu = a->add_unit<mod>("qsu");
   qsu->add_part("debug");
+  qsu->add_part("layer");
 
   // Second-order systems
   a->add_unit<mod>("player");
