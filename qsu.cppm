@@ -15,23 +15,19 @@ export class main {
   static constexpr const auto no_sprite = max_sprites + 1;
 
   quack::renderer m_r{3};
-  layer m_spr{&m_r, max_sprites};
-  layer m_player{&m_r, max_player_sprites};
+  layer m_spr{&m_r, max_sprites, "11_Camping_16x16.png"};
+  layer m_player{&m_r, max_player_sprites,
+                 "Modern_Exteriors_Characters_Scout_16x16_1.png"};
   debug_layer m_debug{&m_r, max_sprites};
   quack::mouse_tracker m_mouse{};
 
 public:
   void process_event(const casein::event &e) {
     m_r.process_event(e);
-    (*m_spr).process_event(e);
-    (*m_player).process_event(e);
+    m_spr.process_event(e);
+    m_player.process_event(e);
     (*m_debug).process_event(e);
     m_mouse.process_event(e);
-
-    if (e.type() == casein::CREATE_WINDOW) {
-      m_spr.setup("11_Camping_16x16.png");
-      m_player.setup("Modern_Exteriors_Characters_Scout_16x16_1.png");
-    }
   }
 
   void center_at(float x, float y) {

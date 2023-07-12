@@ -1,4 +1,5 @@
 export module qsu:layer;
+import casein;
 import jute;
 import quack;
 import silog;
@@ -10,14 +11,21 @@ class layer {
   static constexpr const auto sprite_sz = 16.0f;
 
   quack::ilayout m_spr;
+  jute::view m_atlas_name;
   float m_atlas_w;
   float m_atlas_h;
 
 public:
-  layer(quack::renderer *m_r, unsigned max_sprites) : m_spr{m_r, max_sprites} {}
+  layer(quack::renderer *m_r, unsigned max_sprites, jute::view atlas)
+      : m_spr{m_r, max_sprites}, m_atlas_name{atlas} {}
 
-  void setup(jute::view atlas) {
-    stbi::load_from_resource(atlas)
+  void process_event(const casein::event &e) {
+    m_spr.process_event(e);
+
+    if (e.type() != casein::CREATE_WINDOW)
+      return;
+
+    stbi::load_from_resource(m_atlas_name)
         .map([this](const auto &img) {
           m_atlas_w = img.width;
           m_atlas_h = img.height;
