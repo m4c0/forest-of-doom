@@ -1,11 +1,13 @@
 export module cursor;
 import pog;
+import sprite;
 import tile;
 
+namespace t = tile::camping;
+
 export namespace cursor {
-using compo = pog::singleton<>;
-class compos : public virtual tile::camping::compos,
-               public virtual pog::entity_provider {
+using compo = pog::singleton<sprite>;
+class compos : public virtual pog::entity_provider {
   cursor::compo m_cursor{};
 
 public:
@@ -13,19 +15,30 @@ public:
 };
 
 void add_entity(compos *ec) {
-  auto id = tile::camping::add_tile(ec, {}, 0, 0);
+  auto id = ec->e().alloc();
   ec->cursor().set(id, {});
-  // ec->sprite_layer().add(id, 100);
 }
 
-void update_tile(compos *ec, tile::camping::c t) {
+void add_sprite(compos *ec, sprite::compo &spr) {
   auto id = ec->cursor().get_id();
-  ec->tiles().update(id, t);
+  spr.add(id, ec->cursor().get(id));
+}
+
+void update_tile(compos *ec, t::c c) {
+  auto id = ec->cursor().get_id();
+  auto spr = ec->cursor().get(id);
+  auto uv = tile::uv(c);
+  spr.pos.w = uv.w;
+  spr.pos.h = uv.h;
+  spr.uv = uv;
+  ec->cursor().set(id, spr);
 }
 
 void update_pos(compos *ec, float x, float y) {
   auto id = ec->cursor().get_id();
-  tile::camping::update_tile_pos(ec, id, static_cast<int>(x),
-                                 static_cast<int>(y));
+  auto spr = ec->cursor().get(id);
+  spr.pos.x = static_cast<int>(x);
+  spr.pos.y = static_cast<int>(y);
+  ec->cursor().set(id, spr);
 }
 } // namespace cursor

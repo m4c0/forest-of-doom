@@ -64,6 +64,7 @@ class game {
   void fill_sprites() {
     auto &ec = static_cast<t::compos &>(m_ec);
     t::populate(&m_ec, 0, 0);
+    cursor::add_sprite(&m_ec, ec.sprites());
     (m_q->*tfill)(ec.sprites());
   }
 
