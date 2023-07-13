@@ -23,7 +23,7 @@ public:
     (m_tiles.push_back(n), ...);
   }
 
-  [[nodiscard]] constexpr auto get() const noexcept { return m_tiles[m_index]; }
+  [[nodiscard]] constexpr auto &get() noexcept { return m_tiles[m_index]; }
 
   void operator++() noexcept { m_index = (m_index + 1) % m_tiles.size(); }
   void operator--() noexcept {
@@ -46,16 +46,14 @@ namespace t = tile::camping;
 static constexpr const auto tname = "tile::camping";
 static constexpr const auto tfill = &qsu::main::fill_camping_sprites;
 
-static constexpr const auto tp0 = [] {
-  return palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
-                 t::island_br, t::island_b, t::island_bl, t::island_l};
-};
-static constexpr const auto tp1 = [] {
-  return palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l,
-                 t::lake_br, t::island_t, t::lake_bl, t::island_r};
-};
-static constexpr const auto tp3 = [] {
-  return palette{t::grass_0, t::grass_1, t::water};
+static constexpr const auto pals = [] {
+  return palette<palette<t::c>>{
+      palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
+              t::island_br, t::island_b, t::island_bl, t::island_l},
+      palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l, t::lake_br,
+              t::island_t, t::lake_bl, t::island_r},
+      palette{t::grass_0, t::grass_1, t::water},
+  };
 };
 } // namespace camping_set
 
@@ -68,16 +66,14 @@ namespace t = tile::terrain;
 static constexpr const auto tname = "tile::terrain";
 static constexpr const auto tfill = &qsu::main::fill_terrain_sprites;
 
-static constexpr const auto tp0 = [] {
-  return palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
-                 t::island_br, t::island_b, t::island_bl, t::island_l};
-};
-static constexpr const auto tp1 = [] {
-  return palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l,
-                 t::lake_br, t::island_t, t::lake_bl, t::island_r};
-};
-static constexpr const auto tp2 = [] {
-  return palette{t::grass_0, t::grass_1, t::water};
+static constexpr const auto pals = [] {
+  return palette<palette<t::c>>{
+      palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
+              t::island_br, t::island_b, t::island_bl, t::island_l},
+      palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l, t::lake_br,
+              t::island_t, t::lake_bl, t::island_r},
+      palette{t::grass_0, t::grass_1, t::water},
+  };
 };
 } // namespace terrain_set
 
@@ -92,9 +88,7 @@ class game {
   tilemap::map<t::compos> m_undo_map = prefab;
   t::c m_brush{};
 
-  palette<t::c> m_pal0{tp0()};
-  palette<t::c> m_pal1{tp1()};
-  palette<t::c> m_pal2{tp2()};
+  palette<palette<t::c>> m_pal = pals();
 
   void fill_sprites() {
     auto &ec = static_cast<t::compos &>(m_ec);
@@ -144,25 +138,22 @@ public:
   }
 
   void next_island_brush() {
-    ++m_pal0;
-    set_brush(m_pal0.get());
+    ++m_pal;
+    set_brush(m_pal.get().get());
   }
   void prev_island_brush() {
-    --m_pal0;
-    set_brush(m_pal0.get());
+    --m_pal;
+    set_brush(m_pal.get().get());
   }
   void next_lake_brush() {
-    ++m_pal1;
-    set_brush(m_pal1.get());
+    ++(m_pal.get());
+    set_brush(m_pal.get().get());
   }
   void prev_lake_brush() {
-    --m_pal1;
-    set_brush(m_pal1.get());
+    ++(m_pal.get());
+    set_brush(m_pal.get().get());
   }
-  void next_land_brush() {
-    ++m_pal2;
-    set_brush(m_pal2.get());
-  }
+  void next_land_brush() {}
 
   void mouse_moved() {
     auto [x, y] = m_q->mouse_pos();
