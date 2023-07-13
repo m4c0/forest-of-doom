@@ -20,12 +20,12 @@ export struct c {
 };
 
 export using compo = pog::singleton<c>;
-export class compos : public virtual movement::compos {
+export class compos : public virtual movement::compos,
+                      public virtual pog::entity_provider {
   player::compo m_player{};
   sprite::compo m_player_sprites{};
 
 public:
-  virtual pog::entity_list &e() noexcept = 0;
   virtual animation::compo &animations() noexcept = 0;
 
   player::compo &player() noexcept { return m_player; }

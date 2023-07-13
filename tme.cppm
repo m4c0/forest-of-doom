@@ -30,12 +30,7 @@ static void fail(const char *msg) {
   throw 0;
 }
 
-class ec : public cursor::compos, public tilemap::compos {
-  pog::entity_list m_e{};
-
-public:
-  pog::entity_list &e() noexcept override { return m_e; }
-};
+struct ec : cursor::compos, tilemap::compos {};
 
 class game {
   static constexpr const auto prefab = prefabs::ocean_0;

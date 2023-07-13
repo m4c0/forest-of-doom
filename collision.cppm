@@ -3,12 +3,10 @@ import pog;
 
 namespace collision {
 export using compo = pog::rtree;
-export struct compos {
+export class compos : public virtual pog::entity_provider {
   collision::compo m_bodies{};
 
 public:
-  virtual pog::entity_list &e() noexcept = 0;
-
   collision::compo &bodies() noexcept { return m_bodies; }
 };
 
