@@ -2,6 +2,7 @@ export module cursor;
 import pog;
 import sprite;
 import tile;
+import tilemap;
 
 export namespace cursor {
 using compo = pog::singleton<sprite>;
@@ -35,8 +36,10 @@ void update_tile(compos *ec, auto c) {
 void update_pos(compos *ec, float x, float y) {
   auto id = ec->cursor().get_id();
   auto spr = ec->cursor().get(id);
-  spr.pos.x = static_cast<int>(x);
-  spr.pos.y = static_cast<int>(y);
+  if (x >= 0 && x < tilemap::width)
+    spr.pos.x = static_cast<int>(x);
+  if (y >= 0 && y < tilemap::height)
+    spr.pos.y = static_cast<int>(y);
   ec->cursor().set(id, spr);
 }
 } // namespace cursor
