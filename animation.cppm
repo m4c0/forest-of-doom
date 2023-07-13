@@ -11,6 +11,12 @@ export struct c {
   unsigned ticks{};
 };
 export using compo = pog::sparse_set<c>;
+export struct compos {
+  animation::compo m_animations{};
+
+public:
+  animation::compo &animations() noexcept { return m_animations; }
+};
 
 export void update_animes(compo &set, sprite::compo &sprites, int millis) {
   for (auto &[a, id] : set) {
