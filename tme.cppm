@@ -90,11 +90,10 @@ class game {
 
   void update_sprites() {
     auto &ec = static_cast<t::compos &>(m_ec);
-    ec.tiles().for_each_r([this](auto t, auto eid) {
-      if (eid == m_ec.cursor().get_id())
-        return;
+    while (ec.tiles().size() > 0) {
+      auto [c, eid] = *(ec.tiles().begin());
       t::remove_tile(&m_ec, eid);
-    });
+    }
     m_map.add_entities(&m_ec, 0, 0);
     fill_sprites();
   }
