@@ -4,6 +4,7 @@ import casein;
 import collision;
 import cursor;
 import jute;
+import missingno;
 import pog;
 import prefabs;
 import qsu;
@@ -198,12 +199,15 @@ public:
       out.write("namespace prefabs {\n"_s).take(fail);
       out.writef("export constexpr const tilemap::map %s = [] {\n", mname)
           .take(fail);
-      out.writef("using c = %s::c;\n", tname).take(fail);
-      out.write("  tilemap::map res{};\n"_s).take(fail);
+      out.writef("  using cs = %s::compos;\n", tname).take(fail);
+      out.write("  using c = cs::tile_t;\n"_s).take(fail);
+      out.write("  tilemap::map<cs> res{};\n"_s).take(fail);
       for (auto y = 0; y < tilemap::height; y++) {
         for (auto x = 0; x < tilemap::width; x++) {
           m_map.get(x, y)
               .fmap([&](auto t) {
+                if (t == 0)
+                  return mno::req<void>{};
                 return out.writef(
                     "  res.set(%d, %d, static_cast<c>(0x%08x));\n", x, y, t);
               })
