@@ -3,8 +3,6 @@ import pog;
 import sprite;
 import tile;
 
-namespace t = tile::camping;
-
 export namespace cursor {
 using compo = pog::singleton<sprite>;
 class compos : public virtual pog::entity_provider {
@@ -24,7 +22,7 @@ void add_sprite(compos *ec, sprite::compo &spr) {
   spr.add(id, ec->cursor().get(id));
 }
 
-void update_tile(compos *ec, t::c c) {
+void update_tile(compos *ec, auto c) {
   auto id = ec->cursor().get_id();
   auto spr = ec->cursor().get(id);
   auto uv = tile::uv(c);
