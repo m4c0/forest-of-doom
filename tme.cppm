@@ -3,6 +3,7 @@ export module main;
 import casein;
 import collision;
 import cursor;
+import hai;
 import jute;
 import missingno;
 import pog;
@@ -13,18 +14,23 @@ import tile;
 import tilemap;
 import yoyo_libc;
 
-template <typename C, unsigned N> class palette {
-  C m_tiles[N];
+template <typename C> class palette {
+  hai::varray<C> m_tiles;
   unsigned m_index{};
 
 public:
-  constexpr palette(auto... n) : m_tiles{n...} {}
+  constexpr palette(auto... n) : m_tiles{sizeof...(n)} {
+    (m_tiles.push_back(n), ...);
+  }
 
   [[nodiscard]] constexpr auto get() const noexcept { return m_tiles[m_index]; }
 
-  void operator++() noexcept { m_index = (m_index + 1) % N; }
-  void operator--() noexcept { m_index = (m_index + N - 1) % N; }
+  void operator++() noexcept { m_index = (m_index + 1) % m_tiles.size(); }
+  void operator--() noexcept {
+    m_index = (m_index + m_tiles.size() - 1) % m_tiles.size();
+  }
 };
+template <typename Tp> palette(Tp, auto...) -> palette<Tp>;
 
 static void fail(const char *msg) {
   silog::log(silog::error, "Error: %s", msg);
@@ -40,13 +46,17 @@ namespace t = tile::camping;
 static constexpr const auto tname = "tile::camping";
 static constexpr const auto tfill = &qsu::main::fill_camping_sprites;
 
-static constexpr const palette<t::c, 8> tp0{
-    t::island_tl, t::island_t, t::island_tr, t::island_r,
-    t::island_br, t::island_b, t::island_bl, t::island_l};
-static constexpr const palette<t::c, 8> tp1{
-    t::lake_tl, t::island_b, t::lake_tr, t::island_l,
-    t::lake_br, t::island_t, t::lake_bl, t::island_r};
-static constexpr const palette<t::c, 3> tp2{t::grass_0, t::grass_1, t::water};
+static constexpr const auto tp0 = [] {
+  return palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
+                 t::island_br, t::island_b, t::island_bl, t::island_l};
+};
+static constexpr const auto tp1 = [] {
+  return palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l,
+                 t::lake_br, t::island_t, t::lake_bl, t::island_r};
+};
+static constexpr const auto tp3 = [] {
+  return palette{t::grass_0, t::grass_1, t::water};
+};
 } // namespace camping_set
 
 namespace terrain_set {
@@ -58,13 +68,17 @@ namespace t = tile::terrain;
 static constexpr const auto tname = "tile::terrain";
 static constexpr const auto tfill = &qsu::main::fill_terrain_sprites;
 
-static constexpr const palette<t::c, 8> tp0{
-    t::island_tl, t::island_t, t::island_tr, t::island_r,
-    t::island_br, t::island_b, t::island_bl, t::island_l};
-static constexpr const palette<t::c, 8> tp1{
-    t::lake_tl, t::island_b, t::lake_tr, t::island_l,
-    t::lake_br, t::island_t, t::lake_bl, t::island_r};
-static constexpr const palette<t::c, 3> tp2{t::grass_0, t::grass_1, t::water};
+static constexpr const auto tp0 = [] {
+  return palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
+                 t::island_br, t::island_b, t::island_bl, t::island_l};
+};
+static constexpr const auto tp1 = [] {
+  return palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l,
+                 t::lake_br, t::island_t, t::lake_bl, t::island_r};
+};
+static constexpr const auto tp2 = [] {
+  return palette{t::grass_0, t::grass_1, t::water};
+};
 } // namespace terrain_set
 
 using namespace terrain_set;
@@ -78,9 +92,9 @@ class game {
   tilemap::map<t::compos> m_undo_map = prefab;
   t::c m_brush{};
 
-  palette<t::c, 8> m_pal0{tp0};
-  palette<t::c, 8> m_pal1{tp1};
-  palette<t::c, 3> m_pal2{tp2};
+  palette<t::c> m_pal0{tp0()};
+  palette<t::c> m_pal1{tp1()};
+  palette<t::c> m_pal2{tp2()};
 
   void fill_sprites() {
     auto &ec = static_cast<t::compos &>(m_ec);
