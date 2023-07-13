@@ -20,6 +20,8 @@ class compos : public virtual area::compos, public virtual collision::compos {
   pog::sparse_set<sprite> m_sprites{};
 
 public:
+  using tile_t = C;
+
   auto &tiles() noexcept { return m_tiles; }
   auto &sprites() noexcept { return m_sprites; }
 };

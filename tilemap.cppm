@@ -6,44 +6,43 @@ export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
-struct compos : virtual tile::camping::compos, virtual tile::terrain::compos {};
+template <typename T> class map {
+  using c = T::tile_t;
 
-class map {
-  tile::camping::c m_data[height][width]{};
+  c m_data[height][width]{};
 
 public:
-  constexpr void fill(tile::camping::c t) noexcept {
+  constexpr void fill(c t) noexcept {
     for (auto &row : m_data) {
       for (auto &tile : row) {
         tile = t;
       }
     }
   }
-  constexpr mno::req<tile::camping::c> get(unsigned x,
-                                           unsigned y) const noexcept {
+  constexpr mno::req<c> get(unsigned x, unsigned y) const noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
-      return mno::req<tile::camping::c>::failed("out-of-bounds");
+      return mno::req<c>::failed("out-of-bounds");
 
-    return mno::req<tile::camping::c>{m_data[y][x]};
+    return mno::req<c>{m_data[y][x]};
   }
-  constexpr void set(unsigned x, unsigned y, tile::camping::c t) noexcept {
+  constexpr void set(unsigned x, unsigned y, c t) noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
       return;
 
     m_data[y][x] = t;
   }
 
-  void add_entities(compos *ec, float dx, float dy) const noexcept {
+  void add_entities(T *ec, float dx, float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto px = x + dx;
         auto py = y + dy;
 
         auto t = m_data[y][x];
-        if (t == tile::camping::blank)
+        if (t == c::blank)
           continue;
 
-        tile::camping::add_tile(ec, t, px, py);
+        add_tile(ec, t, px, py);
       }
     }
   }

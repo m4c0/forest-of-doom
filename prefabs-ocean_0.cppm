@@ -4,7 +4,7 @@ import tilemap;
 
 namespace prefabs {
 export constexpr const tilemap::map ocean_0 = [] {
-  tilemap::map res{};
+  tilemap::map<tile::camping::compos> res{};
   res.set(0, 0, static_cast<tile::camping::c>(0x05030101));
   res.set(1, 0, static_cast<tile::camping::c>(0x05030101));
   res.set(2, 0, static_cast<tile::camping::c>(0x05030101));

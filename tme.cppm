@@ -30,9 +30,7 @@ static void fail(const char *msg) {
   throw 0;
 }
 
-struct ec : cursor::compos, tilemap::compos {};
-
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+namespace camping_set {
 static constexpr const auto prefab = prefabs::ocean_0;
 static constexpr const auto fname = "prefabs-ocean_0.cppm";
 static constexpr const auto mname = "ocean_0";
@@ -48,13 +46,35 @@ static constexpr const palette<t::c, 8> tp1{
     t::lake_tl, t::island_b, t::lake_tr, t::island_l,
     t::lake_br, t::island_t, t::lake_bl, t::island_r};
 static constexpr const palette<t::c, 3> tp2{t::grass_0, t::grass_1, t::water};
-// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+} // namespace camping_set
+
+namespace terrain_set {
+static constexpr const auto prefab = prefabs::island_1;
+static constexpr const auto fname = "prefabs-island_1.cppm";
+static constexpr const auto mname = "island_1";
+
+namespace t = tile::terrain;
+static constexpr const auto tname = "tile::terrain";
+static constexpr const auto tfill = &qsu::main::fill_terrain_sprites;
+
+static constexpr const palette<t::c, 8> tp0{
+    t::island_tl, t::island_t, t::island_tr, t::island_r,
+    t::island_br, t::island_b, t::island_bl, t::island_l};
+static constexpr const palette<t::c, 8> tp1{
+    t::lake_tl, t::island_b, t::lake_tr, t::island_l,
+    t::lake_br, t::island_t, t::lake_bl, t::island_r};
+static constexpr const palette<t::c, 3> tp2{t::grass_0, t::grass_1, t::water};
+} // namespace terrain_set
+
+using namespace terrain_set;
+
+struct ec : cursor::compos, t::compos {};
 
 class game {
   ec m_ec{};
   qsu::main *m_q{};
-  tilemap::map m_map = prefab;
-  tilemap::map m_undo_map = prefab;
+  tilemap::map<t::compos> m_map = prefab;
+  tilemap::map<t::compos> m_undo_map = prefab;
   t::c m_brush{};
 
   palette<t::c, 8> m_pal0{tp0};

@@ -13,7 +13,7 @@ import sitime;
 import tile;
 import tilemap;
 
-class ec : public player::compos, public tilemap::compos {};
+struct ec : player::compos, tile::camping::compos, tile::terrain::compos {};
 
 class game {
   qsu::main m_q{};
