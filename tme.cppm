@@ -72,7 +72,11 @@ static constexpr const auto pals = [] {
               t::island_br, t::island_b, t::island_bl, t::island_l},
       palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l, t::lake_br,
               t::island_t, t::lake_bl, t::island_r},
-      palette{t::grass_0, t::grass_1, t::water},
+      palette{t::grass_tl, t::grass_t, t::grass_tr, t::grass_r, t::grass_br,
+              t::grass_b, t::grass_bl, t::grass_l},
+      palette{t::dirt_tl, t::grass_b, t::dirt_tr, t::grass_l, t::dirt_br,
+              t::grass_t, t::dirt_bl, t::grass_r},
+      palette{t::grass_0, t::grass_1, t::water, t::dirt_0},
   };
 };
 } // namespace terrain_set
@@ -150,7 +154,7 @@ public:
     set_brush(m_pal.get().get());
   }
   void prev_lake_brush() {
-    ++(m_pal.get());
+    --(m_pal.get());
     set_brush(m_pal.get().get());
   }
   void next_land_brush() {}
