@@ -2,7 +2,6 @@ export module fod;
 
 import animation;
 import casein;
-import ecs;
 import input;
 import misc;
 import movement;
@@ -12,10 +11,13 @@ import qsu;
 import silog;
 import sitime;
 import tile;
+import tilemap;
+
+class ec : public player::compos, public tilemap::compos {};
 
 class game {
   qsu::main m_q{};
-  ecs::ec m_ec{};
+  ec m_ec{};
   input::dual_axis m_input;
   sitime::stopwatch m_watch;
 

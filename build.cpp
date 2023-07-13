@@ -57,8 +57,7 @@ auto base_app(const char *name) {
   pf->add_part("island_0");
   pf->add_part("ocean_0");
 
-  // ECS + App
-  a->add_unit<mod>("ecs");
+  // App
   a->add_unit<mod>(name);
   return a;
 }
