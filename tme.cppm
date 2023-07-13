@@ -12,8 +12,8 @@ import tile;
 import tilemap;
 import yoyo_libc;
 
-template <unsigned N> class palette {
-  tile::camping::c m_tiles[N];
+template <typename C, unsigned N> class palette {
+  C m_tiles[N];
   unsigned m_index{};
 
 public:
@@ -32,6 +32,10 @@ static void fail(const char *msg) {
 
 struct ec : cursor::compos, tilemap::compos {};
 
+namespace t = tile::camping;
+static constexpr const auto tname = "tile::camping";
+static constexpr const auto tfill = &qsu::main::fill_camping_sprites;
+
 class game {
   static constexpr const auto prefab = prefabs::ocean_0;
   static constexpr const auto fname = "prefabs-ocean_0.cppm";
@@ -41,31 +45,32 @@ class game {
   qsu::main *m_q{};
   tilemap::map m_map = prefab;
   tilemap::map m_undo_map = prefab;
-  tile::camping::c m_brush{};
+  t::c m_brush{};
 
-  palette<8> m_island_pal{tile::camping::island_tl, tile::camping::island_t,
-                          tile::camping::island_tr, tile::camping::island_r,
-                          tile::camping::island_br, tile::camping::island_b,
-                          tile::camping::island_bl, tile::camping::island_l};
-  palette<8> m_lake_pal{tile::camping::lake_tl, tile::camping::island_b,
-                        tile::camping::lake_tr, tile::camping::island_l,
-                        tile::camping::lake_br, tile::camping::island_t,
-                        tile::camping::lake_bl, tile::camping::island_r};
-  palette<3> m_land_pal{tile::camping::grass_0, tile::camping::grass_1,
-                        tile::camping::water};
+  palette<t::c, 8> m_island_pal{t::island_tl, t::island_t,  t::island_tr,
+                                t::island_r,  t::island_br, t::island_b,
+                                t::island_bl, t::island_l};
+  palette<t::c, 8> m_lake_pal{t::lake_tl, t::island_b, t::lake_tr, t::island_l,
+                              t::lake_br, t::island_t, t::lake_bl, t::island_r};
+  palette<t::c, 3> m_land_pal{t::grass_0, t::grass_1, t::water};
+
+  void fill_sprites() {
+    auto &ec = static_cast<t::compos &>(m_ec);
+    m_map.add_entities(&m_ec, 0, 0);
+    (m_q->*tfill)(ec.sprites());
+  }
 
   void update_sprites() {
-    auto &ec = static_cast<tile::camping::compos &>(m_ec);
+    auto &ec = static_cast<t::compos &>(m_ec);
     ec.tiles().for_each_r([this](auto t, auto eid) {
       if (eid == m_ec.cursor().get_id())
         return;
-      tile::camping::remove_tile(&m_ec, eid);
+      t::remove_tile(&m_ec, eid);
     });
-    m_map.add_entities(&m_ec, 0, 0);
-    m_q->fill_camping_sprites(ec.sprites());
+    fill_sprites();
   }
 
-  void flood_fill(auto x, auto y, tile::camping::c old) {
+  void flood_fill(auto x, auto y, t::c old) {
     auto _ = m_map.get(x, y).map([this, x, y, old](auto t) {
       if (t != old)
         return;
@@ -86,15 +91,13 @@ public:
     q->center_at(tilemap::width / 2, tilemap::height / 2);
 
     cursor::add_entity(&m_ec);
-    set_brush(tile::camping::grass_0);
     update_sprites();
   }
 
-  void set_brush(tile::camping::c t) {
-    auto &ec = static_cast<tile::camping::compos &>(m_ec);
+  void set_brush(t::c t) {
     m_brush = t;
     cursor::update_tile(&m_ec, t);
-    m_q->fill_camping_sprites(ec.sprites());
+    fill_sprites();
   }
 
   void next_island_brush() {
@@ -119,10 +122,9 @@ public:
   }
 
   void mouse_moved() {
-    auto &ec = static_cast<tile::camping::compos &>(m_ec);
     auto [x, y] = m_q->mouse_pos();
     cursor::update_pos(&m_ec, x, y);
-    m_q->fill_camping_sprites(ec.sprites());
+    fill_sprites();
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();
@@ -133,7 +135,7 @@ public:
       for (auto dx = 0; dx < tw; dx++) {
         if (dx == 0 && dy == 0)
           continue;
-        m_map.set(x + dx, y + dy, tile::camping::blank);
+        m_map.set(x + dx, y + dy, t::blank);
       }
     }
     cursor::update_pos(&m_ec, x, y);
@@ -168,14 +170,14 @@ public:
       out.write("namespace prefabs {\n"_s).take(fail);
       out.writef("export constexpr const tilemap::map %s = [] {\n", mname)
           .take(fail);
+      out.writef("using c = %s::c;\n", tname).take(fail);
       out.write("  tilemap::map res{};\n"_s).take(fail);
       for (auto y = 0; y < tilemap::height; y++) {
         for (auto x = 0; x < tilemap::width; x++) {
           m_map.get(x, y)
               .fmap([&](auto t) {
-                return out.writef("  res.set(%d, %d, "
-                                  "static_cast<tile::camping::c>(0x%08x));\n",
-                                  x, y, t);
+                return out.writef(
+                    "  res.set(%d, %d, static_cast<c>(0x%08x));\n", x, y, t);
               })
               .take(fail);
         }
@@ -203,7 +205,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::K_D] = [](auto) { gg.flood_fill(); };
     res[casein::K_U] = [](auto) { gg.undo(); };
     res[casein::K_Z] = [](auto) { gg.dump_map(); };
-    res[casein::K_SPACE] = [](auto) { gg.set_brush(tile::camping::blank); };
+    res[casein::K_SPACE] = [](auto) { gg.set_brush(t::blank); };
     return res;
   }();
   static constexpr const auto map = [] {
