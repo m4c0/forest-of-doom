@@ -55,6 +55,7 @@ auto base_app(const char *name) {
 
   auto pf = a->add_unit<mod>("prefabs");
   pf->add_part("island_0");
+  pf->add_part("island_1");
   pf->add_part("ocean_0");
 
   // App
