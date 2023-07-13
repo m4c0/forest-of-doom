@@ -63,7 +63,7 @@ class game {
 
   void fill_sprites() {
     auto &ec = static_cast<t::compos &>(m_ec);
-    m_map.add_entities(&m_ec, 0, 0);
+    t::populate(&m_ec, 0, 0);
     (m_q->*tfill)(ec.sprites());
   }
 
@@ -74,6 +74,7 @@ class game {
         return;
       t::remove_tile(&m_ec, eid);
     });
+    m_map.add_entities(&m_ec, 0, 0);
     fill_sprites();
   }
 
