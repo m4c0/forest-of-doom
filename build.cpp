@@ -34,6 +34,7 @@ auto base_app(const char *name) {
 
   // Components + Systems
   a->add_unit<mod>("tile");
+  a->add_unit<mod>("tilemap");
   a->add_unit<mod>("animation");
   a->add_unit<mod>("movement");
 
@@ -48,7 +49,6 @@ auto base_app(const char *name) {
 
   // Second-order systems
   a->add_unit<mod>("player");
-  a->add_unit<mod>("tilemap");
 
   // Third-order systems
   a->add_unit<mod>("misc");
