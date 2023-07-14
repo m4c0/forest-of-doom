@@ -153,6 +153,18 @@ enum c : unsigned {
   lake_bl = 0x0b070101,
   lake_br = 0x0c070101,
   water = 0x0c080101,
+  fence_tl = 0x00100101,
+  fence_t = 0x01100101,
+  fence_tr = 0x02100101,
+  fence_l = 0x00110101,
+  fence_r = 0x02110101,
+  fence_bl = 0x00120101,
+  fence_b = 0x01120101,
+  fence_br = 0x02120101,
+  fencer_tl = 0x03100101,
+  fencer_tr = 0x04100101,
+  fencer_bl = 0x03110101,
+  fencer_br = 0x04110101,
 };
 using compos = tile::compos<c>;
 
