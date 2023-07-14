@@ -76,11 +76,13 @@ static constexpr const auto pals = [] {
               t::grass_b, t::grass_bl, t::grass_l},
       palette{t::dirt_tl, t::grass_b, t::dirt_tr, t::grass_l, t::dirt_br,
               t::grass_t, t::dirt_bl, t::grass_r},
-      palette{t::fence_tl, t::fence_t, t::fence_tr, t::fence_r, t::fence_br,
-              t::fence_b, t::fence_bl, t::fence_l},
-      palette{t::fencer_tl, t::fence_b, t::fencer_tr, t::fence_l, t::fencer_br,
-              t::fence_t, t::fencer_bl, t::fence_r},
-      palette{t::grass_0, t::grass_1, t::water, t::dirt_0},
+      palette{t::sidewalk_tl, t::sidewalk_t, t::sidewalk_tr, t::sidewalk_r,
+              t::sidewalk_br, t::sidewalk_b, t::sidewalk_bl, t::sidewalk_l},
+      palette{t::sidewalkr_tl, t::sidewalk_b, t::sidewalkr_tr, t::sidewalk_l,
+              t::sidewalkr_br, t::sidewalk_t, t::sidewalkr_bl, t::sidewalk_r},
+      palette{t::grass_0, t::grass_1, t::water, t::dirt_0, t::cobble_0,
+              t::cobble_1, t::cobble_2, t::cobble_3, t::brick_0, t::brick_1,
+              t::brick_2, t::brick_3},
   };
 };
 } // namespace terrain_set
