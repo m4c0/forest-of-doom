@@ -46,15 +46,7 @@ namespace t = tile::camping;
 static constexpr const auto tname = "tile::camping";
 static constexpr const auto tfill = &qsu::main::fill_camping_sprites;
 
-static constexpr const auto pals = [] {
-  return palette<palette<t::c>>{
-      palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
-              t::island_br, t::island_b, t::island_bl, t::island_l},
-      palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l, t::lake_br,
-              t::island_t, t::lake_bl, t::island_r},
-      palette{t::grass_0, t::grass_1, t::water},
-  };
-};
+static constexpr const auto pals = [] { return palette<palette<t::c>>{}; };
 } // namespace camping_set
 
 namespace terrain_set {
