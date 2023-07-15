@@ -47,4 +47,7 @@ public:
     }
   }
 };
+
+template class map<tile::camping::compos>;
+template class map<tile::terrain::compos>;
 } // namespace tilemap
