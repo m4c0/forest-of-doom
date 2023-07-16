@@ -76,7 +76,12 @@ namespace t = tile::ui;
 static constexpr const auto tname = "tile::ui";
 static constexpr const auto tfill = qsu::layers::ui;
 
-static constexpr const auto pals = [] { return palette<palette<t::c>>{}; };
+static constexpr const auto pals = [] {
+  return palette<palette<t::c>>{
+      palette{t::border_tl, t::border_t, t::border_tr, t::border_r,
+              t::border_br, t::border_b, t::border_bl, t::border_l},
+  };
+};
 } // namespace ui_set
 
 static constexpr const auto prefab = prefabs::ui_0;
