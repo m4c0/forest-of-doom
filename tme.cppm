@@ -71,11 +71,19 @@ static constexpr const auto pals = [] {
 };
 } // namespace terrain_set
 
+namespace ui_set {
+namespace t = tile::ui;
+static constexpr const auto tname = "tile::ui";
+static constexpr const auto tfill = qsu::layers::ui;
+
+static constexpr const auto pals = [] { return palette<palette<t::c>>{}; };
+} // namespace ui_set
+
 static constexpr const auto prefab = prefabs::ui_0;
 static constexpr const auto fname = "prefabs-ui_0.cppm";
 static constexpr const auto mname = "ui_0";
 
-using namespace terrain_set;
+using namespace ui_set;
 
 struct ec : cursor::compos, t::compos {};
 

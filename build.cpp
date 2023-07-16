@@ -27,6 +27,7 @@ auto base_app(const char *name) {
   a->add_resource("1_Terrains_and_Fences_16x16.png");
   a->add_resource("11_Camping_16x16.png");
   a->add_resource("Modern_Exteriors_Characters_Scout_16x16_1.png");
+  a->add_resource("Modern_UI_Style_1.png");
 
   // Components
   a->add_unit<mod>("collision");
@@ -59,6 +60,7 @@ auto base_app(const char *name) {
   pf->add_part("island_0");
   pf->add_part("island_1");
   pf->add_part("ocean_0");
+  pf->add_part("ui_0");
 
   // App
   a->add_unit<mod>(name);
