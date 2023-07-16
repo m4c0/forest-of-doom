@@ -1,9 +1,9 @@
 export module tile:common;
-import area;
-import collision;
-import pog;
-import rect;
-import sprite;
+export import area;
+export import collision;
+export import pog;
+export import rect;
+export import sprite;
 
 namespace tile {
 using c_t = unsigned;
