@@ -38,10 +38,6 @@ static void fail(const char *msg) {
 }
 
 namespace camping_set {
-static constexpr const auto prefab = prefabs::ocean_0;
-static constexpr const auto fname = "prefabs-ocean_0.cppm";
-static constexpr const auto mname = "ocean_0";
-
 namespace t = tile::camping;
 static constexpr const auto tname = "tile::camping";
 static constexpr const auto tfill = &qsu::main::fill_camping_sprites;
@@ -50,10 +46,6 @@ static constexpr const auto pals = [] { return palette<palette<t::c>>{}; };
 } // namespace camping_set
 
 namespace terrain_set {
-static constexpr const auto prefab = prefabs::island_1;
-static constexpr const auto fname = "prefabs-island_1.cppm";
-static constexpr const auto mname = "island_1";
-
 namespace t = tile::terrain;
 static constexpr const auto tname = "tile::terrain";
 static constexpr const auto tfill = &qsu::main::fill_terrain_sprites;
@@ -78,6 +70,10 @@ static constexpr const auto pals = [] {
   };
 };
 } // namespace terrain_set
+
+static constexpr const auto prefab = prefabs::ui_0;
+static constexpr const auto fname = "prefabs-ui_0.cppm";
+static constexpr const auto mname = "ui_0";
 
 using namespace terrain_set;
 
