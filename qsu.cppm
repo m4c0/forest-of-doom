@@ -34,11 +34,11 @@ public:
   void process_event(const casein::event &e) {
     m_r.process_event(e);
     (*m_debug).process_event(e);
-    m_hud.process_event(e);
     m_mouse.process_event(e);
     for (auto &l : m_layers) {
       l.process_event(e);
     }
+    m_hud.process_event(e);
   }
 
   void center_at(float x, float y) {
@@ -46,6 +46,7 @@ public:
       (*l)->center_at(x, y);
     }
     (*m_debug)->center_at(x, y);
+    (*m_hud)->center_at(0, 0);
   }
   [[nodiscard]] auto center() const noexcept {
     return (*m_layers[0])->center();
