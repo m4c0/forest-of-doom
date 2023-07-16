@@ -32,4 +32,8 @@ export void add_entities(compos *ec) {
   add_battery(ec, 6, tile::ui::food_l);
   add_battery(ec, 7, tile::ui::energy_l);
 }
+
+export void update_layout(compos *ec, float gw, float gh) {
+  //
+}
 } // namespace hud

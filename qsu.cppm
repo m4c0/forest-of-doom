@@ -58,6 +58,9 @@ public:
     }
     (*m_debug)->set_grid(w, h);
   }
+  [[nodiscard]] auto hud_grid_size() const noexcept {
+    return (*m_hud)->grid_size();
+  }
 
   [[nodiscard]] auto mouse_pos() const noexcept {
     return m_mouse.current_mouse_pos(&**m_layers[0]);

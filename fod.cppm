@@ -69,6 +69,11 @@ class game {
 
   void key_changed() { player::process_input(m_input, &m_ec); }
 
+  void window_changed() {
+    auto [gw, gh] = m_q.hud_grid_size();
+    hud::update_layout(&m_ec, gw, gh);
+  }
+
   void dump_stats() {
     silog::log(silog::debug, "Max entities: %d", m_ec.e().max_elements());
     silog::log(silog::debug, "Animations: %d", m_ec.animations().size());
@@ -90,6 +95,9 @@ public:
     case casein::KEY_DOWN:
     case casein::KEY_UP:
       key_changed();
+      break;
+    case casein::RESIZE_WINDOW:
+      window_changed();
       break;
     case casein::QUIT:
       dump_stats();
