@@ -1,5 +1,6 @@
 export module qsu;
 import :debug;
+import :hud;
 import :layer;
 import area;
 import casein;
@@ -26,7 +27,7 @@ export class main {
       {&m_r, max_player_sprites,
        "Modern_Exteriors_Characters_Scout_16x16_1.png"},
   };
-  layer m_hud{&m_r, max_sprites, "Modern_UI_Style_1.png"};
+  hud_layer m_hud{&m_r, max_sprites, "Modern_UI_Style_1.png"};
   debug_layer m_debug{&m_r, max_sprites};
   quack::mouse_tracker m_mouse{};
 
@@ -46,7 +47,6 @@ public:
       (*l)->center_at(x, y);
     }
     (*m_debug)->center_at(x, y);
-    (*m_hud)->center_at(0, 0);
   }
   [[nodiscard]] auto center() const noexcept {
     return (*m_layers[0])->center();
@@ -57,7 +57,6 @@ public:
       (*l)->set_grid(w, h);
     }
     (*m_debug)->set_grid(w, h);
-    (*m_hud)->set_grid(16, 16);
   }
 
   [[nodiscard]] auto mouse_pos() const noexcept {

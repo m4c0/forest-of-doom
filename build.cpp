@@ -55,6 +55,7 @@ auto base_app(const char *name) {
   auto qsu = a->add_unit<mod>("qsu");
   qsu->add_part("debug");
   qsu->add_part("layer");
+  qsu->add_part("hud");
 
   // Second-order systems
   a->add_unit<mod>("player");
