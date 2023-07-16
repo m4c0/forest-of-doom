@@ -80,6 +80,7 @@ static constexpr const auto pals = [] {
   return palette<palette<t::c>>{
       palette{t::border_tl, t::border_t, t::border_tr, t::border_r,
               t::border_br, t::border_b, t::border_bl, t::border_l},
+      palette{t::border_bg},
   };
 };
 } // namespace ui_set

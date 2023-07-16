@@ -185,6 +185,7 @@ enum c : unsigned {
   border_t = 0x01000101,
   border_tr = 0x02000101,
   border_l = 0x00010101,
+  border_bg = 0x01010101,
   border_r = 0x02010101,
   border_bl = 0x00020101,
   border_b = 0x01020101,
