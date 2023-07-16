@@ -42,6 +42,7 @@ auto base_app(const char *name) {
   tile->add_part("terrain");
   tile->add_part("ui");
 
+  a->add_unit<mod>("hud");
   a->add_unit<mod>("tilemap");
   a->add_unit<mod>("animation");
   a->add_unit<mod>("movement");

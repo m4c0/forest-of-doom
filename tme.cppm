@@ -71,25 +71,11 @@ static constexpr const auto pals = [] {
 };
 } // namespace terrain_set
 
-namespace ui_set {
-namespace t = tile::ui;
-static constexpr const auto tname = "tile::ui";
-static constexpr const auto tfill = qsu::layers::ui;
+static constexpr const auto prefab = prefabs::ocean_0;
+static constexpr const auto fname = "prefabs-ocean_0.cppm";
+static constexpr const auto mname = "ocean_0";
 
-static constexpr const auto pals = [] {
-  return palette<palette<t::c>>{
-      palette{t::border_tl, t::border_t, t::border_tr, t::border_r,
-              t::border_br, t::border_b, t::border_bl, t::border_l},
-      palette{t::border_bg},
-  };
-};
-} // namespace ui_set
-
-static constexpr const auto prefab = prefabs::ui_0;
-static constexpr const auto fname = "prefabs-ui_0.cppm";
-static constexpr const auto mname = "ui_0";
-
-using namespace ui_set;
+using namespace terrain_set;
 
 struct ec : cursor::compos, t::compos {};
 

@@ -2,6 +2,7 @@ export module fod;
 
 import animation;
 import casein;
+import hud;
 import input;
 import misc;
 import movement;
@@ -13,7 +14,10 @@ import sitime;
 import tile;
 import tilemap;
 
-struct ec : player::compos, tile::camping::compos, tile::terrain::compos {};
+struct ec : hud::compos,
+            player::compos,
+            tile::camping::compos,
+            tile::terrain::compos {};
 
 class game {
   qsu::main m_q{};
@@ -33,6 +37,7 @@ class game {
     prefabs::ocean_0.add_entities(&m_ec, 16, 16);
 
     player::add_entity(&m_ec);
+    hud::add_entities(&m_ec);
 
     m_q.set_grid(8, 8);
     repaint();
@@ -49,6 +54,7 @@ class game {
                      static_cast<tile::camping::compos &>(m_ec).sprites());
     m_q.fill_sprites(qsu::layers::terrain,
                      static_cast<tile::terrain::compos &>(m_ec).sprites());
+    m_q.fill_hud(static_cast<hud::compos &>(m_ec).sprites());
     // m_q.fill_debug(m_ec.bodies());
   }
 
