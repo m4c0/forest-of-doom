@@ -36,7 +36,9 @@ auto base_app(const char *name) {
   a->add_unit<mod>("sprite");
 
   // Components + Systems
-  a->add_unit<mod>("tile");
+  auto tile = a->add_unit<mod>("tile");
+  tile->add_part("common");
+
   a->add_unit<mod>("tilemap");
   a->add_unit<mod>("animation");
   a->add_unit<mod>("movement");
