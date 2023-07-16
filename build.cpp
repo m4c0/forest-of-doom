@@ -39,6 +39,8 @@ auto base_app(const char *name) {
   auto tile = a->add_unit<mod>("tile");
   tile->add_part("common");
   tile->add_part("camping");
+  tile->add_part("terrain");
+  tile->add_part("ui");
 
   a->add_unit<mod>("tilemap");
   a->add_unit<mod>("animation");
