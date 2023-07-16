@@ -6,7 +6,9 @@ import rect;
 import sprite;
 
 namespace tile {
-export constexpr rect uv(unsigned t) {
+using c_t = unsigned;
+
+export constexpr rect uv(c_t t) {
   return rect{
       .x = static_cast<float>((t >> 24) & 0xFFU),
       .y = static_cast<float>((t >> 16) & 0xFFU),
@@ -77,7 +79,7 @@ template <typename C> void populate(compos<C> *ec, float cx, float cy) {
 } // namespace tile
 
 export namespace tile::camping {
-enum c : unsigned {
+enum c : c_t {
   blank = 0,
 };
 using compos = tile::compos<c>;
@@ -100,7 +102,7 @@ void populate(compos *ec, float cx, float cy) { tile::populate(ec, cx, cy); }
 } // namespace tile::camping
 
 export namespace tile::terrain {
-enum c : unsigned {
+enum c : c_t {
   blank = 0,
   grass_tl = 0x00060101,
   grass_t = 0x01060101,
@@ -179,7 +181,7 @@ void populate(compos *ec, float cx, float cy) { tile::populate(ec, cx, cy); }
 } // namespace tile::terrain
 
 export namespace tile::ui {
-enum c : unsigned {
+enum c : c_t {
   blank = 0,
   border_tl = 0x00000101,
   border_t = 0x01000101,
