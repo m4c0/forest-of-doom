@@ -9,19 +9,22 @@ import sprite;
 import tile;
 
 namespace qsu {
+export enum class layers { terrain, camping, scout, ui, last };
+
 export class main {
   static constexpr const auto max_player_sprites = 16;
   static constexpr const auto max_sprites = 4096;
   static constexpr const auto no_sprite = max_sprites + 1;
 
-  enum layers { terrain, camping, scout, last };
+  static constexpr const auto layer_count = static_cast<unsigned>(layers::last);
 
-  quack::renderer m_r{last + 1};
-  layer m_layers[last] = {
+  quack::renderer m_r{layer_count + 1};
+  layer m_layers[layer_count] = {
       {&m_r, max_sprites, "1_Terrains_and_Fences_16x16.png"},
       {&m_r, max_sprites, "11_Camping_16x16.png"},
       {&m_r, max_player_sprites,
        "Modern_Exteriors_Characters_Scout_16x16_1.png"},
+      {&m_r, max_sprites, "Modern_UI_Style_1.png"},
   };
   debug_layer m_debug{&m_r, max_sprites};
   quack::mouse_tracker m_mouse{};
@@ -58,14 +61,8 @@ public:
   }
 
   void fill_debug(pog::rtree &set) { m_debug.fill(set); }
-  void fill_camping_sprites(const sprite::compo &set) {
-    m_layers[camping].fill(set);
-  }
-  void fill_player_sprites(const sprite::compo &set) {
-    m_layers[scout].fill(set);
-  }
-  void fill_terrain_sprites(const sprite::compo &set) {
-    m_layers[terrain].fill(set);
+  void fill_sprites(layers l, const sprite::compo &set) {
+    m_layers[static_cast<unsigned>(l)].fill(set);
   }
 }; // namespace qsu
 } // namespace qsu

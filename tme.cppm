@@ -40,7 +40,7 @@ static void fail(const char *msg) {
 namespace camping_set {
 namespace t = tile::camping;
 static constexpr const auto tname = "tile::camping";
-static constexpr const auto tfill = &qsu::main::fill_camping_sprites;
+static constexpr const auto tfill = qsu::layers::camping;
 
 static constexpr const auto pals = [] { return palette<palette<t::c>>{}; };
 } // namespace camping_set
@@ -48,7 +48,7 @@ static constexpr const auto pals = [] { return palette<palette<t::c>>{}; };
 namespace terrain_set {
 namespace t = tile::terrain;
 static constexpr const auto tname = "tile::terrain";
-static constexpr const auto tfill = &qsu::main::fill_terrain_sprites;
+static constexpr const auto tfill = qsu::layers::terrain;
 
 static constexpr const auto pals = [] {
   return palette<palette<t::c>>{
@@ -92,7 +92,7 @@ class game {
     auto &ec = static_cast<t::compos &>(m_ec);
     t::populate(&m_ec, 0, 0);
     cursor::add_sprite(&m_ec, ec.sprites());
-    (m_q->*tfill)(ec.sprites());
+    m_q->fill_sprites(tfill, ec.sprites());
   }
 
   void update_sprites() {
