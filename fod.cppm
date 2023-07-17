@@ -14,10 +14,7 @@ import sitime;
 import tile;
 import tilemap;
 
-struct ec : hud::compos,
-            player::compos,
-            tile::camping::compos,
-            tile::terrain::compos {};
+struct ec : hud::compos, tile::camping::compos, tile::terrain::compos {};
 
 class game {
   qsu::main m_q{};
@@ -60,6 +57,7 @@ class game {
     player::process_input(m_input, &m_ec);
     animation::update_animes(&m_ec, m_ec.player_sprites());
     movement::update_sprites(&m_ec, m_ec.player_sprites());
+    hud::update_batteries(&m_ec);
     repaint();
     m_ec.reset_watch();
   }
