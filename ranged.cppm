@@ -12,7 +12,8 @@ public:
     return *this;
   }
   constexpr auto &operator-=(float delta) noexcept {
-    m_value = delta > m_value ? 0 : m_value - delta;
+    auto n = m_value - delta;
+    m_value = n < 0 ? 0 : n;
     return *this;
   }
 };
