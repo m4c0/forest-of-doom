@@ -17,7 +17,7 @@ public:
 };
 export void update_sprites(compos *c, sprite::compo &sprites, int millis) {
   float ms = millis;
-  for (auto [m, id] : c->movements()) {
+  for (auto [id, m] : c->movements()) {
     auto dx = m.sx * ms;
     auto dy = m.sy * ms;
 

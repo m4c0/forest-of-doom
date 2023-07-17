@@ -65,17 +65,17 @@ public:
       }
     });
     m_spr->map_multipliers([&](auto *ms) {
-      for (auto [spr, _] : set) {
+      for (auto _ : set) {
         *ms++ = {1, 1, 1, 1};
       }
     });
     m_spr->map_positions([&](auto *ps) {
-      for (auto [spr, _] : set) {
+      for (auto [_, spr] : set) {
         *ps++ = quack::rect{spr.pos.x, spr.pos.y, spr.pos.w, spr.pos.h};
       }
     });
     m_spr->map_uvs([&](auto *uvs) {
-      for (auto [spr, _] : set) {
+      for (auto [_, spr] : set) {
         *uvs++ = quack::uv{
             spr.uv.x * sprite_sz / m_atlas_w,
             spr.uv.y * sprite_sz / m_atlas_h,

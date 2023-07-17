@@ -19,7 +19,7 @@ public:
 };
 
 export void update_animes(compo &set, sprite::compo &sprites, int millis) {
-  for (auto &[a, id] : set) {
+  for (auto &[id, a] : set) {
     a.ticks += millis;
 
     auto frame = a.frames_per_sec * a.ticks / 1000;

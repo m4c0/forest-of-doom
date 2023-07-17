@@ -41,7 +41,7 @@ export void add_entities(compos *ec) {
 }
 
 export void update_layout(compos *ec, float gw, float gh) {
-  for (auto &[v, id] : ec->anchors()) {
+  for (auto &[id, v] : ec->anchors()) {
     auto [dx, dy] = v;
     auto spr = ec->sprites().get(id);
     spr.pos.x = -gw + dx;
