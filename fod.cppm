@@ -57,13 +57,12 @@ class game {
   }
 
   void tick() {
+    player::process_input(m_input, &m_ec);
     animation::update_animes(&m_ec, m_ec.player_sprites());
     movement::update_sprites(&m_ec, m_ec.player_sprites());
     repaint();
     m_ec.reset_watch();
   }
-
-  void key_changed() { player::process_input(m_input, &m_ec); }
 
   void window_changed() {
     auto [gw, gh] = m_q.hud_grid_size();
@@ -87,10 +86,6 @@ public:
       break;
     case casein::REPAINT:
       tick();
-      break;
-    case casein::KEY_DOWN:
-    case casein::KEY_UP:
-      key_changed();
       break;
     case casein::RESIZE_WINDOW:
       window_changed();
