@@ -29,31 +29,27 @@ auto base_app(const char *name) {
   a->add_resource("Modern_Exteriors_Characters_Scout_16x16_1.png");
   a->add_resource("Modern_UI_Style_1.png");
 
-  // Utilities
   a->add_unit<mod>("ranged");
   a->add_unit<mod>("rect");
 
-  // Components
   a->add_unit<mod>("collision");
   a->add_unit<mod>("area");
   a->add_unit<mod>("sprite");
   a->add_unit<mod>("stopwatch");
 
-  // Components + Systems
   auto tile = a->add_unit<mod>("tile");
   tile->add_part("common");
   tile->add_part("camping");
   tile->add_part("terrain");
   tile->add_part("ui");
 
-  a->add_unit<mod>("hud");
   a->add_unit<mod>("tilemap");
   a->add_unit<mod>("animation");
   a->add_unit<mod>("movement");
-
-  // Systems
   a->add_unit<mod>("cursor");
   a->add_unit<mod>("input");
+  a->add_unit<mod>("player");
+  a->add_unit<mod>("hud");
 
   // Quack Sprite Unit
   auto qsu = a->add_unit<mod>("qsu");
@@ -61,10 +57,6 @@ auto base_app(const char *name) {
   qsu->add_part("layer");
   qsu->add_part("hud");
 
-  // Second-order systems
-  a->add_unit<mod>("player");
-
-  // Third-order systems
   a->add_unit<mod>("misc");
 
   auto pf = a->add_unit<mod>("prefabs");
