@@ -44,9 +44,9 @@ void add_battery(compos *ec, float y, tile::ui::c icon, battery b) {
   ec->batteries().add(id, b);
 }
 export void add_entities(compos *ec) {
-  add_battery(ec, 3, tile::ui::mind_l, &player::c::energy);
-  add_battery(ec, 2, tile::ui::heart_l, &player::c::energy);
-  add_battery(ec, 1, tile::ui::food_l, &player::c::energy);
+  add_battery(ec, 3, tile::ui::mind_l, &player::c::happyness);
+  add_battery(ec, 2, tile::ui::heart_l, &player::c::health);
+  add_battery(ec, 1, tile::ui::food_l, &player::c::satiation);
   add_battery(ec, 0, tile::ui::energy_l, &player::c::energy);
 }
 

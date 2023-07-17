@@ -21,7 +21,11 @@ export enum side {
 };
 export struct c {
   side side;
+
   ranged energy;
+  ranged happyness;
+  ranged health;
+  ranged satiation;
 };
 
 export using compo = pog::singleton<c>;
