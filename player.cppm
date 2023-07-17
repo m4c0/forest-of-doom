@@ -3,12 +3,16 @@ import animation;
 import collision;
 import input;
 import movement;
+import ranged;
 import pog;
 import sprite;
+import stopwatch;
 
 extern "C" float sqrtf(float);
 
 namespace player {
+constexpr const auto energy_lost_per_sec = 1.f;
+
 export enum side {
   p_right = 0,
   p_up,
@@ -17,12 +21,14 @@ export enum side {
 };
 export struct c {
   side side;
+  ranged energy;
 };
 
 export using compo = pog::singleton<c>;
 export class compos : public virtual movement::compos,
                       public virtual pog::entity_provider,
-                      public virtual animation::compos {
+                      public virtual animation::compos,
+                      public virtual stopwatch {
   player::compo m_player{};
   sprite::compo m_player_sprites{};
 
@@ -61,7 +67,10 @@ void update_compo(compos *ec, side s, animation::c a) {
   if (a.start_x == cur_a.start_x && a.y == cur_a.y)
     return;
 
-  ec->player().set(pid, {s});
+  auto p = ec->player().get(pid);
+  p.side = s;
+  ec->player().set(pid, p);
+
   ec->animations().update(pid, a);
 }
 
@@ -82,6 +91,18 @@ void set_idle_animation(compos *ec) {
 void set_walk_animation(compos *ec, side s) {
   constexpr const auto num_frames = 6;
   constexpr const auto frames_per_sec = 24;
+
+  auto pid = ec->player().get_id();
+  auto p = ec->player().get(pid);
+  auto fps = frames_per_sec * p.energy;
+  if (fps == 0) {
+    set_idle_animation(ec);
+    return;
+  }
+
+  auto ms = ec->current_millis();
+  p.energy -= energy_lost_per_sec * ms / 1000.f;
+  ec->player().set(pid, p);
 
   update_compo(ec, s,
                {
@@ -111,9 +132,12 @@ export void process_input(input::dual_axis in, compos *ec) {
     return;
   }
 
+  const auto &p = ec->player().get(pid);
+  float f_speed = speed * p.energy;
+
   float d = sqrtf(h * h + v * v);
-  float sx = h * speed / d;
-  float sy = v * speed / d;
+  float sx = h * f_speed / d;
+  float sy = v * f_speed / d;
 
   ec->movements().update(pid, {sx, sy});
 }
