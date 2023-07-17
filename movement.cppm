@@ -2,6 +2,7 @@ export module movement;
 import collision;
 import pog;
 import sprite;
+import stopwatch;
 
 namespace movement {
 export struct c {
@@ -9,14 +10,15 @@ export struct c {
   float sy;
 };
 export using compo = pog::sparse_set<c>;
-export class compos : public virtual collision::compos {
+export class compos : public virtual collision::compos,
+                      public virtual stopwatch {
   compo m_movements{};
 
 public:
   compo &movements() noexcept { return m_movements; }
 };
-export void update_sprites(compos *c, sprite::compo &sprites, int millis) {
-  float ms = millis;
+export void update_sprites(compos *c, sprite::compo &sprites) {
+  float ms = c->current_millis();
   for (auto [id, m] : c->movements()) {
     auto dx = m.sx * ms;
     auto dy = m.sy * ms;

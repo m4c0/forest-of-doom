@@ -23,7 +23,6 @@ class game {
   qsu::main m_q{};
   ec m_ec{};
   input::dual_axis m_input;
-  sitime::stopwatch m_watch;
 
   void setup() {
     prefabs::island_0.add_entities(&m_ec, 0, 0);
@@ -41,8 +40,7 @@ class game {
 
     m_q.set_grid(8, 8);
     repaint();
-
-    m_watch = {};
+    m_ec.reset_watch();
   }
 
   void repaint() {
@@ -59,12 +57,10 @@ class game {
   }
 
   void tick() {
-    animation::update_animes(m_ec.animations(), m_ec.player_sprites(),
-                             m_watch.millis());
-    movement::update_sprites(&m_ec, m_ec.player_sprites(), m_watch.millis());
+    animation::update_animes(&m_ec, m_ec.player_sprites());
+    movement::update_sprites(&m_ec, m_ec.player_sprites());
     repaint();
-
-    m_watch = {};
+    m_ec.reset_watch();
   }
 
   void key_changed() { player::process_input(m_input, &m_ec); }

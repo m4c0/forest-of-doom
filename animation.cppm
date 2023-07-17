@@ -1,6 +1,7 @@
 export module animation;
 import pog;
 import sprite;
+import stopwatch;
 
 namespace animation {
 export struct c {
@@ -11,16 +12,16 @@ export struct c {
   unsigned ticks{};
 };
 export using compo = pog::sparse_set<c>;
-export struct compos {
+export class compos : public virtual stopwatch {
   animation::compo m_animations{};
 
 public:
   animation::compo &animations() noexcept { return m_animations; }
 };
 
-export void update_animes(compo &set, sprite::compo &sprites, int millis) {
-  for (auto &[id, a] : set) {
-    a.ticks += millis;
+export void update_animes(compos *ec, sprite::compo &sprites) {
+  for (auto &[id, a] : ec->animations()) {
+    a.ticks += ec->current_millis();
 
     auto frame = a.frames_per_sec * a.ticks / 1000;
 

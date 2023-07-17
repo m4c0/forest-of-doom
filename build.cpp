@@ -37,6 +37,7 @@ auto base_app(const char *name) {
   a->add_unit<mod>("collision");
   a->add_unit<mod>("area");
   a->add_unit<mod>("sprite");
+  a->add_unit<mod>("stopwatch");
 
   // Components + Systems
   auto tile = a->add_unit<mod>("tile");
