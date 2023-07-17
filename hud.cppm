@@ -4,7 +4,6 @@ import pog;
 import ranged;
 import sprite;
 import tile;
-import silog;
 
 namespace hud {
 export struct anchor {
@@ -57,7 +56,6 @@ export void update_batteries(compos *ec) {
   auto p = ec->player().get(ec->player().get_id());
   for (auto &[id, attr] : ec->batteries()) {
     unsigned val = static_cast<unsigned>(4.0f * (p.*attr));
-    silog::log(silog::debug, "%u", val);
 
     auto spr = ec->sprites().get(id);
     spr.uv = tile::uv(levels[val]);
