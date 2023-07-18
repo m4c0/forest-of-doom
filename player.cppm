@@ -15,6 +15,9 @@ constexpr const auto energy_lost_per_sec = 1.f;
 constexpr const auto food_lost_per_sec = 0.1f;
 constexpr const auto food_energy_ratio = 2.f;
 
+constexpr const auto food_limit_for_mental_loss = 0.25f;
+constexpr const auto mental_loss_per_sec_wo_food = 0.1f;
+
 export enum side {
   p_right = 0,
   p_up,
@@ -80,6 +83,21 @@ void update_compo(compos *ec, side s, animation::c a) {
   ec->animations().update(pid, a);
 }
 
+void reduce_mental_health(compos *ec) {
+  auto pid = ec->player().get_id();
+  auto p = ec->player().get(pid);
+
+  if (p.satiation > food_limit_for_mental_loss)
+    return;
+
+  auto adj_food = 1.0f - (p.satiation - food_limit_for_mental_loss) /
+                             food_limit_for_mental_loss;
+  p.happyness -=
+      adj_food * mental_loss_per_sec_wo_food * ec->current_millis() / 1000.f;
+
+  ec->player().set(pid, p);
+}
+
 void set_idle_animation(compos *ec) {
   constexpr const auto num_frames = 6;
   constexpr const auto frames_per_sec = 6;
@@ -102,6 +120,8 @@ void set_walk_animation(compos *ec, side s) {
   auto p = ec->player().get(pid);
   auto fps = frames_per_sec * p.energy;
   if (fps == 0) {
+    reduce_mental_health(ec);
+
     set_idle_animation(ec);
     return;
   }
