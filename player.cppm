@@ -12,6 +12,8 @@ extern "C" float sqrtf(float);
 
 namespace player {
 constexpr const auto energy_lost_per_sec = 1.f;
+constexpr const auto food_lost_per_sec = 0.1f;
+constexpr const auto food_energy_ratio = 2.f;
 
 export enum side {
   p_right = 0,
@@ -131,12 +133,20 @@ export void process_input(input::dual_axis in, compos *ec) {
     set_idle_animation(ec);
   }
 
+  auto p = ec->player().get(pid);
+
   if (v == 0 && h == 0) {
+    if (p.energy < 1) {
+      auto delta = food_lost_per_sec * ec->current_millis() / 1000.f;
+      delta = (delta > p.satiation) ? p.satiation : delta;
+      p.satiation -= delta;
+      p.energy += delta * food_energy_ratio;
+      ec->player().set(pid, p);
+    }
     ec->movements().update(pid, {});
     return;
   }
 
-  const auto &p = ec->player().get(pid);
   float f_speed = speed * p.energy;
 
   float d = sqrtf(h * h + v * v);
