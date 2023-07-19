@@ -4,9 +4,9 @@ import :common;
 export namespace tile::camping {
 enum c : c_t {
   blank = 0,
-  backpack_a = 0x101f0101,
-  backpack_b = 0x111f0101,
-  backpack_c = 0x121f0101,
+  backpack_a = 0x10220102,
+  backpack_b = 0x11220102,
+  backpack_c = 0x12220102,
 };
 using compos = tile::compos<c>;
 
@@ -17,7 +17,7 @@ auto add_tile(compos *ec, c t, float x, float y) {
   case backpack_a:
   case backpack_b:
   case backpack_c:
-    collision::add(ec, id, x, y, 1, 1);
+    collision::add(ec, id, x, y + 0.7, 1, 0.4);
     break;
   default:
     break;
