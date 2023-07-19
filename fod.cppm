@@ -31,6 +31,9 @@ class game {
     prefabs::ocean_0.add_entities(&m_ec, -16, 16);
     prefabs::ocean_0.add_entities(&m_ec, 0, 16);
     prefabs::ocean_0.add_entities(&m_ec, 16, 16);
+    tile::camping::add_tile(&m_ec, tile::camping::backpack_a, 9, 7);
+    tile::camping::add_tile(&m_ec, tile::camping::backpack_b, 10, 7);
+    tile::camping::add_tile(&m_ec, tile::camping::backpack_c, 11, 7);
 
     player::add_entity(&m_ec);
     hud::add_entities(&m_ec);
