@@ -68,20 +68,26 @@ export void add_entity(compos *ec) {
   collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
 }
 
-void update_compo(compos *ec, side s, animation::c a) {
-  a.start_x = static_cast<unsigned>(s) * a.num_frames;
+bool update_compo(compos *ec, unsigned s, animation::c a) {
+  a.start_x = s * a.num_frames;
 
   auto pid = ec->player().get_id();
 
   auto cur_a = ec->animations().get(pid);
   if (a.start_x == cur_a.start_x && a.y == cur_a.y)
+    return false;
+
+  ec->animations().update(pid, a);
+  return true;
+}
+void update_compo(compos *ec, side s, animation::c a) {
+  if (!update_compo(ec, static_cast<unsigned>(s), a))
     return;
 
+  auto pid = ec->player().get_id();
   auto p = ec->player().get(pid);
   p.side = s;
   ec->player().set(pid, p);
-
-  ec->animations().update(pid, a);
 }
 
 void process_starvation(compos *ec) {
@@ -136,6 +142,34 @@ void set_walk_animation(compos *ec, side s) {
   update_compo(ec, s,
                {
                    .y = 4,
+                   .num_frames = num_frames,
+                   .frames_per_sec = frames_per_sec,
+               });
+}
+void set_sit_animation(compos *ec) {
+  constexpr const auto num_frames = 6;
+  constexpr const auto frames_per_sec = 6;
+
+  auto pid = ec->player().get_id();
+  unsigned s = ec->player().get(pid).side / 2U;
+
+  update_compo(ec, s,
+               {
+                   .y = 8,
+                   .num_frames = num_frames,
+                   .frames_per_sec = frames_per_sec,
+               });
+}
+void set_pick_animation(compos *ec) {
+  constexpr const auto num_frames = 12;
+  constexpr const auto frames_per_sec = 12;
+
+  auto pid = ec->player().get_id();
+  auto s = ec->player().get(pid).side;
+
+  update_compo(ec, s,
+               {
+                   .y = 18,
                    .num_frames = num_frames,
                    .frames_per_sec = frames_per_sec,
                });
