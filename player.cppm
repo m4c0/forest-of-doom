@@ -26,6 +26,7 @@ export enum side {
   p_down,
 };
 export struct c {
+  pog::eid eid;
   side side;
 
   ranged energy;
@@ -34,16 +35,15 @@ export struct c {
   ranged satiation;
 };
 
-export using compo = pog::singleton<c>;
 export class compos : public virtual movement::compos,
                       public virtual pog::entity_provider,
                       public virtual animation::compos,
                       public virtual stopwatch {
-  player::compo m_player{};
+  c m_player;
   sprite::compo m_player_sprites{};
 
 public:
-  player::compo &player() noexcept { return m_player; }
+  c &player() noexcept { return m_player; }
   sprite::compo &player_sprites() noexcept { return m_player_sprites; }
 };
 
@@ -61,29 +61,37 @@ export void add_entity(compos *ec) {
       .num_frames = 1,
   };
   auto pid = ec->e().alloc();
-  ec->player().set(pid, {});
+  ec->player().eid = pid;
   ec->player_sprites().add(pid, spr);
   ec->animations().add(pid, a);
   ec->movements().add(pid, {});
   collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
 }
 
-auto get_side(compos *ec) {
-  auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-  return ec->player().get(pid).side;
+export rect get_area(compos *ec) {
+  auto pid = ec->player().eid;
+  auto spr = ec->player_sprites().get(pid);
+  return spr.pos;
 }
-void set_side(compos *ec, side s) {
-  auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-  p.side = s;
-  ec->player().set(pid, p);
+
+auto get_side(compos *ec) { return ec->player().side; }
+void set_side(compos *ec, side s) { ec->player().side = s; }
+
+void starve(compos *ec, float val_per_sec) {
+  ec->player().health -= val_per_sec * ec->current_millis() / 1000.f;
 }
+void depress(compos *ec, float val_per_sec) {
+  ec->player().happyness -= val_per_sec * ec->current_millis() / 1000.f;
+}
+void exercise(compos *ec, float val_per_sec) {
+  ec->player().energy -= val_per_sec * ec->current_millis() / 1000.f;
+}
+void rest(compos *ec, float val_per_sec) { exercise(ec, -val_per_sec); }
 
 bool update_animation(compos *ec, unsigned s, animation::c a) {
   a.start_x = s * a.num_frames;
 
-  auto pid = ec->player().get_id();
+  auto pid = ec->player().eid;
 
   auto cur_a = ec->animations().get(pid);
   if (a.start_x == cur_a.start_x && a.y == cur_a.y)
@@ -98,20 +106,13 @@ void update_animation(compos *ec, side s, animation::c a) {
 }
 
 void process_starvation(compos *ec) {
-  auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-
-  if (p.satiation > starvation_limit)
+  auto satiation = ec->player().satiation;
+  if (satiation > starvation_limit)
     return;
 
-  auto adj_food = 1.0f - (p.satiation - starvation_limit) / starvation_limit;
-
-  p.happyness -=
-      adj_food * starvation_mental_loss_per_sec * ec->current_millis() / 1000.f;
-  p.health -=
-      adj_food * starvation_health_loss_per_sec * ec->current_millis() / 1000.f;
-
-  ec->player().set(pid, p);
+  auto adj_food = 1.0f - (satiation - starvation_limit) / starvation_limit;
+  starve(ec, adj_food * starvation_mental_loss_per_sec);
+  depress(ec, adj_food * starvation_health_loss_per_sec);
 }
 
 void set_idle_animation(compos *ec) {
@@ -136,23 +137,18 @@ void set_walk_animation(compos *ec, side s) {
       .num_frames = 6,
       .frames_per_sec = 24,
   };
-  constexpr const auto num_frames = 6;
-  constexpr const auto frames_per_sec = 24;
 
-  auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-  if (p.energy == 0) {
+  auto energy = ec->player().energy;
+  if (energy == 0) {
     process_starvation(ec);
     set_sit_animation(ec);
     return;
   }
 
-  auto ms = ec->current_millis();
-  p.energy -= energy_lost_per_sec * ms / 1000.f;
-  ec->player().set(pid, p);
+  exercise(ec, energy_lost_per_sec);
 
   auto aa = a;
-  aa.frames_per_sec = static_cast<unsigned>(a.frames_per_sec * p.energy);
+  aa.frames_per_sec = static_cast<unsigned>(a.frames_per_sec * energy);
   update_animation(ec, s, aa);
 }
 void set_pick_animation(compos *ec) {
@@ -168,7 +164,6 @@ export void process_input(input::dual_axis in, compos *ec) {
   constexpr const auto blocks_per_sec = 4.0f;
   constexpr const auto speed = blocks_per_sec / 1000.0f;
 
-  auto pid = ec->player().get_id();
   auto h = in.h_value();
   auto v = in.v_value();
   if (v != 0) {
@@ -179,32 +174,23 @@ export void process_input(input::dual_axis in, compos *ec) {
     set_idle_animation(ec);
   }
 
-  auto p = ec->player().get(pid);
+  auto pid = ec->player().eid;
 
   if (v == 0 && h == 0) {
-    if (p.energy < 1) {
-      auto delta = food_lost_per_sec * ec->current_millis() / 1000.f;
-      delta = (delta > p.satiation) ? p.satiation : delta;
-      p.satiation -= delta;
-      p.energy += delta * food_energy_ratio;
-      ec->player().set(pid, p);
+    if (ec->player().energy < 1) {
+      starve(ec, food_lost_per_sec);
+      rest(ec, food_energy_ratio);
     }
     ec->movements().update(pid, {});
     return;
   }
 
-  float f_speed = speed * p.energy;
+  float f_speed = speed * ec->player().energy;
 
   float d = sqrtf(h * h + v * v);
   float sx = h * f_speed / d;
   float sy = v * f_speed / d;
 
   ec->movements().update(pid, {sx, sy});
-}
-
-export rect get_area(compos *ec) {
-  auto pid = ec->player().get_id();
-  auto spr = ec->player_sprites().get(pid);
-  return spr.pos;
 }
 } // namespace player
