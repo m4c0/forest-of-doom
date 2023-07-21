@@ -11,9 +11,9 @@ import stopwatch;
 extern "C" float sqrtf(float);
 
 namespace player {
-constexpr const auto energy_lost_per_sec = 0.025f;
+constexpr const auto energy_lost_per_sec = 0.25f;
 constexpr const auto food_lost_per_sec = 0.1f;
-constexpr const auto food_energy_ratio = 2.f;
+constexpr const auto energy_gain_per_sec = food_lost_per_sec * 2.0f;
 
 constexpr const auto starvation_limit = 0.25f;
 constexpr const auto starvation_mental_loss_per_sec = 0.1f;
@@ -87,6 +87,9 @@ void exercise(compos *ec, float val_per_sec) {
   ec->player().energy -= val_per_sec * ec->current_millis() / 1000.f;
 }
 void rest(compos *ec, float val_per_sec) { exercise(ec, -val_per_sec); }
+void burn_callories(compos *ec, float val_per_sec) {
+  ec->player().satiation -= val_per_sec * ec->current_millis() / 1000.0f;
+}
 
 bool update_animation(compos *ec, unsigned s, animation::c a) {
   a.start_x = s * a.num_frames;
@@ -178,8 +181,8 @@ export void process_input(input::dual_axis in, compos *ec) {
 
   if (v == 0 && h == 0) {
     if (ec->player().energy < 1) {
-      starve(ec, food_lost_per_sec);
-      rest(ec, food_energy_ratio);
+      burn_callories(ec, food_lost_per_sec);
+      rest(ec, energy_gain_per_sec);
     }
     ec->movements().update(pid, {});
     return;
