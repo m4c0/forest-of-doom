@@ -68,7 +68,19 @@ export void add_entity(compos *ec) {
   collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
 }
 
-bool update_compo(compos *ec, unsigned s, animation::c a) {
+auto get_side(compos *ec) {
+  auto pid = ec->player().get_id();
+  auto p = ec->player().get(pid);
+  return ec->player().get(pid).side;
+}
+void set_side(compos *ec, side s) {
+  auto pid = ec->player().get_id();
+  auto p = ec->player().get(pid);
+  p.side = s;
+  ec->player().set(pid, p);
+}
+
+bool update_animation(compos *ec, unsigned s, animation::c a) {
   a.start_x = s * a.num_frames;
 
   auto pid = ec->player().get_id();
@@ -80,14 +92,9 @@ bool update_compo(compos *ec, unsigned s, animation::c a) {
   ec->animations().update(pid, a);
   return true;
 }
-void update_compo(compos *ec, side s, animation::c a) {
-  if (!update_compo(ec, static_cast<unsigned>(s), a))
-    return;
-
-  auto pid = ec->player().get_id();
-  auto p = ec->player().get(pid);
-  p.side = s;
-  ec->player().set(pid, p);
+void update_animation(compos *ec, side s, animation::c a) {
+  if (update_animation(ec, static_cast<unsigned>(s), a))
+    set_side(ec, s);
 }
 
 void process_starvation(compos *ec) {
@@ -108,34 +115,27 @@ void process_starvation(compos *ec) {
 }
 
 void set_idle_animation(compos *ec) {
-  constexpr const auto num_frames = 6;
-  constexpr const auto frames_per_sec = 6;
-
-  auto pid = ec->player().get_id();
-  auto s = ec->player().get(pid).side;
-
-  update_compo(ec, s,
-               {
-                   .y = 2,
-                   .num_frames = num_frames,
-                   .frames_per_sec = frames_per_sec,
-               });
+  constexpr const animation::c a{
+      .y = 2,
+      .num_frames = 6,
+      .frames_per_sec = 6,
+  };
+  update_animation(ec, get_side(ec), a);
 }
 void set_sit_animation(compos *ec) {
-  constexpr const auto num_frames = 6;
-  constexpr const auto frames_per_sec = 6;
-
-  auto pid = ec->player().get_id();
-  unsigned s = ec->player().get(pid).side / 2U;
-
-  update_compo(ec, s,
-               {
-                   .y = 8,
-                   .num_frames = num_frames,
-                   .frames_per_sec = frames_per_sec,
-               });
+  constexpr const animation::c a{
+      .y = 8,
+      .num_frames = 6,
+      .frames_per_sec = 6,
+  };
+  update_animation(ec, get_side(ec) / 2U, a);
 }
 void set_walk_animation(compos *ec, side s) {
+  constexpr const animation::c a{
+      .y = 4,
+      .num_frames = 6,
+      .frames_per_sec = 24,
+  };
   constexpr const auto num_frames = 6;
   constexpr const auto frames_per_sec = 24;
 
@@ -151,27 +151,17 @@ void set_walk_animation(compos *ec, side s) {
   p.energy -= energy_lost_per_sec * ms / 1000.f;
   ec->player().set(pid, p);
 
-  auto fps = static_cast<unsigned>(frames_per_sec * p.energy);
-  update_compo(ec, s,
-               {
-                   .y = 4,
-                   .num_frames = num_frames,
-                   .frames_per_sec = fps,
-               });
+  auto aa = a;
+  aa.frames_per_sec = static_cast<unsigned>(a.frames_per_sec * p.energy);
+  update_animation(ec, s, aa);
 }
 void set_pick_animation(compos *ec) {
-  constexpr const auto num_frames = 12;
-  constexpr const auto frames_per_sec = 12;
-
-  auto pid = ec->player().get_id();
-  auto s = ec->player().get(pid).side;
-
-  update_compo(ec, s,
-               {
-                   .y = 18,
-                   .num_frames = num_frames,
-                   .frames_per_sec = frames_per_sec,
-               });
+  constexpr const animation::c a{
+      .y = 18,
+      .num_frames = 12,
+      .frames_per_sec = 12,
+  };
+  update_animation(ec, get_side(ec), a);
 }
 
 export void process_input(input::dual_axis in, compos *ec) {
