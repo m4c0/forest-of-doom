@@ -87,8 +87,9 @@ void exercise(compos *ec, float val_per_sec) {
   ec->player().energy -= val_per_sec * ec->current_millis() / 1000.f;
 }
 void rest(compos *ec, float val_per_sec) { exercise(ec, -val_per_sec); }
-void burn_callories(compos *ec, float val_per_sec) {
+bool burn_callories(compos *ec, float val_per_sec) {
   ec->player().satiation -= val_per_sec * ec->current_millis() / 1000.0f;
+  return ec->player().satiation > 0;
 }
 
 bool update_animation(compos *ec, unsigned s, animation::c a) {
@@ -181,8 +182,8 @@ export void process_input(input::dual_axis in, compos *ec) {
 
   if (v == 0 && h == 0) {
     if (ec->player().energy < 1) {
-      burn_callories(ec, food_lost_per_sec);
-      rest(ec, energy_gain_per_sec);
+      if (burn_callories(ec, food_lost_per_sec))
+        rest(ec, energy_gain_per_sec);
     }
     ec->movements().update(pid, {});
     return;
