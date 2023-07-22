@@ -6,11 +6,11 @@ import sprite;
 import tile;
 
 namespace hud {
-export struct anchor {
+struct anchor {
   float dx;
   float dy;
 };
-export using battery = ranged(player::c::*);
+using battery = ranged (*)(player::compos *);
 export class compos : public virtual pog::entity_provider,
                       public virtual player::compos {
   pog::sparse_set<anchor> m_anchors{};
@@ -43,10 +43,10 @@ void add_battery(compos *ec, float y, tile::ui::c icon, battery b) {
   ec->batteries().add(id, b);
 }
 export void add_entities(compos *ec) {
-  add_battery(ec, 3, tile::ui::mind_l, &player::c::happyness);
-  add_battery(ec, 2, tile::ui::heart_l, &player::c::health);
-  add_battery(ec, 1, tile::ui::food_l, &player::c::satiation);
-  add_battery(ec, 0, tile::ui::energy_l, &player::c::energy);
+  add_battery(ec, 3, tile::ui::mind_l, &player::get_happyness);
+  add_battery(ec, 2, tile::ui::heart_l, &player::get_health);
+  add_battery(ec, 1, tile::ui::food_l, &player::get_satiation);
+  add_battery(ec, 0, tile::ui::energy_l, &player::get_energy);
 }
 
 export void update_batteries(compos *ec) {
@@ -55,7 +55,7 @@ export void update_batteries(compos *ec) {
                                        tile::ui::bat_g_4};
   auto p = ec->player();
   for (auto &[id, attr] : ec->batteries()) {
-    unsigned val = static_cast<unsigned>(4.0f * (p.*attr));
+    unsigned val = static_cast<unsigned>(4.0f * attr(ec));
 
     auto spr = ec->sprites().get(id);
     spr.uv = tile::uv(levels[val]);

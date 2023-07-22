@@ -74,6 +74,11 @@ export rect get_area(compos *ec) {
   return spr.pos;
 }
 
+export ranged get_happyness(compos *ec) { return ec->player().happyness; }
+export ranged get_health(compos *ec) { return ec->player().health; }
+export ranged get_satiation(compos *ec) { return ec->player().satiation; }
+export ranged get_energy(compos *ec) { return ec->player().energy; }
+
 auto get_side(compos *ec) { return ec->player().side; }
 void set_side(compos *ec, side s) { ec->player().side = s; }
 
