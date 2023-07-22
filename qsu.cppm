@@ -34,11 +34,11 @@ export class main {
 public:
   void process_event(const casein::event &e) {
     m_r.process_event(e);
-    (*m_debug).process_event(e);
     m_mouse.process_event(e);
     for (auto &l : m_layers) {
       l.process_event(e);
     }
+    (*m_debug).process_event(e);
     m_hud.process_event(e);
   }
 
