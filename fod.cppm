@@ -23,7 +23,7 @@ class game {
 
   void setup() {
     auto *ect = static_cast<tile::terrain::compos *>(&m_ec);
-    prefabs::island_0.add_entities(ect, 0, 0);
+    prefabs::island_0(ect, 0, 0);
     prefabs::ocean_0(ect, -16, 0);
     prefabs::ocean_0(ect, 16, 0);
     prefabs::ocean_0(ect, -16, -16);
