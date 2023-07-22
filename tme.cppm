@@ -10,6 +10,7 @@ import pog;
 import prefabs;
 import qsu;
 import silog;
+import sprite;
 import tile;
 import tilemap;
 import yoyo_libc;
@@ -70,7 +71,7 @@ static auto pals() {
 }
 } // namespace terrain_set
 
-static constexpr const auto prefab = prefabs::ocean_0;
+static constexpr const auto prefab = &prefabs::ocean_0;
 static constexpr const auto fname = "prefabs-ocean_0.cppm";
 static constexpr const auto mname = "ocean_0";
 
@@ -81,8 +82,7 @@ struct ec : cursor::compos, tile::compos {};
 class game {
   ec m_ec{};
   qsu::main *m_q{};
-  tilemap::map m_map = prefab;
-  tilemap::map m_undo_map = prefab;
+  tilemap::map m_undo{};
   tile::c_t m_brush{};
 
   decltype(pals()) m_pal = pals();
@@ -98,21 +98,36 @@ class game {
       auto [eid, c] = *(m_ec.tiles().begin());
       tile::remove_tile(&m_ec, eid);
     }
-    m_map.add_entities(&m_ec, 0, 0);
+    prefab(&m_ec, 0, 0);
     fill_sprites();
   }
 
-  void flood_fill(auto x, auto y, tile::c_t old) {
-    auto _ = m_map.get(x, y).map([this, x, y, old](auto t) {
-      if (t != old)
-        return;
+  bool replace_tile(float x, float y, tile::c_t old, tile::c_t brush) {
+    for (auto &[id, spr] : m_ec.sprites()) {
+      auto [rx, ry, rw, rh] = spr.pos;
+      if (rx != x || ry != y)
+        continue;
 
-      m_map.set(x, y, m_brush);
-      flood_fill(x + 1, y, old);
-      flood_fill(x - 1, y, old);
-      flood_fill(x, y + 1, old);
-      flood_fill(x, y - 1, old);
-    });
+      auto t = m_ec.tiles().get(id);
+      if (t != old && old != brush)
+        continue;
+
+      m_undo.set(x, y, old);
+      tile::remove_tile(&m_ec, id);
+      tile::add_tile(&m_ec, brush, x, y);
+      return true;
+    }
+    return false;
+  }
+
+  void flood_fill_at(auto x, auto y, tile::c_t old) {
+    if (!replace_tile(x, y, old, m_brush))
+      return;
+
+    flood_fill_at(x + 1, y, old);
+    flood_fill_at(x - 1, y, old);
+    flood_fill_at(x, y + 1, old);
+    flood_fill_at(x, y - 1, old);
   }
 
 public:
@@ -157,14 +172,14 @@ public:
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();
-    m_undo_map = m_map;
-    m_map.set(x, y, m_brush);
+    replace_tile(x, y, m_brush, m_brush);
+
     auto [tx, ty, tw, th] = tile::uv(m_brush);
     for (auto dy = 0; dy < th; dy++) {
       for (auto dx = 0; dx < tw; dx++) {
         if (dx == 0 && dy == 0)
           continue;
-        m_map.set(x + dx, y + dy, 0);
+        replace_tile(x + dx, y + dy, 0, 0);
       }
     }
     cursor::update_pos(&m_ec, x, y);
@@ -173,17 +188,25 @@ public:
 
   void flood_fill() {
     auto [x, y] = m_q->mouse_pos();
-    auto _ = m_map.get(x, y).map([this, x, y](auto t) {
-      if (t == m_brush)
+    tile::c_t old{};
+    for (auto [id, spr] : m_ec.sprites()) {
+      auto [rx, ry, rw, rh] = spr.pos;
+      if (rx != x || ry != y)
         return;
-      m_undo_map = m_map;
-      flood_fill(x, y, t);
+
+      old = m_ec.tiles().get(id);
+      if (old == m_brush)
+        return;
+
+      flood_fill_at(x, y, old);
       update_sprites();
-    });
+      return;
+    }
   }
 
   void undo() {
-    m_map = m_undo_map;
+    static_cast<tile::compos &>(m_ec) = {};
+    m_undo.add_entities(&m_ec, 0, 0);
     update_sprites();
   }
 
@@ -193,29 +216,28 @@ public:
     try {
       yoyo::file_writer out{fname};
       out.writef("export module prefabs:%s;\n", mname).take(fail);
-      out.write("import tilemap;\n"_s).take(fail);
+      out.write("import tile;\n"_s).take(fail);
       out.write("\n"_s).take(fail);
       out.write("namespace prefabs {\n"_s).take(fail);
-      out.writef("export constexpr const tilemap::map %s = [] {\n", mname)
+      out.writef("export void %s(tile::compos *ec, float x, float y) {\n",
+                 mname)
           .take(fail);
-      out.write("  tilemap::map res{};\n"_s).take(fail);
-      for (auto y = 0; y < tilemap::height; y++) {
-        for (auto x = 0; x < tilemap::width; x++) {
-          m_map.get(x, y)
-              .fmap([&](auto t) {
-                if (t == 0)
-                  return mno::req<void>{};
-                return out.writef("  res.set(%d, %d, 0x%08x);\n", x, y, t);
-              })
-              .take(fail);
-        }
-      }
-      out.write("  return res;\n"_s).take(fail);
-      out.write("}();\n"_s).take(fail);
+
+      m_ec.tiles().for_each_r([&](auto id, auto t) {
+        if (!t)
+          return;
+
+        auto spr = m_ec.sprites().get(id);
+        auto [x, y, w, h] = spr.pos;
+        out.writef("  add_tile(ec, 0x%08x, %d, %d);\n", t, x, y).take(fail);
+      });
+
       out.write("}\n"_s).take(fail);
+      out.write("} // namespace prefabs\n"_s).take(fail);
+
+      silog::log(silog::info, "Source saved");
     } catch (...) {
     }
-    silog::log(silog::info, "Source saved");
   }
 };
 

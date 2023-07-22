@@ -24,14 +24,14 @@ class game {
   void setup() {
     auto *ect = static_cast<tile::terrain::compos *>(&m_ec);
     prefabs::island_0.add_entities(ect, 0, 0);
-    prefabs::ocean_0.add_entities(ect, -16, 0);
-    prefabs::ocean_0.add_entities(ect, 16, 0);
-    prefabs::ocean_0.add_entities(ect, -16, -16);
-    prefabs::ocean_0.add_entities(ect, 0, -16);
-    prefabs::ocean_0.add_entities(ect, 16, -16);
-    prefabs::ocean_0.add_entities(ect, -16, 16);
-    prefabs::ocean_0.add_entities(ect, 0, 16);
-    prefabs::ocean_0.add_entities(ect, 16, 16);
+    prefabs::ocean_0(ect, -16, 0);
+    prefabs::ocean_0(ect, 16, 0);
+    prefabs::ocean_0(ect, -16, -16);
+    prefabs::ocean_0(ect, 0, -16);
+    prefabs::ocean_0(ect, 16, -16);
+    prefabs::ocean_0(ect, -16, 16);
+    prefabs::ocean_0(ect, 0, 16);
+    prefabs::ocean_0(ect, 16, 16);
     tile::camping::add_tile(&m_ec, tile::camping::backpack_a, 9, 7);
     tile::camping::add_tile(&m_ec, tile::camping::backpack_b, 10, 7);
     tile::camping::add_tile(&m_ec, tile::camping::backpack_c, 11, 7);

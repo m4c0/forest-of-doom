@@ -1,5 +1,4 @@
 export module tilemap;
-import missingno;
 import tile;
 
 export namespace tilemap {
@@ -12,19 +11,6 @@ class map {
   c m_data[height][width]{};
 
 public:
-  constexpr void fill(c t) noexcept {
-    for (auto &row : m_data) {
-      for (auto &tile : row) {
-        tile = t;
-      }
-    }
-  }
-  constexpr mno::req<c> get(unsigned x, unsigned y) const noexcept {
-    if (x < 0 || x >= width || y < 0 || y >= height)
-      return mno::req<c>::failed("out-of-bounds");
-
-    return mno::req<c>{m_data[y][x]};
-  }
   constexpr void set(unsigned x, unsigned y, c t) noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
       return;
