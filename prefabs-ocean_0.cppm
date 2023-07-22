@@ -4,7 +4,7 @@ import tilemap;
 
 namespace prefabs {
 export constexpr const tilemap::map ocean_0 = [] {
-  tilemap::map<tile::terrain::compos> res{};
+  tilemap::map res{};
   res.set(0, 0, tile::terrain::water);
   res.set(1, 0, tile::terrain::water);
   res.set(2, 0, tile::terrain::water);

@@ -4,9 +4,8 @@ import tilemap;
 
 namespace prefabs {
 export constexpr const tilemap::map island_0 = [] {
-  using cs = tile::terrain::compos;
-  using c = cs::tile_t;
-  tilemap::map<cs> res{};
+  using c = tile::c_t;
+  tilemap::map res{};
   res.set(0, 0, static_cast<c>(0x08060101));
   res.set(1, 0, static_cast<c>(0x09060101));
   res.set(2, 0, static_cast<c>(0x09060101));

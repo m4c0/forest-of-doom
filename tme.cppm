@@ -38,20 +38,19 @@ static void fail(const char *msg) {
 }
 
 namespace camping_set {
-namespace t = tile::camping;
 static constexpr const auto tname = "tile::camping";
 static constexpr const auto tfill = qsu::layers::camping;
 
-static constexpr const auto pals = [] { return palette<palette<t::c>>{}; };
+static auto pals() { return palette<palette<tile::c_t>>{}; }
 } // namespace camping_set
 
 namespace terrain_set {
-namespace t = tile::terrain;
 static constexpr const auto tname = "tile::terrain";
 static constexpr const auto tfill = qsu::layers::terrain;
 
-static constexpr const auto pals = [] {
-  return palette<palette<t::c>>{
+static auto pals() {
+  namespace t = tile::terrain;
+  return palette{
       palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
               t::island_br, t::island_b, t::island_bl, t::island_l},
       palette{t::lake_tl, t::island_b, t::lake_tr, t::island_l, t::lake_br,
@@ -68,7 +67,7 @@ static constexpr const auto pals = [] {
               t::cobble_1, t::cobble_2, t::cobble_3, t::brick_0, t::brick_1,
               t::brick_2, t::brick_3},
   };
-};
+}
 } // namespace terrain_set
 
 static constexpr const auto prefab = prefabs::ocean_0;
@@ -77,35 +76,33 @@ static constexpr const auto mname = "ocean_0";
 
 using namespace terrain_set;
 
-struct ec : cursor::compos, t::compos {};
+struct ec : cursor::compos, tile::compos {};
 
 class game {
   ec m_ec{};
   qsu::main *m_q{};
-  tilemap::map<t::compos> m_map = prefab;
-  tilemap::map<t::compos> m_undo_map = prefab;
-  t::c m_brush{};
+  tilemap::map m_map = prefab;
+  tilemap::map m_undo_map = prefab;
+  tile::c_t m_brush{};
 
-  palette<palette<t::c>> m_pal = pals();
+  decltype(pals()) m_pal = pals();
 
   void fill_sprites() {
-    auto &ec = static_cast<t::compos &>(m_ec);
-    t::populate(&m_ec, 0, 0);
-    cursor::add_sprite(&m_ec, ec.sprites());
-    m_q->fill_sprites(tfill, ec.sprites());
+    tile::populate(&m_ec, 0, 0);
+    cursor::add_sprite(&m_ec, m_ec.sprites());
+    m_q->fill_sprites(tfill, m_ec.sprites());
   }
 
   void update_sprites() {
-    auto &ec = static_cast<t::compos &>(m_ec);
-    while (ec.tiles().size() > 0) {
-      auto [eid, c] = *(ec.tiles().begin());
-      t::remove_tile(&m_ec, eid);
+    while (m_ec.tiles().size() > 0) {
+      auto [eid, c] = *(m_ec.tiles().begin());
+      tile::remove_tile(&m_ec, eid);
     }
     m_map.add_entities(&m_ec, 0, 0);
     fill_sprites();
   }
 
-  void flood_fill(auto x, auto y, t::c old) {
+  void flood_fill(auto x, auto y, tile::c_t old) {
     auto _ = m_map.get(x, y).map([this, x, y, old](auto t) {
       if (t != old)
         return;
@@ -129,7 +126,7 @@ public:
     update_sprites();
   }
 
-  void set_brush(t::c t) {
+  void set_brush(tile::c_t t) {
     m_brush = t;
     cursor::update_tile(&m_ec, t);
     fill_sprites();
@@ -167,7 +164,7 @@ public:
       for (auto dx = 0; dx < tw; dx++) {
         if (dx == 0 && dy == 0)
           continue;
-        m_map.set(x + dx, y + dy, t::blank);
+        m_map.set(x + dx, y + dy, 0);
       }
     }
     cursor::update_pos(&m_ec, x, y);
@@ -196,23 +193,19 @@ public:
     try {
       yoyo::file_writer out{fname};
       out.writef("export module prefabs:%s;\n", mname).take(fail);
-      out.write("import tile;\n"_s).take(fail);
       out.write("import tilemap;\n"_s).take(fail);
       out.write("\n"_s).take(fail);
       out.write("namespace prefabs {\n"_s).take(fail);
       out.writef("export constexpr const tilemap::map %s = [] {\n", mname)
           .take(fail);
-      out.writef("  using cs = %s::compos;\n", tname).take(fail);
-      out.write("  using c = cs::tile_t;\n"_s).take(fail);
-      out.write("  tilemap::map<cs> res{};\n"_s).take(fail);
+      out.write("  tilemap::map res{};\n"_s).take(fail);
       for (auto y = 0; y < tilemap::height; y++) {
         for (auto x = 0; x < tilemap::width; x++) {
           m_map.get(x, y)
               .fmap([&](auto t) {
                 if (t == 0)
                   return mno::req<void>{};
-                return out.writef(
-                    "  res.set(%d, %d, static_cast<c>(0x%08x));\n", x, y, t);
+                return out.writef("  res.set(%d, %d, 0x%08x);\n", x, y, t);
               })
               .take(fail);
         }
@@ -240,7 +233,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::K_D] = [](auto) { gg.flood_fill(); };
     res[casein::K_U] = [](auto) { gg.undo(); };
     res[casein::K_Z] = [](auto) { gg.dump_map(); };
-    res[casein::K_SPACE] = [](auto) { gg.set_brush(t::blank); };
+    res[casein::K_SPACE] = [](auto) { gg.set_brush(0); };
     return res;
   }();
   static constexpr const auto map = [] {

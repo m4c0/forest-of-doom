@@ -42,7 +42,7 @@ enum c : c_t {
   bat_0_3 = 0x12150101,
   bat_0_4 = 0x11130101,
 };
-using compos = tile::compos<c>;
+struct compos : tile::compos {};
 
 auto add_tile(compos *ec, c t, float x, float y) {
   return tile::add_tile(ec, t, x, y);

@@ -5,10 +5,10 @@ export import pog;
 export import rect;
 export import sprite;
 
-namespace tile {
+export namespace tile {
 using c_t = unsigned;
 
-export constexpr rect uv(c_t t) {
+constexpr rect uv(c_t t) {
   return rect{
       .x = static_cast<float>((t >> 24) & 0xFFU),
       .y = static_cast<float>((t >> 16) & 0xFFU),
@@ -16,19 +16,16 @@ export constexpr rect uv(c_t t) {
       .h = static_cast<float>((t >> 0) & 0xFFU),
   };
 }
-template <typename C>
 class compos : public virtual area::compos, public virtual collision::compos {
-  pog::sparse_set<C> m_tiles{};
+  pog::sparse_set<c_t> m_tiles{};
   pog::sparse_set<sprite> m_sprites{};
 
 public:
-  using tile_t = C;
-
   auto &tiles() noexcept { return m_tiles; }
   auto &sprites() noexcept { return m_sprites; }
 };
 
-template <typename C> auto add_tile(compos<C> *ec, C t, float x, float y) {
+auto add_tile(compos *ec, c_t t, float x, float y) {
   rect r = uv(t);
   r.x = x;
   r.y = y;
@@ -39,8 +36,7 @@ template <typename C> auto add_tile(compos<C> *ec, C t, float x, float y) {
   return id;
 }
 
-template <typename C>
-void update_tile_pos(compos<C> *ec, pog::eid id, float x, float y) {
+void update_tile_pos(compos *ec, pog::eid id, float x, float y) {
   auto t = ec->tiles().get(id);
   rect r = uv(t);
   r.x = x;
@@ -51,14 +47,14 @@ void update_tile_pos(compos<C> *ec, pog::eid id, float x, float y) {
   area::add(ec, id, r);
 }
 
-template <typename C> void remove_tile(compos<C> *ec, pog::eid id) {
+void remove_tile(compos *ec, pog::eid id) {
   collision::remove(ec, id);
   area::remove(ec, id);
   ec->tiles().remove(id);
   ec->e().dealloc(id);
 }
 
-template <typename C> void populate(compos<C> *ec, float cx, float cy) {
+void populate(compos *ec, float cx, float cy) {
   constexpr const auto radius = 16;
   area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
 

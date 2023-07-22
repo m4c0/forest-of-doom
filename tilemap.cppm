@@ -6,8 +6,8 @@ export namespace tilemap {
 constexpr const unsigned width = 16;
 constexpr const unsigned height = 16;
 
-template <typename T> class map {
-  using c = T::tile_t;
+class map {
+  using c = tile::c_t;
 
   c m_data[height][width]{};
 
@@ -32,14 +32,14 @@ public:
     m_data[y][x] = t;
   }
 
-  void add_entities(T *ec, float dx, float dy) const noexcept {
+  void add_entities(tile::compos *ec, float dx, float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto px = x + dx;
         auto py = y + dy;
 
         auto t = m_data[y][x];
-        if (t == c::blank)
+        if (!t)
           continue;
 
         add_tile(ec, t, px, py);
@@ -47,7 +47,4 @@ public:
     }
   }
 };
-
-template class map<tile::camping::compos>;
-template class map<tile::terrain::compos>;
 } // namespace tilemap

@@ -4,9 +4,8 @@ import tilemap;
 
 namespace prefabs {
 export constexpr const tilemap::map ui_0 = [] {
-  using cs = tile::ui::compos;
-  using c = cs::tile_t;
-  tilemap::map<cs> res{};
+  using c = tile::c_t;
+  tilemap::map res{};
   return res;
 }();
 }

@@ -53,7 +53,7 @@ enum c : c_t {
   brick_2 = 0x1b0a0101,
   brick_3 = 0x1c0a0101,
 };
-using compos = tile::compos<c>;
+struct compos : tile::compos {};
 
 auto add_tile(compos *ec, c t, float x, float y) {
   auto id = tile::add_tile(ec, t, x, y);

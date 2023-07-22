@@ -8,7 +8,7 @@ enum c : c_t {
   backpack_b = 0x11220102,
   backpack_c = 0x12220102,
 };
-using compos = tile::compos<c>;
+struct compos : tile::compos {};
 
 auto add_tile(compos *ec, c t, float x, float y) {
   auto id = tile::add_tile(ec, t, x, y);
