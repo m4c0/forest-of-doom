@@ -215,12 +215,13 @@ public:
                  mname)
           .take(fail);
 
-      for (auto [id, spr] : m_ec.sprites()) {
+      for (auto &[id, spr] : m_ec.sprites()) {
         auto t = m_ec.tiles().get(id);
         if (!t)
           continue;
 
-        auto [x, y, w, h] = spr.pos;
+        auto x = static_cast<int>(spr.pos.x);
+        auto y = static_cast<int>(spr.pos.y);
         out.writef("  add_tile(ec, 0x%08x, x + %d, y + %d);\n", t, x, y)
             .take(fail);
       }
