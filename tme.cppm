@@ -41,6 +41,7 @@ static void fail(const char *msg) {
 namespace camping_set {
 static constexpr const auto tname = "tile::camping";
 static constexpr const auto tfill = qsu::layers::camping;
+namespace t = tile::camping;
 
 static auto pals() { return palette<palette<tile::c_t>>{}; }
 } // namespace camping_set
@@ -48,9 +49,9 @@ static auto pals() { return palette<palette<tile::c_t>>{}; }
 namespace terrain_set {
 static constexpr const auto tname = "tile::terrain";
 static constexpr const auto tfill = qsu::layers::terrain;
+namespace t = tile::terrain;
 
 static auto pals() {
-  namespace t = tile::terrain;
   return palette{
       palette{t::island_tl, t::island_t, t::island_tr, t::island_r,
               t::island_br, t::island_b, t::island_bl, t::island_l},
@@ -77,7 +78,7 @@ static constexpr const auto mname = "ocean_0";
 
 using namespace terrain_set;
 
-struct ec : cursor::compos, tile::compos {};
+struct ec : cursor::compos, t::compos {};
 
 class game {
   ec m_ec{};
@@ -210,9 +211,10 @@ public:
       out.writef("export module prefabs:%s;\n", mname).take(fail);
       out.write("import tile;\n"_s).take(fail);
       out.write("\n"_s).take(fail);
+      out.writef("using namespace %s;\n", tname).take(fail);
+      out.write("\n"_s).take(fail);
       out.write("namespace prefabs {\n"_s).take(fail);
-      out.writef("export void %s(tile::compos *ec, float x, float y) {\n",
-                 mname)
+      out.writef("export void %s(compos *ec, float x, float y) {\n", mname)
           .take(fail);
 
       for (auto &[id, spr] : m_ec.sprites()) {
@@ -222,7 +224,9 @@ public:
 
         auto x = static_cast<int>(spr.pos.x);
         auto y = static_cast<int>(spr.pos.y);
-        out.writef("  add_tile(ec, 0x%08x, x + %d, y + %d);\n", t, x, y)
+        out.writef(
+               "  %s::add_tile(ec, static_cast<c>(0x%08x), x + %d, y + %d);\n",
+               tname, t, x, y)
             .take(fail);
       }
 
