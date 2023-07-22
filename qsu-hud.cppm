@@ -1,11 +1,14 @@
 export module qsu:hud;
 import :layer;
 import casein;
+import jute;
+import quack;
 
 namespace qsu {
 class hud_layer : public layer {
 public:
-  using layer::layer;
+  hud_layer(quack::renderer *m_r, unsigned max_sprites, jute::view atlas)
+      : layer{m_r, max_sprites, atlas} {}
 
   void process_event(const casein::event &e) {
     layer::process_event(e);
