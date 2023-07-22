@@ -93,15 +93,6 @@ class game {
     m_q->fill_sprites(tfill, m_ec.sprites());
   }
 
-  void update_sprites() {
-    while (m_ec.tiles().size() > 0) {
-      auto [eid, c] = *(m_ec.tiles().begin());
-      tile::remove_tile(&m_ec, eid);
-    }
-    prefab(&m_ec, 0, 0);
-    fill_sprites();
-  }
-
   bool replace_tile(float x, float y, tile::c_t old, tile::c_t brush) {
     for (auto &[id, spr] : m_ec.sprites()) {
       auto [rx, ry, rw, rh] = spr.pos;
@@ -138,7 +129,8 @@ public:
     q->center_at(tilemap::width / 2, tilemap::height / 2);
 
     cursor::add_entity(&m_ec);
-    update_sprites();
+    prefab(&m_ec, 0, 0);
+    fill_sprites();
   }
 
   void set_brush(tile::c_t t) {
@@ -183,7 +175,7 @@ public:
       }
     }
     cursor::update_pos(&m_ec, x, y);
-    update_sprites();
+    fill_sprites();
   }
 
   void flood_fill() {
@@ -199,7 +191,7 @@ public:
         return;
 
       flood_fill_at(x, y, old);
-      update_sprites();
+      fill_sprites();
       return;
     }
   }
@@ -207,7 +199,7 @@ public:
   void undo() {
     static_cast<tile::compos &>(m_ec) = {};
     m_undo.add_entities(&m_ec, 0, 0);
-    update_sprites();
+    fill_sprites();
   }
 
   void dump_map() {
@@ -223,14 +215,15 @@ public:
                  mname)
           .take(fail);
 
-      m_ec.tiles().for_each_r([&](auto id, auto t) {
+      for (auto [id, spr] : m_ec.sprites()) {
+        auto t = m_ec.tiles().get(id);
         if (!t)
-          return;
+          continue;
 
-        auto spr = m_ec.sprites().get(id);
         auto [x, y, w, h] = spr.pos;
-        out.writef("  add_tile(ec, 0x%08x, %d, %d);\n", t, x, y).take(fail);
-      });
+        out.writef("  add_tile(ec, 0x%08x, x + %d, y + %d);\n", t, x, y)
+            .take(fail);
+      }
 
       out.write("}\n"_s).take(fail);
       out.write("} // namespace prefabs\n"_s).take(fail);
