@@ -65,7 +65,7 @@ auto add_tile(compos *ec, c t, float x, float y) {
   case island_bl:
   case island_b:
   case island_br:
-    collision::add(ec, id, x, y + 0.7, 1, 0.3);
+    collision::add(ec, id, x, y + 0.5, 1, 0.5);
     break;
   default:
     break;
