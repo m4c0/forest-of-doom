@@ -2,6 +2,30 @@ export module input;
 import casein;
 
 export namespace input {
+template <casein::keys K> class button {
+  bool m_down{};
+
+public:
+  void process_event(const casein::event &e) {
+    switch (e.type()) {
+    case casein::KEY_DOWN: {
+      auto key = *e.as<casein::events::key_down>();
+      if (key == K)
+        m_down = true;
+      break;
+    }
+    case casein::KEY_UP: {
+      auto key = *e.as<casein::events::key_down>();
+      if (key == K)
+        m_down = false;
+      break;
+    }
+    default:
+      break;
+    }
+  }
+};
+
 template <casein::keys N, casein::keys P> class axis {
   bool m_n{};
   bool m_p{};
