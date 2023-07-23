@@ -47,8 +47,8 @@ void add_battery(compos *ec, float y, tile::ui::c icon, pog::eid gg) {
 export void add_entities(compos *ec) {
   add_battery(ec, 3, tile::ui::mind_l, ec->player().happyness);
   add_battery(ec, 2, tile::ui::heart_l, ec->player().health);
-  // add_battery(ec, 1, tile::ui::food_l, &player::get_satiation);
-  // add_battery(ec, 0, tile::ui::energy_l, &player::get_energy);
+  add_battery(ec, 1, tile::ui::food_l, ec->player().satiation);
+  add_battery(ec, 0, tile::ui::energy_l, ec->player().energy);
 }
 
 // Looks excessive, but it is precise and it allows per-range adjustment (just

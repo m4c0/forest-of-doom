@@ -59,7 +59,7 @@ class game {
   }
 
   void tick() {
-    player::process_input(m_input, &m_ec);
+    player::tick(m_input, &m_ec);
     animation::update_animes(&m_ec, m_ec.player_sprites());
     movement::update_sprites(&m_ec, m_ec.player_sprites());
     gauge::run_drains(&m_ec);
@@ -76,6 +76,7 @@ class game {
   void dump_stats() {
     silog::log(silog::debug, "Max entities: %d", m_ec.e().max_elements());
     silog::log(silog::debug, "Animations: %d", m_ec.animations().size());
+    silog::log(silog::debug, "Gauges: %d", m_ec.gauges.size());
     silog::log(silog::debug, "Movements: %d", m_ec.movements().size());
   }
 
