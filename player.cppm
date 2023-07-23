@@ -162,22 +162,11 @@ export void tick(input::dual_axis in, compos *ec) {
   constexpr const auto blocks_per_sec = 4.0f;
   constexpr const auto speed = blocks_per_sec / 1000.0f;
   const auto pid = ec->player().eid;
+  const auto energy = ec->gauges.get(ec->player().energy).value;
+  const auto satiation = ec->gauges.get(ec->player().satiation).value;
 
-  auto energy = ec->gauges.get(ec->player().energy).value;
-  auto satiation = ec->gauges.get(ec->player().satiation).value;
-  if (energy == 0 && satiation < starvation_limit) {
-    auto adj_food = 1.0f - (satiation - starvation_limit) / starvation_limit;
-    depress(ec, adj_food * starvation_mental_loss_per_sec);
-    starve(ec, adj_food * starvation_health_loss_per_sec);
-  }
   if (energy < 1 && satiation > 0) {
     burn_callories(ec, food_lost_per_sec);
-  }
-
-  if (energy == 0) {
-    set_sit_animation(ec);
-    ec->movements().update(pid, {});
-    return;
   }
 
   auto h = in.h_value();
@@ -195,6 +184,17 @@ export void tick(input::dual_axis in, compos *ec) {
       // TODO: only do this when "actively" resting
       rest(ec, energy_gain_per_sec);
     }
+    ec->movements().update(pid, {});
+    return;
+  }
+
+  if (energy == 0 && satiation < starvation_limit) {
+    auto adj_food = 1.0f - (satiation - starvation_limit) / starvation_limit;
+    depress(ec, adj_food * starvation_mental_loss_per_sec);
+    starve(ec, adj_food * starvation_health_loss_per_sec);
+  }
+  if (energy == 0) {
+    set_sit_animation(ec);
     ec->movements().update(pid, {});
     return;
   }
