@@ -130,6 +130,7 @@ void set_idle_animation(compos *ec) {
   update_animation(ec, get_side(ec), a);
 }
 void set_sit_animation(compos *ec) {
+  // TODO: realign "sitting" because he is actually floating
   constexpr const animation::c a{
       .y = 8,
       .num_frames = 6,
@@ -143,8 +144,6 @@ void set_walk_animation(compos *ec, side s) {
       .num_frames = 6,
       .frames_per_sec = 24,
   };
-
-  exercise(ec, energy_lost_per_sec);
 
   auto energy = ec->gauges.get(ec->player().energy).value;
   auto aa = a;
@@ -167,25 +166,25 @@ export void tick(compos *ec) {
   const auto energy = ec->gauges.get(ec->player().energy).value;
   const auto satiation = ec->gauges.get(ec->player().satiation).value;
 
-  if (energy < 1 && satiation > 0) {
-    burn_callories(ec, food_lost_per_sec);
+  if (ec->input().rest()) {
+    if (energy < 1 && satiation > 0) {
+      burn_callories(ec, food_lost_per_sec);
+      rest(ec, energy_gain_per_sec);
+    }
+    set_sit_animation(ec);
+    ec->movements().update(pid, {});
+    return;
   }
 
   auto h = ec->input().h_value();
   auto v = ec->input().v_value();
+  auto s = ec->player().side;
   if (v != 0) {
-    set_walk_animation(ec, v > 0 ? p_down : p_up);
+    s = v > 0 ? p_down : p_up;
   } else if (h != 0) {
-    set_walk_animation(ec, h > 0 ? p_right : p_left);
+    s = h > 0 ? p_right : p_left;
   } else {
     set_idle_animation(ec);
-  }
-
-  if (v == 0 && h == 0) {
-    if (ec->gauges.get(ec->player().satiation).value > 0) {
-      // TODO: only do this when "actively" resting
-      rest(ec, energy_gain_per_sec);
-    }
     ec->movements().update(pid, {});
     return;
   }
@@ -196,16 +195,18 @@ export void tick(compos *ec) {
     starve(ec, adj_food * starvation_health_loss_per_sec);
   }
   if (energy == 0) {
+    // TODO: use "hurt" animation or something
     set_sit_animation(ec);
     ec->movements().update(pid, {});
     return;
   }
 
   float f_speed = speed * energy;
-
   float d = sqrtf(h * h + v * v);
   float sx = h * f_speed / d;
   float sy = v * f_speed / d;
+  set_walk_animation(ec, s);
+  exercise(ec, energy_lost_per_sec);
 
   ec->movements().update(pid, {sx, sy});
 }
