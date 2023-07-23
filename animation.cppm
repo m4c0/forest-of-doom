@@ -9,7 +9,7 @@ export struct c {
   unsigned y;
   unsigned num_frames;
   unsigned frames_per_sec;
-  unsigned ticks{};
+  unsigned frame{};
 };
 export using compo = pog::sparse_set<c>;
 export class compos : public virtual stopwatch {
@@ -20,10 +20,12 @@ public:
 };
 
 export void update_animes(compos *ec, sprite::compo &sprites) {
-  for (auto &[id, a] : ec->animations()) {
-    a.ticks += ec->current_millis();
+  auto millis = ec->current_millis();
+  for (auto [id, a] : ec->animations()) {
+    a.frame += millis * a.frames_per_sec;
+    ec->animations().update(id, a);
 
-    auto frame = a.frames_per_sec * a.ticks / 1000;
+    auto frame = a.frame / 1000;
 
     auto spr = sprites.get(id);
     spr.uv.x = a.start_x + (frame % a.num_frames);
