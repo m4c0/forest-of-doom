@@ -51,15 +51,26 @@ export void add_entities(compos *ec) {
   // add_battery(ec, 0, tile::ui::energy_l, &player::get_energy);
 }
 
+// Looks excessive, but it is precise and it allows per-range adjustment (just
+// like iPhone batteries now feels like they never leave 100% for some reason).
+constexpr unsigned step(float v) {
+  if (v == 0)
+    return 0;
+  if (v < 0.25f)
+    return 1;
+  if (v < 0.5f)
+    return 2;
+  if (v < 0.75f)
+    return 3;
+  return 4;
+}
 export void update_batteries(compos *ec) {
   constexpr const tile::ui::c levels[]{tile::ui::bat_empty, tile::ui::bat_r_1,
                                        tile::ui::bat_y_2, tile::ui::bat_g_3,
                                        tile::ui::bat_g_4};
   auto p = ec->player();
   for (auto &[id, _] : ec->batteries()) {
-    auto fv = 4.0f * ec->gauges.get(id).value;
-    unsigned iv = static_cast<unsigned>(fv);
-    unsigned val = (fv - iv > 0) ? (iv + 1) : iv;
+    unsigned val = step(ec->gauges.get(id).value);
 
     auto spr = ec->sprites().get(id);
     spr.uv = tile::uv(levels[val]);
