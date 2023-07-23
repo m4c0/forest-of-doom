@@ -36,6 +36,7 @@ auto base_app(const char *name) {
   a->add_unit<mod>("area");
   a->add_unit<mod>("sprite");
   a->add_unit<mod>("stopwatch");
+  a->add_unit<mod>("gauge");
 
   auto tile = a->add_unit<mod>("tile");
   tile->add_part("common");
