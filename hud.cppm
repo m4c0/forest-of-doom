@@ -57,9 +57,9 @@ export void update_batteries(compos *ec) {
                                        tile::ui::bat_g_4};
   auto p = ec->player();
   for (auto &[id, _] : ec->batteries()) {
-    auto raw_value = ec->gauges.get(id).value;
-    // TODO: replace with "round up"
-    unsigned val = static_cast<unsigned>(4.0f * raw_value);
+    auto fv = 4.0f * ec->gauges.get(id).value;
+    unsigned iv = static_cast<unsigned>(fv);
+    unsigned val = (fv - iv > 0) ? (iv + 1) : iv;
 
     auto spr = ec->sprites().get(id);
     spr.uv = tile::uv(levels[val]);
