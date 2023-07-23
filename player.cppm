@@ -121,13 +121,13 @@ void update_animation(compos *ec, side s, animation::c a) {
     set_side(ec, s);
 }
 
-void set_idle_animation(compos *ec) {
+void set_idle_animation(compos *ec, side s) {
   constexpr const animation::c a{
       .y = 2,
       .num_frames = 6,
       .frames_per_sec = 6,
   };
-  update_animation(ec, get_side(ec), a);
+  update_animation(ec, s, a);
 }
 void set_sit_animation(compos *ec) {
   // TODO: realign "sitting" because he is actually floating
@@ -184,7 +184,7 @@ export void tick(compos *ec) {
   } else if (h != 0) {
     s = h > 0 ? p_right : p_left;
   } else {
-    set_idle_animation(ec);
+    set_idle_animation(ec, s);
     ec->movements().update(pid, {});
     return;
   }
@@ -196,7 +196,7 @@ export void tick(compos *ec) {
   }
   if (energy == 0) {
     // TODO: use "hurt" animation or something
-    set_sit_animation(ec);
+    set_idle_animation(ec, s);
     ec->movements().update(pid, {});
     return;
   }
