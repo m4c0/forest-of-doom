@@ -63,4 +63,19 @@ public:
     m_v.process_event(e);
   }
 };
+
+class state {
+  dual_axis m_move;
+  button<casein::K_SPACE> m_rest;
+
+public:
+  [[nodiscard]] int h_value() const noexcept { return m_move.h_value(); }
+  [[nodiscard]] int v_value() const noexcept { return m_move.v_value(); }
+  [[nodiscard]] bool rest() const noexcept { return m_rest.value(); }
+
+  void process_event(const casein::event &e) {
+    m_move.process_event(e);
+    m_rest.process_event(e);
+  }
+};
 } // namespace input
