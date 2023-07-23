@@ -6,6 +6,8 @@ template <casein::keys K> class button {
   bool m_down{};
 
 public:
+  [[nodiscard]] constexpr auto value() const noexcept { return m_down; }
+
   void process_event(const casein::event &e) {
     switch (e.type()) {
     case casein::KEY_DOWN: {
@@ -27,39 +29,21 @@ public:
 };
 
 template <casein::keys N, casein::keys P> class axis {
-  bool m_n{};
-  bool m_p{};
+  button<N> m_n;
+  button<P> m_p;
 
 public:
   [[nodiscard]] int value() const noexcept {
-    if (m_n && !m_p)
+    if (m_n.value() && !m_p.value())
       return -1;
-    if (m_p && !m_n)
+    if (m_p.value() && !m_n.value())
       return 1;
     return 0;
   }
 
   void process_event(const casein::event &e) {
-    switch (e.type()) {
-    case casein::KEY_DOWN: {
-      auto key = *e.as<casein::events::key_down>();
-      if (key == N)
-        m_n = true;
-      if (key == P)
-        m_p = true;
-      break;
-    }
-    case casein::KEY_UP: {
-      auto key = *e.as<casein::events::key_down>();
-      if (key == N)
-        m_n = false;
-      if (key == P)
-        m_p = false;
-      break;
-    }
-    default:
-      break;
-    }
+    m_n.process_event(e);
+    m_p.process_event(e);
   }
 };
 
