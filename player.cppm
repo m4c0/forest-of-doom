@@ -43,10 +43,12 @@ export class compos : public virtual animation::compos,
                       public virtual stopwatch {
   c m_player;
   sprite::compo m_player_sprites{};
+  input::state m_input{};
 
 public:
   c &player() noexcept { return m_player; }
   sprite::compo &player_sprites() noexcept { return m_player_sprites; }
+  input::state &input() noexcept { return m_input; }
 };
 
 export void add_entity(compos *ec) {
@@ -158,7 +160,7 @@ void set_pick_animation(compos *ec) {
   update_animation(ec, get_side(ec), a);
 }
 
-export void tick(input::dual_axis in, compos *ec) {
+export void tick(compos *ec) {
   constexpr const auto blocks_per_sec = 4.0f;
   constexpr const auto speed = blocks_per_sec / 1000.0f;
   const auto pid = ec->player().eid;
@@ -169,8 +171,8 @@ export void tick(input::dual_axis in, compos *ec) {
     burn_callories(ec, food_lost_per_sec);
   }
 
-  auto h = in.h_value();
-  auto v = in.v_value();
+  auto h = ec->input().h_value();
+  auto v = ec->input().v_value();
   if (v != 0) {
     set_walk_animation(ec, v > 0 ? p_down : p_up);
   } else if (h != 0) {

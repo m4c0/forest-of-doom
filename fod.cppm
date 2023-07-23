@@ -20,7 +20,6 @@ struct ec : hud::compos, tile::camping::compos, tile::terrain::compos {};
 class game {
   qsu::main m_q{};
   ec m_ec{};
-  input::dual_axis m_input;
 
   void setup() {
     auto *ect = static_cast<tile::terrain::compos *>(&m_ec);
@@ -59,7 +58,7 @@ class game {
   }
 
   void tick() {
-    player::tick(m_input, &m_ec);
+    player::tick(&m_ec);
     animation::update_animes(&m_ec, m_ec.player_sprites());
     movement::update_sprites(&m_ec, m_ec.player_sprites());
     gauge::run_drains(&m_ec);
@@ -83,7 +82,7 @@ class game {
 public:
   void process_event(const casein::event &e) {
     m_q.process_event(e);
-    m_input.process_event(e);
+    m_ec.input().process_event(e);
 
     switch (e.type()) {
     case casein::CREATE_WINDOW:
