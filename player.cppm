@@ -32,7 +32,7 @@ export struct c {
 
   ranged energy;
   pog::eid happyness;
-  ranged health;
+  pog::eid health;
   ranged satiation;
 };
 
@@ -65,6 +65,7 @@ export void add_entity(compos *ec) {
   auto pid = ec->e().alloc();
   ec->player().eid = pid;
   ec->player().happyness = gauge::add_gauge(ec);
+  ec->player().health = gauge::add_gauge(ec);
   ec->player_sprites().add(pid, spr);
   ec->animations().add(pid, a);
   ec->movements().add(pid, {});
@@ -77,7 +78,6 @@ export rect get_area(compos *ec) {
   return spr.pos;
 }
 
-export ranged get_health(compos *ec) { return ec->player().health; }
 export ranged get_satiation(compos *ec) { return ec->player().satiation; }
 export ranged get_energy(compos *ec) { return ec->player().energy; }
 
@@ -85,7 +85,7 @@ auto get_side(compos *ec) { return ec->player().side; }
 void set_side(compos *ec, side s) { ec->player().side = s; }
 
 void starve(compos *ec, float val_per_sec) {
-  ec->player().health -= val_per_sec * ec->current_millis() / 1000.f;
+  gauge::add_drain(ec, ec->player().health, val_per_sec);
 }
 void depress(compos *ec, float val_per_sec) {
   gauge::add_drain(ec, ec->player().happyness, val_per_sec);
@@ -122,8 +122,8 @@ void process_starvation(compos *ec) {
     return;
 
   auto adj_food = 1.0f - (satiation - starvation_limit) / starvation_limit;
-  starve(ec, adj_food * starvation_mental_loss_per_sec);
-  depress(ec, adj_food * starvation_health_loss_per_sec);
+  depress(ec, adj_food * starvation_mental_loss_per_sec);
+  starve(ec, adj_food * starvation_health_loss_per_sec);
 }
 
 void set_idle_animation(compos *ec) {
