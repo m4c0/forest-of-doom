@@ -1,13 +1,14 @@
 export module gauge;
 import pog;
 import ranged;
+import stopwatch;
 
 namespace gauge {
 export struct c {
   ranged value;
   float drain;
 };
-export struct compos : virtual pog::entity_provider {
+export struct compos : virtual pog::entity_provider, virtual stopwatch {
   pog::sparse_set<c> gauges{};
 };
 
@@ -21,5 +22,14 @@ export void add_drain(compos *ec, pog::eid id, float val_per_sec) {
   auto v = ec->gauges.get(id);
   v.drain += val_per_sec;
   ec->gauges.update(id, v);
+}
+
+export void run_drains(compos *ec) {
+  auto ms = ec->current_millis();
+  for (auto [id, g] : ec->gauges) {
+    g.value -= g.drain * ms / 1000.0f;
+    g.drain = 0;
+    ec->gauges.update(id, g);
+  }
 }
 } // namespace gauge

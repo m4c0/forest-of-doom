@@ -3,6 +3,7 @@ export module fod;
 import animation;
 import casein;
 import hud;
+import gauge;
 import input;
 import misc;
 import movement;
@@ -61,6 +62,7 @@ class game {
     player::process_input(m_input, &m_ec);
     animation::update_animes(&m_ec, m_ec.player_sprites());
     movement::update_sprites(&m_ec, m_ec.player_sprites());
+    gauge::run_drains(&m_ec);
     hud::update_batteries(&m_ec);
     repaint();
     m_ec.reset_watch();
