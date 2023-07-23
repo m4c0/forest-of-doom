@@ -10,11 +10,10 @@ struct anchor {
   float dx;
   float dy;
 };
-using battery = ranged (*)(player::compos *);
 export class compos : public virtual pog::entity_provider,
                       public virtual player::compos {
   pog::sparse_set<anchor> m_anchors{};
-  pog::sparse_set<battery> m_batteries{};
+  pog::sparse_set<pog::marker> m_batteries{};
   sprite::compo m_sprites{};
 
 public:
@@ -23,30 +22,33 @@ public:
   [[nodiscard]] auto &sprites() noexcept { return m_sprites; }
 };
 
-auto add_sprite(compos *ec, float x, float y, tile::ui::c t) {
+void add_sprite(compos *ec, pog::eid id, float x, float y, tile::ui::c t) {
   sprite spr{
       .pos = {0, 0, 1, 1},
       .uv = tile::uv(t),
   };
-  auto id = ec->e().alloc();
   ec->anchors().add(id, {x, y});
   ec->sprites().add(id, spr);
+}
+auto add_sprite(compos *ec, float x, float y, tile::ui::c t) {
+  auto id = ec->e().alloc();
+  add_sprite(ec, id, x, y, t);
   return id;
 }
 
-void add_battery(compos *ec, float y, tile::ui::c icon, battery b) {
+void add_battery(compos *ec, float y, tile::ui::c icon, pog::eid gg) {
   add_sprite(ec, 0, y, icon);
   add_sprite(ec, 0.2, y, tile::ui::bat_l);
-  auto id = add_sprite(ec, 1.2, y, tile::ui::bat_g_4);
+  add_sprite(ec, gg, 1.2, y, tile::ui::bat_g_4);
   add_sprite(ec, 2.2, y, tile::ui::bat_r);
 
-  ec->batteries().add(id, b);
+  ec->batteries().add(gg, {});
 }
 export void add_entities(compos *ec) {
-  add_battery(ec, 3, tile::ui::mind_l, &player::get_happyness);
-  add_battery(ec, 2, tile::ui::heart_l, &player::get_health);
-  add_battery(ec, 1, tile::ui::food_l, &player::get_satiation);
-  add_battery(ec, 0, tile::ui::energy_l, &player::get_energy);
+  add_battery(ec, 3, tile::ui::mind_l, ec->player().happyness);
+  // add_battery(ec, 2, tile::ui::heart_l, &player::get_health);
+  // add_battery(ec, 1, tile::ui::food_l, &player::get_satiation);
+  // add_battery(ec, 0, tile::ui::energy_l, &player::get_energy);
 }
 
 export void update_batteries(compos *ec) {
@@ -54,8 +56,10 @@ export void update_batteries(compos *ec) {
                                        tile::ui::bat_y_2, tile::ui::bat_g_3,
                                        tile::ui::bat_g_4};
   auto p = ec->player();
-  for (auto &[id, attr] : ec->batteries()) {
-    unsigned val = static_cast<unsigned>(4.0f * attr(ec));
+  for (auto &[id, _] : ec->batteries()) {
+    auto raw_value = ec->gauges.get(id).value;
+    // TODO: replace with "round up"
+    unsigned val = static_cast<unsigned>(4.0f * raw_value);
 
     auto spr = ec->sprites().get(id);
     spr.uv = tile::uv(levels[val]);

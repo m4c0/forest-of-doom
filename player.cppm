@@ -1,6 +1,7 @@
 export module player;
 import animation;
 import collision;
+import gauge;
 import input;
 import movement;
 import ranged;
@@ -30,14 +31,15 @@ export struct c {
   side side;
 
   ranged energy;
-  ranged happyness;
+  pog::eid happyness;
   ranged health;
   ranged satiation;
 };
 
-export class compos : public virtual movement::compos,
+export class compos : public virtual animation::compos,
+                      public virtual gauge::compos,
+                      public virtual movement::compos,
                       public virtual pog::entity_provider,
-                      public virtual animation::compos,
                       public virtual stopwatch {
   c m_player;
   sprite::compo m_player_sprites{};
@@ -62,6 +64,7 @@ export void add_entity(compos *ec) {
   };
   auto pid = ec->e().alloc();
   ec->player().eid = pid;
+  ec->player().happyness = gauge::add_gauge(ec);
   ec->player_sprites().add(pid, spr);
   ec->animations().add(pid, a);
   ec->movements().add(pid, {});
@@ -74,7 +77,6 @@ export rect get_area(compos *ec) {
   return spr.pos;
 }
 
-export ranged get_happyness(compos *ec) { return ec->player().happyness; }
 export ranged get_health(compos *ec) { return ec->player().health; }
 export ranged get_satiation(compos *ec) { return ec->player().satiation; }
 export ranged get_energy(compos *ec) { return ec->player().energy; }
@@ -86,7 +88,7 @@ void starve(compos *ec, float val_per_sec) {
   ec->player().health -= val_per_sec * ec->current_millis() / 1000.f;
 }
 void depress(compos *ec, float val_per_sec) {
-  ec->player().happyness -= val_per_sec * ec->current_millis() / 1000.f;
+  gauge::add_drain(ec, ec->player().happyness, val_per_sec);
 }
 void exercise(compos *ec, float val_per_sec) {
   ec->player().energy -= val_per_sec * ec->current_millis() / 1000.f;
