@@ -31,7 +31,6 @@ export bool move_by(compos *c, pog::eid id, float dx, float dy) {
     return false;
   }
 
-  c->collisions.remove(id);
   c->bodies.remove(id);
   c->bodies.add(id, aabb);
   return true;

@@ -208,6 +208,7 @@ export void tick(compos *ec) {
   set_walk_animation(ec, s);
   exercise(ec, energy_lost_per_sec);
 
+  ec->collisions.remove(pid);
   ec->movements().update(pid, {sx, sy});
 }
 } // namespace player
