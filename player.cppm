@@ -12,7 +12,7 @@ import stopwatch;
 extern "C" float sqrtf(float);
 
 namespace player {
-constexpr const auto energy_lost_per_sec = 0.25f;
+constexpr const auto energy_lost_per_sec = 0.025f;
 constexpr const auto food_lost_per_sec = 0.1f;
 constexpr const auto energy_gain_per_sec = food_lost_per_sec * 2.0f;
 
