@@ -1,23 +1,37 @@
 export module qsu:debug;
+import casein;
 import collision;
 import pog;
+import silog;
 import quack;
 
 namespace qsu {
 class debug_layer {
   quack::ilayout m_spr;
+  unsigned m_max_sprites{};
 
 public:
   debug_layer(quack::renderer *m_r, unsigned max_sprites)
       : m_spr{m_r, max_sprites} {}
 
-  void fill(collision::compo &set) {
+  void process_event(const casein::event &e) {
+    m_spr.process_event(e);
+
+    if (e.type() == casein::QUIT)
+      silog::log(silog::info, "[qsu] %d colliders debugged", m_max_sprites);
+  }
+
+  void fill(collision::compos *ec) {
     // TODO: center this based on current player pos
     constexpr const pog::aabb area{{-100, -100}, {100, 100}};
+
+    const auto &set = ec->bodies;
 
     auto size = 0;
     set.for_each_in(area, [&](auto, auto) { size++; });
     m_spr->set_count(size);
+    if (size > m_max_sprites)
+      m_max_sprites = size;
 
     m_spr->map_colours([&](auto *cs) {
       for (auto i = 0; i < size; i++) {

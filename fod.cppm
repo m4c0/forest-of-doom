@@ -54,7 +54,7 @@ class game {
     m_q.fill_sprites(qsu::layers::terrain,
                      static_cast<tile::terrain::compos &>(m_ec).sprites());
     m_q.fill_hud(static_cast<hud::compos &>(m_ec).sprites());
-    // m_q.fill_debug(m_ec.bodies());
+    // m_q.fill_debug(&m_ec);
   }
 
   void tick() {

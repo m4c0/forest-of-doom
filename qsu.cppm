@@ -4,6 +4,7 @@ import :hud;
 import :layer;
 import area;
 import casein;
+import collision;
 import pog;
 import quack;
 import sprite;
@@ -38,7 +39,7 @@ public:
     for (auto &l : m_layers) {
       l.process_event(e);
     }
-    (*m_debug).process_event(e);
+    m_debug.process_event(e);
     m_hud.process_event(e);
   }
 
@@ -66,7 +67,7 @@ public:
     return m_mouse.current_mouse_pos(&**m_layers[0]);
   }
 
-  void fill_debug(pog::rtree &set) { m_debug.fill(set); }
+  void fill_debug(collision::compos *ec) { m_debug.fill(ec); }
   void fill_hud(const sprite::compo &set) { m_hud.fill(set); }
   void fill_sprites(layers l, const sprite::compo &set) {
     m_layers[static_cast<unsigned>(l)].fill(set);
