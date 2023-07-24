@@ -2,9 +2,9 @@ export module collision;
 import pog;
 
 namespace collision {
-export using compo = pog::rtree;
 export struct compos : virtual pog::entity_provider {
-  collision::compo bodies{};
+  pog::rtree bodies{};
+  pog::map collisions{};
 };
 
 export void add(compos *c, pog::eid id, float x, float y, float w, float h) {
@@ -21,12 +21,17 @@ export bool move_by(compos *c, pog::eid id, float dx, float dy) {
   aabb.b.x += dx;
   aabb.b.y += dy;
 
-  auto collides = false;
-  c->bodies.for_each_in(aabb,
-                        [&](pog::eid oid, auto) { collides |= (id != oid); });
-  if (collides)
+  pog::eid hit{};
+  c->bodies.for_each_in(aabb, [&](pog::eid oid, auto) {
+    if (id != oid)
+      hit = oid;
+  });
+  if (hit) {
+    c->collisions.set(id, hit);
     return false;
+  }
 
+  c->collisions.remove(id);
   c->bodies.remove(id);
   c->bodies.add(id, aabb);
   return true;
