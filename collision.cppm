@@ -3,21 +3,18 @@ import pog;
 
 namespace collision {
 export using compo = pog::rtree;
-export class compos : public virtual pog::entity_provider {
-  collision::compo m_bodies{};
-
-public:
-  collision::compo &bodies() noexcept { return m_bodies; }
+export struct compos : virtual pog::entity_provider {
+  collision::compo bodies{};
 };
 
 export void add(compos *c, pog::eid id, float x, float y, float w, float h) {
   pog::aabb area{{x, y}, {x + w, y + h}};
-  c->bodies().add(id, area);
+  c->bodies.add(id, area);
 }
-export void remove(compos *c, pog::eid id) { c->bodies().remove(id); }
+export void remove(compos *c, pog::eid id) { c->bodies.remove(id); }
 
 export bool move_by(compos *c, pog::eid id, float dx, float dy) {
-  auto aabb = c->bodies().get(id);
+  auto aabb = c->bodies.get(id);
   auto old = aabb;
   aabb.a.x += dx;
   aabb.a.y += dy;
@@ -25,13 +22,13 @@ export bool move_by(compos *c, pog::eid id, float dx, float dy) {
   aabb.b.y += dy;
 
   auto collides = false;
-  c->bodies().for_each_in(aabb,
-                          [&](pog::eid oid, auto) { collides |= (id != oid); });
+  c->bodies.for_each_in(aabb,
+                        [&](pog::eid oid, auto) { collides |= (id != oid); });
   if (collides)
     return false;
 
-  c->bodies().remove(id);
-  c->bodies().add(id, aabb);
+  c->bodies.remove(id);
+  c->bodies.add(id, aabb);
   return true;
 }
 } // namespace collision

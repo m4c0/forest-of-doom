@@ -23,7 +23,7 @@ export void update_sprites(compos *c, sprite::compo &sprites) {
     auto dx = m.sx * ms;
     auto dy = m.sy * ms;
 
-    if (c->bodies().has(id)) {
+    if (c->bodies.has(id)) {
       if (collision::move_by(c, id, dx, dy)) {
       } else if (collision::move_by(c, id, 0, dy)) {
         dx = 0;
