@@ -37,6 +37,7 @@ auto base_app(const char *name) {
   b->add_mod("gauge");
   b->add_mod("hud");
   b->add_mod("input");
+  b->add_mod("looting");
   b->add_mod("misc");
   b->add_mod("movement");
   b->add_mod("player");

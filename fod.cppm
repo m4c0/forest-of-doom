@@ -5,6 +5,7 @@ import casein;
 import hud;
 import gauge;
 import input;
+import looting;
 import misc;
 import movement;
 import player;
@@ -15,18 +16,11 @@ import sitime;
 import tile;
 import tilemap;
 
-struct ec : hud::compos, tile::camping::compos, tile::terrain::compos {
-  pog::sparse_set<pog::marker> lootable{};
-};
+struct ec : hud::compos, looting::compos, tile::terrain::compos {};
 
 class game {
   qsu::main m_q{};
   ec m_ec{};
-
-  void add_backpack(tile::camping::c c, float x, float y) {
-    auto id = tile::camping::add_tile(&m_ec, c, x, y);
-    m_ec.lootable.add(id, {});
-  }
 
   void setup() {
     auto *ect = static_cast<tile::terrain::compos *>(&m_ec);
@@ -39,9 +33,9 @@ class game {
     prefabs::ocean_0(ect, -16, 16);
     prefabs::ocean_0(ect, 0, 16);
     prefabs::ocean_0(ect, 16, 16);
-    add_backpack(tile::camping::backpack_a, 9, 7);
-    add_backpack(tile::camping::backpack_b, 10, 7);
-    add_backpack(tile::camping::backpack_c, 11, 7);
+    looting::add_backpack(&m_ec, tile::camping::backpack_a, 9, 7);
+    looting::add_backpack(&m_ec, tile::camping::backpack_b, 10, 7);
+    looting::add_backpack(&m_ec, tile::camping::backpack_c, 11, 7);
 
     player::add_entity(&m_ec);
     hud::add_entities(&m_ec);
