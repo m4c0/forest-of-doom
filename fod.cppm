@@ -64,6 +64,7 @@ class game {
     movement::update_sprites(&m_ec, m_ec.player_sprites());
     gauge::run_drains(&m_ec);
     hud::update_batteries(&m_ec);
+    looting::mark_lootable(&m_ec);
     repaint();
     m_ec.reset_watch();
   }
