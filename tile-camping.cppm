@@ -1,5 +1,6 @@
 export module tile:camping;
 import :common;
+import sprite;
 
 export namespace tile::camping {
 enum c : c_t {
@@ -8,10 +9,9 @@ enum c : c_t {
   backpack_b = 0x11220102,
   backpack_c = 0x12220102,
 };
-struct compos : tile::compos {};
 
 auto add_tile(compos *ec, c t, float x, float y) {
-  auto id = tile::add_tile(ec, t, x, y);
+  auto id = tile::add_tile(ec, t, sprite::layers::camping, x, y);
 
   switch (t) {
   case backpack_a:
@@ -25,9 +25,4 @@ auto add_tile(compos *ec, c t, float x, float y) {
 
   return id;
 }
-void update_tile_pos(compos *ec, pog::eid id, float x, float y) {
-  tile::update_tile_pos(ec, id, x, y);
-}
-void remove_tile(compos *ec, pog::eid id) { tile::remove_tile(ec, id); }
-void populate(compos *ec, float cx, float cy) { tile::populate(ec, cx, cy); }
 } // namespace tile::camping

@@ -89,24 +89,23 @@ class game {
   decltype(pals()) m_pal = pals();
 
   void fill_sprites() {
-    tile::populate(&m_ec, 0, 0);
-    cursor::add_sprite(&m_ec, m_ec.sprites());
-    m_q->fill_sprites(tfill, m_ec.sprites());
+    cursor::add_sprite(&m_ec, m_ec.sprites);
+    m_q->fill(&m_ec);
   }
 
   bool replace_tile(float x, float y, tile::c_t old, tile::c_t brush) {
-    for (auto &[id, spr] : m_ec.sprites()) {
-      auto [rx, ry, rw, rh] = spr.pos;
+    for (auto &[id, spr] : m_ec.sprites) {
+      auto [rx, ry, rw, rh] = area::get(&m_ec, id);
       if (rx != x || ry != y)
         continue;
 
-      auto t = m_ec.tiles().get(id);
+      auto t = m_ec.tiles.get(id);
       if (t != old && old != brush)
         continue;
 
       m_undo.set(x, y, old);
       tile::remove_tile(&m_ec, id);
-      tile::add_tile(&m_ec, brush, x, y);
+      tile::add_tile(&m_ec, brush, tfill, x, y);
       return true;
     }
     return false;
@@ -182,12 +181,12 @@ public:
   void flood_fill() {
     auto [x, y] = m_q->mouse_pos();
     tile::c_t old{};
-    for (auto [id, spr] : m_ec.sprites()) {
-      auto [rx, ry, rw, rh] = spr.pos;
+    for (auto [id, spr] : m_ec.sprites) {
+      auto [rx, ry, rw, rh] = area::get(&m_ec, id);
       if (rx != x || ry != y)
         return;
 
-      old = m_ec.tiles().get(id);
+      old = m_ec.tiles.get(id);
       if (old == m_brush)
         return;
 
@@ -199,7 +198,7 @@ public:
 
   void undo() {
     static_cast<tile::compos &>(m_ec) = {};
-    m_undo.add_entities(&m_ec, 0, 0);
+    m_undo.add_entities(&m_ec, tfill, 0, 0);
     fill_sprites();
   }
 
@@ -217,13 +216,14 @@ public:
       out.writef("export void %s(compos *ec, float x, float y) {\n", mname)
           .take(fail);
 
-      for (auto &[id, spr] : m_ec.sprites()) {
-        auto t = m_ec.tiles().get(id);
+      for (auto &[id, spr] : m_ec.sprites) {
+        auto t = m_ec.tiles.get(id);
         if (!t)
           continue;
 
-        auto x = static_cast<int>(spr.pos.x);
-        auto y = static_cast<int>(spr.pos.y);
+        auto r = area::get(&m_ec, id);
+        auto x = static_cast<int>(r.x);
+        auto y = static_cast<int>(r.y);
         out.writef(
                "  %s::add_tile(ec, static_cast<c>(0x%08x), x + %d, y + %d);\n",
                tname, t, x, y)

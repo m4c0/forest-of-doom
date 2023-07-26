@@ -1,6 +1,5 @@
 export module qsu;
 import :debug;
-import :hud;
 import :layer;
 import area;
 import casein;
@@ -27,10 +26,17 @@ export class main {
       {&m_r, sprite::layers::camping, max_sprites, "11_Camping_16x16.png"},
       {&m_r, sprite::layers::scout, max_player_sprites,
        "Modern_Exteriors_Characters_Scout_16x16_1.png"},
+      {&m_r, sprite::layers::ui, max_sprites, "Modern_UI_Style_1.png"},
   };
-  hud_layer m_hud{&m_r, max_sprites, "Modern_UI_Style_1.png"};
   debug_layer m_debug{&m_r, max_sprites};
   quack::mouse_tracker m_mouse{};
+
+  [[nodiscard]] auto &layer_of(sprite::layers l) {
+    return m_layers[static_cast<unsigned>(l)];
+  }
+  [[nodiscard]] auto &layer_of(sprite::layers l) const {
+    return m_layers[static_cast<unsigned>(l)];
+  }
 
 public:
   void process_event(const casein::event &e) {
@@ -40,13 +46,13 @@ public:
       l.process_event(e);
     }
     m_debug.process_event(e);
-    m_hud.process_event(e);
   }
 
   void center_at(float x, float y) {
     for (auto &l : m_layers) {
       (*l)->center_at(x, y);
     }
+    (*layer_of(sprite::layers::ui))->center_at(0, 0);
     (*m_debug)->center_at(x, y);
   }
   [[nodiscard]] auto center() const noexcept {
@@ -56,11 +62,12 @@ public:
   void set_grid(float w, float h) {
     for (auto &l : m_layers) {
       (*l)->set_grid(w, h);
+      (*layer_of(sprite::layers::ui))->center_at(16, 16);
     }
     (*m_debug)->set_grid(w, h);
   }
   [[nodiscard]] auto hud_grid_size() const noexcept {
-    return (*m_hud)->grid_size();
+    return (*layer_of(sprite::layers::ui))->grid_size();
   }
 
   [[nodiscard]] auto mouse_pos() const noexcept {
@@ -68,10 +75,6 @@ public:
   }
 
   void fill_debug(collision::compos *ec) { m_debug.fill(ec); }
-  void fill_hud(const sprite::compo &set) { m_hud.fill(set); }
-  void fill_sprites(sprite::layers l, const sprite::compo &set) {
-    m_layers[static_cast<unsigned>(l)].fill(set);
-  }
   void fill(sprite::compos *ec) {
     for (auto &l : m_layers) {
       l.fill(ec);

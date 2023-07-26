@@ -1,5 +1,6 @@
 export module tile:ui;
 import :common;
+import sprite;
 
 export namespace tile::ui {
 enum c : c_t {
@@ -45,11 +46,6 @@ enum c : c_t {
 struct compos : tile::compos {};
 
 auto add_tile(compos *ec, c t, float x, float y) {
-  return tile::add_tile(ec, t, x, y);
+  return tile::add_tile(ec, t, sprite::layers::ui, x, y);
 }
-void update_tile_pos(compos *ec, pog::eid id, float x, float y) {
-  tile::update_tile_pos(ec, id, x, y);
-}
-void remove_tile(compos *ec, pog::eid id) { tile::remove_tile(ec, id); }
-void populate(compos *ec, float cx, float cy) { tile::populate(ec, cx, cy); }
 } // namespace tile::ui

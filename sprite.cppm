@@ -4,7 +4,7 @@ import pog;
 export import rect;
 
 export namespace sprite {
-enum class layers { terrain, camping, scout, last };
+enum class layers { terrain, camping, scout, ui, last };
 
 struct c {
   rect pos;
@@ -22,6 +22,11 @@ auto add(compos *ec, c spr, rect r) {
   area::add(ec, id, r);
   ec->sprites.add(id, spr);
   return id;
+}
+void remove(compos *ec, pog::eid id) {
+  ec->sprites.remove(id);
+  area::remove(ec, id);
+  ec->e().dealloc(id);
 }
 void set_pos(compos *ec, pog::eid id, float x, float y) {
   auto r = area::get(ec, id);

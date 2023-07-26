@@ -56,7 +56,6 @@ auto base_app(const char *name) {
   // Quack Sprite Unit
   auto qsu = b->add_mod("qsu");
   qsu->add_part("debug");
-  qsu->add_part("hud");
   qsu->add_part("layer");
 
   auto pf = b->add_mod("prefabs");

@@ -1,4 +1,5 @@
 export module tilemap;
+import sprite;
 import tile;
 
 export namespace tilemap {
@@ -18,7 +19,8 @@ public:
     m_data[y][x] = t;
   }
 
-  void add_entities(tile::compos *ec, float dx, float dy) const noexcept {
+  void add_entities(tile::compos *ec, sprite::layers l, float dx,
+                    float dy) const noexcept {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto px = x + dx;
@@ -28,7 +30,7 @@ public:
         if (!t)
           continue;
 
-        add_tile(ec, t, px, py);
+        add_tile(ec, t, l, px, py);
       }
     }
   }

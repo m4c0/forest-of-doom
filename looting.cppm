@@ -4,7 +4,7 @@ import silog;
 import tile;
 
 export namespace looting {
-struct compos : virtual player::compos, virtual tile::camping::compos {
+struct compos : virtual player::compos, virtual tile::compos {
   pog::sparse_set<pog::marker> lootable{};
 };
 

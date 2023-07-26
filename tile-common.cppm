@@ -16,60 +16,30 @@ constexpr rect uv(c_t t) {
       .h = static_cast<float>((t >> 0) & 0xFFU),
   };
 }
-class compos : public virtual area::compos, public virtual collision::compos {
-  pog::sparse_set<c_t> m_tiles{};
-  pog::sparse_set<sprite::c> m_sprites{};
-
-public:
-  auto &tiles() noexcept { return m_tiles; }
-  auto &sprites() noexcept { return m_sprites; }
+struct compos : virtual collision::compos, virtual sprite::compos {
+  pog::sparse_set<c_t> tiles{};
 };
 
-auto add_tile(compos *ec, c_t t, float x, float y) {
-  rect r = uv(t);
-  r.x = x;
-  r.y = y;
+auto add_tile(compos *ec, c_t t, sprite::layers l, float x, float y) {
+  sprite::c s{
+      .uv = uv(t),
+      .layer = l,
+  };
+  rect r{
+      .x = x,
+      .y = y,
+      .w = s.uv.w,
+      .h = s.uv.h,
+  };
 
-  auto id = ec->e().alloc();
-  area::add(ec, id, r);
-  ec->tiles().add(id, t);
+  auto id = sprite::add(ec, s, r);
+  ec->tiles.add(id, t);
   return id;
 }
 
-void update_tile_pos(compos *ec, pog::eid id, float x, float y) {
-  auto t = ec->tiles().get(id);
-  rect r = uv(t);
-  r.x = x;
-  r.y = y;
-
-  // TODO: update collisor?
-  area::remove(ec, id);
-  area::add(ec, id, r);
-}
-
 void remove_tile(compos *ec, pog::eid id) {
+  ec->tiles.remove(id);
   collision::remove(ec, id);
-  area::remove(ec, id);
-  ec->tiles().remove(id);
-  ec->e().dealloc(id);
-}
-
-void populate(compos *ec, float cx, float cy) {
-  constexpr const auto radius = 16;
-  area::c a{cx - radius, cy - radius, cx + radius, cy + radius};
-
-  ec->sprites().remove_if([](auto, auto) { return true; });
-  ec->areas().for_each_in(a, [&](pog::eid id, auto area) {
-    auto t = ec->tiles().get(id);
-    if (t == 0)
-      return;
-
-    sprite::c s{
-        .pos = rect_of(area),
-        .uv = uv(t),
-    };
-
-    ec->sprites().add(id, s);
-  });
+  sprite::remove(ec, id);
 }
 } // namespace tile
