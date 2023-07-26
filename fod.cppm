@@ -49,7 +49,8 @@ class game {
     auto [cx, cy] = misc::follow_player(&m_q, &m_ec);
     tile::camping::populate(&m_ec, cx, cy);
     tile::terrain::populate(&m_ec, cx, cy);
-    m_q.fill_sprites(sprite::layers::scout, m_ec.player_sprites());
+    m_q.fill_sprites(sprite::layers::scout,
+                     static_cast<sprite::compos &>(m_ec).sprites);
     m_q.fill_sprites(sprite::layers::camping,
                      static_cast<tile::camping::compos &>(m_ec).sprites());
     m_q.fill_sprites(sprite::layers::terrain,
@@ -60,8 +61,8 @@ class game {
 
   void tick() {
     player::tick(&m_ec);
-    animation::update_animes(&m_ec, m_ec.player_sprites());
-    movement::update_sprites(&m_ec, m_ec.player_sprites());
+    animation::update_animes(&m_ec);
+    movement::update_sprites(&m_ec);
     gauge::run_drains(&m_ec);
     hud::update_batteries(&m_ec);
     looting::mark_lootable(&m_ec);

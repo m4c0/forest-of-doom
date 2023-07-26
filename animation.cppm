@@ -12,14 +12,14 @@ export struct c {
   unsigned frame{};
 };
 export using compo = pog::sparse_set<c>;
-export class compos : public virtual stopwatch {
+export class compos : public virtual sprite::compos, public virtual stopwatch {
   animation::compo m_animations{};
 
 public:
   animation::compo &animations() noexcept { return m_animations; }
 };
 
-export void update_animes(compos *ec, sprite::compo &sprites) {
+export void update_animes(compos *ec) {
   auto millis = ec->current_millis();
   for (auto [id, a] : ec->animations()) {
     a.frame += millis * a.frames_per_sec;
@@ -27,10 +27,8 @@ export void update_animes(compos *ec, sprite::compo &sprites) {
 
     auto frame = a.frame / 1000;
 
-    auto spr = sprites.get(id);
-    spr.uv.x = a.start_x + (frame % a.num_frames);
-    spr.uv.y = a.y;
-    sprites.update(id, spr);
+    auto u = a.start_x + (frame % a.num_frames);
+    sprite::set_uv(ec, id, u, a.y);
   }
 }
 } // namespace animation

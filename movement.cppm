@@ -11,13 +11,14 @@ export struct c {
 };
 export using compo = pog::sparse_set<c>;
 export class compos : public virtual collision::compos,
+                      public virtual sprite::compos,
                       public virtual stopwatch {
   compo m_movements{};
 
 public:
   compo &movements() noexcept { return m_movements; }
 };
-export void update_sprites(compos *c, sprite::compo &sprites) {
+export void update_sprites(compos *c) {
   float ms = c->current_millis();
   for (auto [id, m] : c->movements()) {
     auto dx = m.sx * ms;
@@ -35,10 +36,7 @@ export void update_sprites(compos *c, sprite::compo &sprites) {
       }
     }
 
-    auto spr = sprites.get(id);
-    spr.pos.x += dx;
-    spr.pos.y += dy;
-    sprites.update(id, spr);
+    sprite::move_by(c, id, dx, dy);
   }
 }
 } // namespace movement

@@ -1,5 +1,6 @@
 export module player;
 import animation;
+import area;
 import collision;
 import gauge;
 import input;
@@ -40,14 +41,13 @@ export class compos : public virtual animation::compos,
                       public virtual gauge::compos,
                       public virtual movement::compos,
                       public virtual pog::entity_provider,
+                      public virtual sprite::compos,
                       public virtual stopwatch {
   c m_player;
-  sprite::compo m_player_sprites{};
   input::state m_input{};
 
 public:
   c &player() noexcept { return m_player; }
-  sprite::compo &player_sprites() noexcept { return m_player_sprites; }
   input::state &input() noexcept { return m_input; }
 };
 
@@ -55,16 +55,18 @@ export void add_entity(compos *ec) {
   constexpr const auto sx = 8.0f;
   constexpr const auto sy = 8.0f;
 
+  rect pos{sx, sy, 1, 2};
   sprite::c spr{
-      .pos = {sx, sy, 1, 2},
+      .pos = pos,
       .uv = {0, 2, 1, 2},
+      .layer = sprite::layers::scout,
   };
   animation::c a{
       .start_x = 0,
       .y = 0,
       .num_frames = 1,
   };
-  auto pid = ec->e().alloc();
+  auto pid = sprite::add(ec, spr, pos);
   ec->player() = c{
       .eid = pid,
       .energy = gauge::add_gauge(ec),
@@ -72,7 +74,6 @@ export void add_entity(compos *ec) {
       .health = gauge::add_gauge(ec),
       .satiation = gauge::add_gauge(ec),
   };
-  ec->player_sprites().add(pid, spr);
   ec->animations().add(pid, a);
   ec->movements().add(pid, {});
   collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
@@ -80,8 +81,7 @@ export void add_entity(compos *ec) {
 
 export rect get_area(compos *ec) {
   auto pid = ec->player().eid;
-  auto spr = ec->player_sprites().get(pid);
-  return spr.pos;
+  return area::get(ec, pid);
 }
 
 auto get_side(compos *ec) { return ec->player().side; }
