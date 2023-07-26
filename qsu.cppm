@@ -11,14 +11,13 @@ import sprite;
 import tile;
 
 namespace qsu {
-export enum class layers { terrain, camping, scout, last };
-
 export class main {
   static constexpr const auto max_player_sprites = 16;
   static constexpr const auto max_sprites = 4096;
   static constexpr const auto no_sprite = max_sprites + 1;
 
-  static constexpr const auto layer_count = static_cast<unsigned>(layers::last);
+  static constexpr const auto layer_count =
+      static_cast<unsigned>(sprite::layers::last);
   static constexpr const auto extra_layer_count = 2;
 
   quack::renderer m_r{layer_count + extra_layer_count};
@@ -69,7 +68,7 @@ public:
 
   void fill_debug(collision::compos *ec) { m_debug.fill(ec); }
   void fill_hud(const sprite::compo &set) { m_hud.fill(set); }
-  void fill_sprites(layers l, const sprite::compo &set) {
+  void fill_sprites(sprite::layers l, const sprite::compo &set) {
     m_layers[static_cast<unsigned>(l)].fill(set);
   }
 }; // namespace qsu

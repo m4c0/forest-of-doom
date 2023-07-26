@@ -40,7 +40,7 @@ static void fail(const char *msg) {
 
 namespace camping_set {
 static constexpr const auto tname = "tile::camping";
-static constexpr const auto tfill = qsu::layers::camping;
+static constexpr const auto tfill = sprite::layers::camping;
 namespace t = tile::camping;
 
 static auto pals() { return palette<palette<tile::c_t>>{}; }
@@ -48,7 +48,7 @@ static auto pals() { return palette<palette<tile::c_t>>{}; }
 
 namespace terrain_set {
 static constexpr const auto tname = "tile::terrain";
-static constexpr const auto tfill = qsu::layers::terrain;
+static constexpr const auto tfill = sprite::layers::terrain;
 namespace t = tile::terrain;
 
 static auto pals() {
