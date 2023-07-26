@@ -62,8 +62,8 @@ public:
   void set_grid(float w, float h) {
     for (auto &l : m_layers) {
       (*l)->set_grid(w, h);
-      (*layer_of(sprite::layers::ui))->center_at(16, 16);
     }
+    (*layer_of(sprite::layers::ui))->set_grid(16, 16);
     (*m_debug)->set_grid(w, h);
   }
   [[nodiscard]] auto hud_grid_size() const noexcept {
