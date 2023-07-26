@@ -22,9 +22,10 @@ export class main {
 
   quack::renderer m_r{layer_count + extra_layer_count};
   layer m_layers[layer_count] = {
-      {&m_r, max_sprites, "1_Terrains_and_Fences_16x16.png"},
-      {&m_r, max_sprites, "11_Camping_16x16.png"},
-      {&m_r, max_player_sprites,
+      {&m_r, sprite::layers::terrain, max_sprites,
+       "1_Terrains_and_Fences_16x16.png"},
+      {&m_r, sprite::layers::camping, max_sprites, "11_Camping_16x16.png"},
+      {&m_r, sprite::layers::scout, max_player_sprites,
        "Modern_Exteriors_Characters_Scout_16x16_1.png"},
   };
   hud_layer m_hud{&m_r, max_sprites, "Modern_UI_Style_1.png"};
@@ -70,6 +71,11 @@ public:
   void fill_hud(const sprite::compo &set) { m_hud.fill(set); }
   void fill_sprites(sprite::layers l, const sprite::compo &set) {
     m_layers[static_cast<unsigned>(l)].fill(set);
+  }
+  void fill(sprite::compos *ec) {
+    for (auto &l : m_layers) {
+      l.fill(ec);
+    }
   }
 }; // namespace qsu
 } // namespace qsu

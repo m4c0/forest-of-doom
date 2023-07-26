@@ -49,8 +49,7 @@ class game {
     auto [cx, cy] = misc::follow_player(&m_q, &m_ec);
     tile::camping::populate(&m_ec, cx, cy);
     tile::terrain::populate(&m_ec, cx, cy);
-    m_q.fill_sprites(sprite::layers::scout,
-                     static_cast<sprite::compos &>(m_ec).sprites);
+    m_q.fill(&m_ec);
     m_q.fill_sprites(sprite::layers::camping,
                      static_cast<tile::camping::compos &>(m_ec).sprites());
     m_q.fill_sprites(sprite::layers::terrain,
