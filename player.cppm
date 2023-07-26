@@ -57,7 +57,6 @@ export void add_entity(compos *ec) {
 
   rect pos{sx, sy, 1, 2};
   sprite::c spr{
-      .pos = pos,
       .uv = {0, 2, 1, 2},
       .layer = sprite::layers::scout,
   };

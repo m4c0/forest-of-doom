@@ -99,38 +99,6 @@ public:
     });
   }
 
-  void fill(const sprite::compo &set) {
-    m_spr->map_colours([&](auto *cs) {
-      for (auto _ : set) {
-        *cs++ = {};
-      }
-    });
-    m_spr->map_multipliers([&](auto *ms) {
-      for (auto _ : set) {
-        *ms++ = {1, 1, 1, 1};
-      }
-    });
-    m_spr->map_positions([&](auto *ps) {
-      for (auto [_, spr] : set) {
-        *ps++ = quack::rect{spr.pos.x, spr.pos.y, spr.pos.w, spr.pos.h};
-      }
-    });
-    m_spr->map_uvs([&](auto *uvs) {
-      for (auto [_, spr] : set) {
-        *uvs++ = quack::uv{
-            spr.uv.x * sprite_sz / m_atlas_w,
-            spr.uv.y * sprite_sz / m_atlas_h,
-            (spr.uv.x + spr.uv.w) * sprite_sz / m_atlas_w,
-            (spr.uv.y + spr.uv.h) * sprite_sz / m_atlas_h,
-        };
-      }
-    });
-    m_spr->set_count(set.size());
-    if (set.size() > m_max_sprites) {
-      m_max_sprites = set.size();
-    }
-  }
-
   [[nodiscard]] constexpr auto &operator*() noexcept { return m_spr; }
   [[nodiscard]] constexpr auto &operator*() const noexcept { return m_spr; }
 };

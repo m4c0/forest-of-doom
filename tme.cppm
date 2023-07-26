@@ -88,10 +88,7 @@ class game {
 
   decltype(pals()) m_pal = pals();
 
-  void fill_sprites() {
-    cursor::add_sprite(&m_ec, m_ec.sprites);
-    m_q->fill(&m_ec);
-  }
+  void fill_sprites() { m_q->fill(&m_ec); }
 
   bool replace_tile(float x, float y, tile::c_t old, tile::c_t brush) {
     for (auto &[id, spr] : m_ec.sprites) {

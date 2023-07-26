@@ -14,21 +14,20 @@ export class compos : public virtual pog::entity_provider,
                       public virtual player::compos {
   pog::sparse_set<anchor> m_anchors{};
   pog::sparse_set<pog::marker> m_batteries{};
-  sprite::compo m_sprites{};
 
 public:
   [[nodiscard]] auto &anchors() noexcept { return m_anchors; }
   [[nodiscard]] auto &batteries() noexcept { return m_batteries; }
-  [[nodiscard]] auto &sprites() noexcept { return m_sprites; }
 };
 
 void add_sprite(compos *ec, pog::eid id, float x, float y, tile::ui::c t) {
+  rect pos{0, 0, 1, 1};
   sprite::c spr{
-      .pos = {0, 0, 1, 1},
       .uv = tile::uv(t),
+      .layer = sprite::layers::ui,
   };
+  sprite::add(ec, id, spr, pos);
   ec->anchors().add(id, {x, y});
-  ec->sprites().add(id, spr);
 }
 auto add_sprite(compos *ec, float x, float y, tile::ui::c t) {
   auto id = ec->e().alloc();
@@ -71,20 +70,16 @@ export void update_batteries(compos *ec) {
   auto p = ec->player();
   for (auto &[id, _] : ec->batteries()) {
     unsigned val = step(ec->gauges.get(id).value);
-
-    auto spr = ec->sprites().get(id);
-    spr.uv = tile::uv(levels[val]);
-    ec->sprites().update(id, spr);
+    sprite::set_uv(ec, id, tile::uv(levels[val]));
   }
 }
 
 export void update_layout(compos *ec, float gw, float gh) {
   for (auto &[id, v] : ec->anchors()) {
     auto [dx, dy] = v;
-    auto spr = ec->sprites().get(id);
-    spr.pos.x = -gw + dx;
-    spr.pos.y = gh - dy - 1;
-    ec->sprites().update(id, spr);
+    auto x = -gw + dx;
+    auto y = gh - dy - 1;
+    sprite::set_pos(ec, id, x, y);
   }
 }
 } // namespace hud

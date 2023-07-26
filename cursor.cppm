@@ -5,41 +5,23 @@ import tile;
 import tilemap;
 
 export namespace cursor {
-using compo = pog::singleton<sprite::c>;
-class compos : public virtual pog::entity_provider {
-  cursor::compo m_cursor{};
-
-public:
-  cursor::compo &cursor() noexcept { return m_cursor; }
+struct compos : virtual sprite::compos {
+  pog::eid cursor;
 };
 
-void add_entity(compos *ec) {
-  auto id = ec->e().alloc();
-  ec->cursor().set(id, {});
-}
-
-void add_sprite(compos *ec, sprite::compo &spr) {
-  auto id = ec->cursor().get_id();
-  spr.add(id, ec->cursor().get(id));
-}
+void add_entity(compos *ec) { ec->cursor = sprite::add(ec, {}, {}); }
 
 void update_tile(compos *ec, auto c) {
-  auto id = ec->cursor().get_id();
-  auto spr = ec->cursor().get(id);
+  auto id = ec->cursor;
+
   auto uv = tile::uv(c);
-  spr.pos.w = uv.w;
-  spr.pos.h = uv.h;
-  spr.uv = uv;
-  ec->cursor().set(id, spr);
+  sprite::set_uv(ec, id, tile::uv(c));
+  sprite::set_size(ec, id, uv.w, uv.h);
 }
 
 void update_pos(compos *ec, float x, float y) {
-  auto id = ec->cursor().get_id();
-  auto spr = ec->cursor().get(id);
-  if (x >= 0 && x < tilemap::width)
-    spr.pos.x = static_cast<int>(x);
-  if (y >= 0 && y < tilemap::height)
-    spr.pos.y = static_cast<int>(y);
-  ec->cursor().set(id, spr);
+  auto xx = static_cast<int>(x);
+  auto yy = static_cast<int>(y);
+  sprite::set_pos(ec, ec->cursor, xx, yy);
 }
 } // namespace cursor
