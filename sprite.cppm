@@ -1,4 +1,5 @@
 export module sprite;
+import area;
 import pog;
 export import rect;
 
@@ -12,7 +13,27 @@ struct c {
 };
 using compo = pog::sparse_set<c>;
 
-struct compos {
+struct compos : virtual pog::entity_provider, virtual area::compos {
   pog::sparse_set<c> sprites{};
 };
+
+auto add(compos *ec, c spr, rect aabb) {
+  auto id = ec->e().alloc();
+  area::add(ec, id, aabb);
+  ec->sprites.add(id, spr);
+  return id;
+}
+void set_pos(compos *ec, pog::eid id, float x, float y) {
+  auto r = area::get(ec, id);
+  r.x = x;
+  r.y = y;
+
+  area::remove(ec, id);
+  area::add(ec, id, r);
+
+  auto spr = ec->sprites.get(id);
+  spr.pos.x = x;
+  spr.pos.y = y;
+  ec->sprites.update(id, spr);
+}
 } // namespace sprite
