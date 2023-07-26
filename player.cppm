@@ -55,7 +55,7 @@ export void add_entity(compos *ec) {
   constexpr const auto sx = 8.0f;
   constexpr const auto sy = 8.0f;
 
-  sprite spr{
+  sprite::c spr{
       .pos = {sx, sy, 1, 2},
       .uv = {0, 2, 1, 2},
   };

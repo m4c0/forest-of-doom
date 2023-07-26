@@ -23,7 +23,7 @@ public:
 };
 
 void add_sprite(compos *ec, pog::eid id, float x, float y, tile::ui::c t) {
-  sprite spr{
+  sprite::c spr{
       .pos = {0, 0, 1, 1},
       .uv = tile::uv(t),
   };

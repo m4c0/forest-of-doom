@@ -18,7 +18,7 @@ constexpr rect uv(c_t t) {
 }
 class compos : public virtual area::compos, public virtual collision::compos {
   pog::sparse_set<c_t> m_tiles{};
-  pog::sparse_set<sprite> m_sprites{};
+  pog::sparse_set<sprite::c> m_sprites{};
 
 public:
   auto &tiles() noexcept { return m_tiles; }
@@ -64,7 +64,7 @@ void populate(compos *ec, float cx, float cy) {
     if (t == 0)
       return;
 
-    sprite s{
+    sprite::c s{
         .pos = rect_of(area),
         .uv = uv(t),
     };

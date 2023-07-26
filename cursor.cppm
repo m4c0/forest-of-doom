@@ -5,7 +5,7 @@ import tile;
 import tilemap;
 
 export namespace cursor {
-using compo = pog::singleton<sprite>;
+using compo = pog::singleton<sprite::c>;
 class compos : public virtual pog::entity_provider {
   cursor::compo m_cursor{};
 
