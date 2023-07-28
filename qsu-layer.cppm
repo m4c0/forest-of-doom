@@ -78,7 +78,7 @@ public:
           return;
 
         *cs++ = {};
-        *ms++ = {1, 1, 1, 1};
+        *ms++ = {1, 1, 1, 1.0f - spr.dim};
 
         *ps++ = quack::rect{aabb.a.x, aabb.a.y, aabb.b.x - aabb.a.x,
                             aabb.b.y - aabb.a.y};

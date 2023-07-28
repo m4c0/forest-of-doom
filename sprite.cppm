@@ -9,6 +9,7 @@ enum class layers { terrain, camping, scout, ui, last };
 struct c {
   rect uv;
   layers layer;
+  float dim; // 1-alpha
 };
 using compo = pog::sparse_set<c>;
 

@@ -1,6 +1,7 @@
 export module looting;
 import player;
 import silog;
+import sprite;
 import tile;
 
 export namespace looting {
@@ -21,6 +22,11 @@ void mark_lootable(compos *ec) {
 
   if (!ec->lootable.has(cid))
     return;
+
+  // Just tempsie, until the real fx is decided
+  auto spr = ec->sprites.get(cid);
+  spr.dim = 0.1;
+  ec->sprites.update(cid, spr);
 
   silog::log(silog::debug, "got %d", (unsigned)cid);
 }
