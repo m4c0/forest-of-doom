@@ -1,20 +1,20 @@
 export module looting;
 import player;
-import silog;
 import sprite;
 import tile;
 
-export namespace looting {
-struct compos : virtual player::compos, virtual tile::compos {
+namespace looting {
+export struct compos : virtual player::compos, virtual tile::compos {
+  pog::eid selected_lootable{};
   pog::sparse_set<pog::marker> lootable{};
 };
 
-void add_backpack(compos *ec, tile::camping::c c, float x, float y) {
+export void add_backpack(compos *ec, tile::camping::c c, float x, float y) {
   auto id = tile::camping::add_tile(ec, c, x, y);
   ec->lootable.add(id, {});
 }
 
-void mark_lootable(compos *ec) {
+void select_lootable(compos *ec) {
   auto pid = ec->player().eid;
   auto cid = ec->collisions.get(pid);
   if (!cid)
@@ -23,11 +23,25 @@ void mark_lootable(compos *ec) {
   if (!ec->lootable.has(cid))
     return;
 
-  // Just tempsie, until the real fx is decided
-  auto spr = ec->sprites.get(cid);
-  spr.dim = 0.1;
-  ec->sprites.update(cid, spr);
+  ec->selected_lootable = cid;
+}
+export void mark_lootable(compos *ec) {
+  auto old = ec->selected_lootable;
+  select_lootable(ec);
 
-  silog::log(silog::debug, "got %d", (unsigned)cid);
+  if (old == ec->selected_lootable)
+    return;
+
+  // Just tempsie, until the real fx is decided
+  if (auto cid = ec->selected_lootable) {
+    auto spr = ec->sprites.get(cid);
+    spr.dim = 0.1;
+    ec->sprites.update(cid, spr);
+  }
+  if (old) {
+    auto spr = ec->sprites.get(old);
+    spr.dim = 0;
+    ec->sprites.update(old, spr);
+  }
 }
 } // namespace looting
