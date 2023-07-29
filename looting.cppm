@@ -14,26 +14,26 @@ export void add_backpack(compos *ec, tile::camping::c c, float x, float y) {
   ec->lootable.add(id, {});
 }
 
-void select_lootable(compos *ec) {
+pog::eid select_lootable(compos *ec) {
   auto pid = ec->player().eid;
   auto cid = ec->collisions.get(pid);
   if (!cid)
-    return;
+    return {};
 
   if (!ec->lootable.has(cid))
-    return;
+    return {};
 
-  ec->selected_lootable = cid;
+  return cid;
 }
 export void mark_lootable(compos *ec) {
   auto old = ec->selected_lootable;
-  select_lootable(ec);
+  auto cid = ec->selected_lootable = select_lootable(ec);
 
-  if (old == ec->selected_lootable)
+  if (old == cid)
     return;
 
   // Just tempsie, until the real fx is decided
-  if (auto cid = ec->selected_lootable) {
+  if (cid) {
     auto spr = ec->sprites.get(cid);
     spr.dim = 0.1;
     ec->sprites.update(cid, spr);
