@@ -28,9 +28,7 @@ auto base_app(const char *name) {
   a->add_resource("11_Camping_16x16.png");
   a->add_resource("Modern_Exteriors_Characters_Scout_16x16_1.png");
   a->add_resource("Modern_UI_Style_1.png");
-
-  auto b = a->add_unit<box>("box");
-  b->add_mod(name);
+  a->add_unit<box>(name);
   return a;
 }
 
