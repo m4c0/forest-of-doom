@@ -2,7 +2,6 @@ export module cursor;
 import pog;
 import sprite;
 import tile;
-import tilemap;
 
 export namespace cursor {
 struct compos : virtual sprite::compos {
