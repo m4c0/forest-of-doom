@@ -30,42 +30,7 @@ auto base_app(const char *name) {
   a->add_resource("Modern_UI_Style_1.png");
 
   auto b = a->add_unit<box>("box");
-  b->add_mod("animation");
-  b->add_mod("area");
-  b->add_mod("collision");
-  b->add_mod("cursor");
-  b->add_mod("gauge");
-  b->add_mod("hud");
-  b->add_mod("input");
-  b->add_mod("looting");
-  b->add_mod("misc");
-  b->add_mod("movement");
-  b->add_mod("player");
-  b->add_mod("ranged");
-  b->add_mod("rect");
-  b->add_mod("sprite");
-  b->add_mod("stopwatch");
-  b->add_mod("tilemap");
-
-  auto tile = b->add_mod("tile");
-  tile->add_part("camping");
-  tile->add_part("common");
-  tile->add_part("terrain");
-  tile->add_part("ui");
-
-  // Quack Sprite Unit
-  auto qsu = b->add_mod("qsu");
-  qsu->add_part("debug");
-  qsu->add_part("layer");
-
-  auto pf = b->add_mod("prefabs");
-  pf->add_part("island_0");
-  pf->add_part("island_1");
-  pf->add_part("ocean_0");
-  pf->add_part("ui_0");
-
-  // App
-  a->add_unit<mod>(name);
+  b->add_mod(name);
   return a;
 }
 
