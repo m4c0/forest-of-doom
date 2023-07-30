@@ -1,7 +1,6 @@
-export module main;
+export module tme;
 
 import casein;
-import collision;
 import cursor;
 import hai;
 import jute;
