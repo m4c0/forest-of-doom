@@ -34,6 +34,7 @@ auto base_app(const char *name) {
 
 int main(int argc, char **argv) {
   auto all = unit::create<seq>("all");
+  all->add_ref(base_app("wgen"));
   all->add_ref(base_app("tme"));
   all->add_ref(base_app("fod"));
   return run_main(all, argc, argv);
