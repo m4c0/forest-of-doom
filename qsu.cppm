@@ -1,5 +1,4 @@
 export module qsu;
-import :debug;
 import :layer;
 import area;
 import casein;
@@ -27,8 +26,8 @@ export class main {
       {&m_r, sprite::layers::scout, max_player_sprites,
        "Modern_Exteriors_Characters_Scout_16x16_1.png"},
       {&m_r, sprite::layers::ui, max_sprites, "Modern_UI_Style_1.png"},
+      {&m_r, sprite::layers::debug, max_sprites, {}},
   };
-  debug_layer m_debug{&m_r, max_sprites};
   quack::mouse_tracker m_mouse{};
 
   [[nodiscard]] auto &layer_of(sprite::layers l) {
@@ -45,7 +44,6 @@ public:
     for (auto &l : m_layers) {
       l.process_event(e);
     }
-    m_debug.process_event(e);
   }
 
   void center_at(float x, float y) {
@@ -53,7 +51,6 @@ public:
       (*l)->center_at(x, y);
     }
     (*layer_of(sprite::layers::ui))->center_at(0, 0);
-    (*m_debug)->center_at(x, y);
   }
   [[nodiscard]] auto center() const noexcept {
     return (*m_layers[0])->center();
@@ -64,7 +61,6 @@ public:
       (*l)->set_grid(w, h);
     }
     (*layer_of(sprite::layers::ui))->set_grid(16, 16);
-    (*m_debug)->set_grid(w, h);
   }
   [[nodiscard]] auto hud_grid_size() const noexcept {
     return (*layer_of(sprite::layers::ui))->grid_size();
@@ -74,7 +70,6 @@ public:
     return m_mouse.current_mouse_pos(&**m_layers[0]);
   }
 
-  void fill_debug(collision::compos *ec) { m_debug.fill(ec); }
   void fill(sprite::compos *ec) {
     for (auto &l : m_layers) {
       l.fill(ec);
