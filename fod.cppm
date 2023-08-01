@@ -2,6 +2,7 @@ export module fod;
 
 import animation;
 import casein;
+import debug;
 import hud;
 import gauge;
 import input;
@@ -16,7 +17,10 @@ import sitime;
 import tile;
 import tilemap;
 
-struct ec : hud::compos, looting::compos, tile::terrain::compos {};
+struct ec : debug::compos,
+            hud::compos,
+            looting::compos,
+            tile::terrain::compos {};
 
 class game {
   qsu::main m_q{};
@@ -47,8 +51,8 @@ class game {
 
   void repaint() {
     auto [cx, cy] = misc::follow_player(&m_q, &m_ec);
+    debug::show_collisions_around(&m_ec, cx, cy, 8);
     m_q.fill(&m_ec);
-    // m_q.fill_debug(&m_ec);
   }
 
   void tick() {

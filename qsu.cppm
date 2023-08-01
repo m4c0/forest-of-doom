@@ -16,17 +16,16 @@ export class main {
 
   static constexpr const auto layer_count =
       static_cast<unsigned>(sprite::layers::last);
-  static constexpr const auto extra_layer_count = 2;
 
-  quack::renderer m_r{layer_count + extra_layer_count};
+  quack::renderer m_r{layer_count};
   layer m_layers[layer_count] = {
       {&m_r, sprite::layers::terrain, max_sprites,
        "1_Terrains_and_Fences_16x16.png"},
       {&m_r, sprite::layers::camping, max_sprites, "11_Camping_16x16.png"},
       {&m_r, sprite::layers::scout, max_player_sprites,
        "Modern_Exteriors_Characters_Scout_16x16_1.png"},
-      {&m_r, sprite::layers::ui, max_sprites, "Modern_UI_Style_1.png"},
       {&m_r, sprite::layers::debug, max_sprites, {}},
+      {&m_r, sprite::layers::ui, max_sprites, "Modern_UI_Style_1.png"},
   };
   quack::mouse_tracker m_mouse{};
 
