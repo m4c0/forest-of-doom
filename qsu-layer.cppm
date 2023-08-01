@@ -19,6 +19,9 @@ class layer {
   unsigned m_max_sprites{};
 
   void create_window() {
+    if (m_atlas_name == jute::view{})
+      return;
+
     stbi::load_from_resource(m_atlas_name)
         .map([this](const auto &img) {
           m_atlas_w = img.width;
@@ -77,7 +80,7 @@ public:
         if (spr.layer != m_layer)
           return;
 
-        *cs++ = {};
+        *cs++ = {spr.colour.r, spr.colour.g, spr.colour.b, spr.colour.a};
         *ms++ = {1, 1, 1, 1.0f - spr.dim};
 
         *ps++ = quack::rect{aabb.a.x, aabb.a.y, aabb.b.x - aabb.a.x,

@@ -6,9 +6,16 @@ export import rect;
 export namespace sprite {
 enum class layers { terrain, camping, scout, ui, last };
 
+struct colour {
+  float r;
+  float g;
+  float b;
+  float a;
+};
 struct c {
   rect uv;
   layers layer;
+  colour colour;
   float dim; // 1-alpha
 };
 using compo = pog::sparse_set<c>;
