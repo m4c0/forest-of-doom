@@ -14,8 +14,8 @@ class layer {
   quack::ilayout m_spr;
   sprite::layers m_layer;
   jute::view m_atlas_name;
-  float m_atlas_w;
-  float m_atlas_h;
+  float m_atlas_w{1};
+  float m_atlas_h{1};
   unsigned m_max_sprites{};
 
   void create_window() {
