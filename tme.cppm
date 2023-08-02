@@ -89,7 +89,7 @@ class game {
 
   void fill_sprites() { m_q->fill(&m_ec); }
 
-  auto find_tile(int x, int y) {
+  auto find_tile_id(int x, int y) {
     for (auto &[id, spr] : m_ec.sprites) {
       if (id == m_ec.cursor)
         continue;
@@ -117,15 +117,14 @@ class game {
     }
   }
   void paint(int x, int y, tile::c_t brush) {
-    auto tid = find_tile(x, y);
+    auto tid = find_tile_id(x, y);
     paint(x, y, tid, brush);
   }
 
   bool replace_tile(int x, int y, tile::c_t old, tile::c_t brush) {
-    auto tid = find_tile(x, y);
+    auto tid = find_tile_id(x, y);
 
-    auto t = m_ec.tiles.get(tid);
-    silog::log(silog::debug, "%d %d = %08x %08x %08x\n", x, y, t, old, brush);
+    auto t = tid ? m_ec.tiles.get(tid) : tile::c_t{};
     if (t != old && old != brush)
       return false;
 
@@ -208,7 +207,10 @@ public:
 
   void flood_fill() {
     auto [x, y] = m_q->mouse_pos();
-    tile::c_t old = find_tile(x, y);
+    auto tid = find_tile_id(x, y);
+    tile::c_t old = tid ? m_ec.tiles.get(tid) : tile::c_t{};
+    if (old == m_brush)
+      return;
     flood_fill_at(x, y, old);
     fill_sprites();
   }
