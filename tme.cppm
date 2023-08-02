@@ -89,25 +89,54 @@ class game {
 
   void fill_sprites() { m_q->fill(&m_ec); }
 
-  bool replace_tile(float x, float y, tile::c_t old, tile::c_t brush) {
+  auto find_tile(int x, int y) {
     for (auto &[id, spr] : m_ec.sprites) {
+      if (id == m_ec.cursor)
+        continue;
+
       auto [rx, ry, rw, rh] = area::get(&m_ec, id);
       if (rx != x || ry != y)
         continue;
 
-      auto t = m_ec.tiles.get(id);
-      if (t != old && old != brush)
-        continue;
-
-      m_undo.set(x, y, old);
-      tile::remove_tile(&m_ec, id);
-      tile::add_tile(&m_ec, brush, tfill, x, y);
-      return true;
+      return id;
     }
-    return false;
+
+    return pog::eid{};
   }
 
-  void flood_fill_at(auto x, auto y, tile::c_t old) {
+  void paint(int x, int y, pog::eid tid, tile::c_t brush) {
+    if (tid) {
+      m_undo.set(x, y, m_ec.tiles.get(tid));
+      tile::remove_tile(&m_ec, tid);
+    } else {
+      m_undo.set(x, y, 0);
+    }
+
+    if (brush) {
+      tile::add_tile(&m_ec, brush, tfill, x, y);
+    }
+  }
+  void paint(int x, int y, tile::c_t brush) {
+    auto tid = find_tile(x, y);
+    paint(x, y, tid, brush);
+  }
+
+  bool replace_tile(int x, int y, tile::c_t old, tile::c_t brush) {
+    auto tid = find_tile(x, y);
+
+    auto t = m_ec.tiles.get(tid);
+    silog::log(silog::debug, "%d %d = %08x %08x %08x\n", x, y, t, old, brush);
+    if (t != old && old != brush)
+      return false;
+
+    paint(x, y, tid, brush);
+    return true;
+  }
+
+  void flood_fill_at(int x, int y, tile::c_t old) {
+    if (x < 0 || x > 16 || y < 0 || y > 16)
+      return;
+
     if (!replace_tile(x, y, old, m_brush))
       return;
 
@@ -160,14 +189,17 @@ public:
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();
-    replace_tile(x, y, m_brush, m_brush);
+    if (x < 0 || x > 16 || y < 0 || y > 16)
+      return;
+
+    paint(x, y, m_brush);
 
     auto [tx, ty, tw, th] = tile::uv(m_brush);
     for (auto dy = 0; dy < th; dy++) {
       for (auto dx = 0; dx < tw; dx++) {
         if (dx == 0 && dy == 0)
           continue;
-        replace_tile(x + dx, y + dy, 0, 0);
+        paint(x + dx, y + dy, 0);
       }
     }
     cursor::update_pos(&m_ec, x, y);
@@ -176,20 +208,9 @@ public:
 
   void flood_fill() {
     auto [x, y] = m_q->mouse_pos();
-    tile::c_t old{};
-    for (auto [id, spr] : m_ec.sprites) {
-      auto [rx, ry, rw, rh] = area::get(&m_ec, id);
-      if (rx != x || ry != y)
-        return;
-
-      old = m_ec.tiles.get(id);
-      if (old == m_brush)
-        return;
-
-      flood_fill_at(x, y, old);
-      fill_sprites();
-      return;
-    }
+    tile::c_t old = find_tile(x, y);
+    flood_fill_at(x, y, old);
+    fill_sprites();
   }
 
   void undo() {
@@ -213,6 +234,9 @@ public:
           .take(fail);
 
       for (auto &[id, spr] : m_ec.sprites) {
+        if (id == m_ec.cursor)
+          continue;
+
         auto t = m_ec.tiles.get(id);
         if (!t)
           continue;
