@@ -1,12 +1,8 @@
-export module prefabs:ui_0;
+export module prefabs:empty;
 import tile;
-import tilemap;
+
+using namespace tile::terrain;
 
 namespace prefabs {
-export constexpr const tilemap::map ui_0 = [] {
-  using cs = tile::terrain::compos;
-  using c = cs::tile_t;
-  tilemap::map<cs> res{};
-  return res;
-}();
-}
+export void island_0(compos *ec, float x, float y) {}
+} // namespace prefabs
