@@ -66,7 +66,7 @@ static auto pals() {
               t::sidewalkr_br, t::sidewalk_t, t::sidewalkr_bl, t::sidewalk_r},
       palette{t::grass_0, t::grass_1, t::water, t::dirt_0, t::cobble_0,
               t::cobble_1, t::cobble_2, t::cobble_3, t::brick_0, t::brick_1,
-              t::brick_2, t::brick_3},
+              t::brick_2, t::brick_3, t::blank},
   };
 }
 } // namespace terrain_set
