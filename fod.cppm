@@ -15,7 +15,6 @@ import qsu;
 import silog;
 import sitime;
 import tile;
-import tilemap;
 
 struct ec : debug::compos,
             hud::compos,
