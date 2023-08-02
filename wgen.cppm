@@ -1,13 +1,27 @@
 export module wgen;
 import casein;
+import prefabs;
 import qsu;
 import tile;
+import tilemap;
 
 struct ec : tile::terrain::compos {};
+
+static tilemap::map load_pat() {
+  tile::terrain::compos tmp{};
+  prefabs::wgen(&tmp, 0, 0);
+  tilemap::map pat{};
+  for (auto &[id, t] : tmp.tiles) {
+    auto [x, y, w, h] = area::get(&tmp, id);
+    pat.set(x, y, t);
+  }
+  return pat;
+}
 
 class app {
   qsu::main m_q{};
   ec m_ec{};
+  tilemap::map m_pat = load_pat();
 
   void setup() {
     m_q.set_grid(16, 16);

@@ -12,6 +12,10 @@ class map {
   c m_data[height][width]{};
 
 public:
+  constexpr auto get(unsigned x, unsigned y) const noexcept {
+    return m_data[y][x];
+  }
+
   constexpr void set(unsigned x, unsigned y, c t) noexcept {
     if (x < 0 || x >= width || y < 0 || y >= height)
       return;
