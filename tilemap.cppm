@@ -31,15 +31,14 @@ public:
     }
   }
 
-  void add_entities(tile::compos *ec, sprite::layers l, float dx,
-                    float dy) const noexcept {
+  void add_entities(auto &&add_fn, float dx, float dy) const noexcept {
     for_each([&](auto x, auto y, auto t) {
       if (!t)
         return;
 
       auto px = x + dx;
       auto py = y + dy;
-      add_tile(ec, t, l, px, py);
+      add_fn(px, py, t);
     });
   }
 };

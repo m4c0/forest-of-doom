@@ -20,9 +20,9 @@ struct compos : virtual collision::compos, virtual sprite::compos {
   pog::sparse_set<c_t> tiles{};
 };
 
-auto add_tile(compos *ec, c_t t, sprite::layers l, float x, float y) {
+auto add_tile(compos *ec, c_t t, rect uv, sprite::layers l, float x, float y) {
   sprite::c s{
-      .uv = uv(t),
+      .uv = uv,
       .layer = l,
   };
   rect r{

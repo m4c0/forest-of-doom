@@ -11,7 +11,8 @@ enum c : c_t {
 };
 
 auto add_tile(compos *ec, c t, float x, float y) {
-  auto id = tile::add_tile(ec, t, sprite::layers::camping, x, y);
+  auto tuv = uv(t);
+  auto id = tile::add_tile(ec, t, tuv, sprite::layers::camping, x, y);
 
   switch (t) {
   case backpack_a:

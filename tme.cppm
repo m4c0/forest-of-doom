@@ -83,7 +83,7 @@ class game {
   ec m_ec{};
   qsu::main *m_q{};
   tilemap::map m_undo{};
-  tile::c_t m_brush{};
+  t::c m_brush{};
 
   decltype(pals()) m_pal = pals();
 
@@ -104,7 +104,7 @@ class game {
     return pog::eid{};
   }
 
-  void paint(int x, int y, pog::eid tid, tile::c_t brush) {
+  void paint(int x, int y, pog::eid tid, t::c brush) {
     if (tid) {
       m_undo.set(x, y, m_ec.tiles.get(tid));
       tile::remove_tile(&m_ec, tid);
@@ -113,15 +113,15 @@ class game {
     }
 
     if (brush) {
-      tile::add_tile(&m_ec, brush, tfill, x, y);
+      t::add_tile(&m_ec, brush, x, y);
     }
   }
-  void paint(int x, int y, tile::c_t brush) {
+  void paint(int x, int y, t::c brush) {
     auto tid = find_tile_id(x, y);
     paint(x, y, tid, brush);
   }
 
-  bool replace_tile(int x, int y, tile::c_t old, tile::c_t brush) {
+  bool replace_tile(int x, int y, tile::c_t old, t::c brush) {
     auto tid = find_tile_id(x, y);
 
     auto t = tid ? m_ec.tiles.get(tid) : tile::c_t{};
@@ -157,9 +157,9 @@ public:
     fill_sprites();
   }
 
-  void set_brush(tile::c_t t) {
+  void set_brush(t::c t) {
     m_brush = t;
-    cursor::update_tile(&m_ec, t);
+    cursor::update_sprite(&m_ec, tile::uv(t::tile_id(t)));
     fill_sprites();
   }
 
@@ -198,7 +198,7 @@ public:
       for (auto dx = 0; dx < tw; dx++) {
         if (dx == 0 && dy == 0)
           continue;
-        paint(x + dx, y + dy, 0);
+        paint(x + dx, y + dy, {});
       }
     }
     cursor::update_pos(&m_ec, x, y);
@@ -217,7 +217,11 @@ public:
 
   void undo() {
     static_cast<tile::compos &>(m_ec) = {};
-    m_undo.add_entities(&m_ec, tfill, 0, 0);
+    m_undo.add_entities(
+        [&](auto x, auto y, auto t) {
+          t::add_tile(&m_ec, static_cast<t::c>(t), x, y);
+        },
+        0, 0);
     fill_sprites();
   }
 
@@ -275,7 +279,7 @@ extern "C" void casein_handle(const casein::event &e) {
     res[casein::K_D] = [](auto) { gg.flood_fill(); };
     res[casein::K_U] = [](auto) { gg.undo(); };
     res[casein::K_Z] = [](auto) { gg.dump_map(); };
-    res[casein::K_SPACE] = [](auto) { gg.set_brush(0); };
+    res[casein::K_SPACE] = [](auto) { gg.set_brush({}); };
     return res;
   }();
   static constexpr const auto map = [] {

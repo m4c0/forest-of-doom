@@ -163,7 +163,8 @@ constexpr unsigned tile_id(c cc) {
 struct compos : tile::compos {};
 
 auto add_tile(compos *ec, c t, float x, float y) {
-  auto id = tile::add_tile(ec, tile_id(t), sprite::layers::terrain, x, y);
+  auto tuv = uv(tile_id(t));
+  auto id = tile::add_tile(ec, t, tuv, sprite::layers::terrain, x, y);
 
   switch (t) {
   case water:

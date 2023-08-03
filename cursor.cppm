@@ -1,7 +1,6 @@
 export module cursor;
 import pog;
 import sprite;
-import tile;
 
 export namespace cursor {
 struct compos : virtual sprite::compos {
@@ -10,11 +9,10 @@ struct compos : virtual sprite::compos {
 
 void add_entity(compos *ec) { ec->cursor = sprite::add(ec, {}, {}); }
 
-void update_tile(compos *ec, auto c) {
+void update_sprite(compos *ec, rect uv) {
   auto id = ec->cursor;
 
-  auto uv = tile::uv(c);
-  sprite::set_uv(ec, id, tile::uv(c));
+  sprite::set_uv(ec, id, uv);
   sprite::set_size(ec, id, uv.w, uv.h);
 }
 

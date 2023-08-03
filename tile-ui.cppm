@@ -46,6 +46,7 @@ enum c : c_t {
 struct compos : tile::compos {};
 
 auto add_tile(compos *ec, c t, float x, float y) {
-  return tile::add_tile(ec, t, sprite::layers::ui, x, y);
+  auto tuv = uv(t);
+  return tile::add_tile(ec, t, tuv, sprite::layers::ui, x, y);
 }
 } // namespace tile::ui
