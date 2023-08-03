@@ -80,6 +80,16 @@ public:
     }
     m_states[min_y][min_x].observe();
   }
+
+  void print(tile::terrain::compos *ec) const {
+    for (auto y = margin; y < height - margin * 2; y++) {
+      for (auto x = margin; x < width - margin * 2; x++) {
+        auto t = static_cast<tile::terrain::c>(m_states[y][x].value());
+        if (t > tile::terrain::blank)
+          tile::terrain::add_tile(ec, t, x, y);
+      }
+    }
+  }
 };
 
 static const tilemap::map pat = [] {
@@ -96,11 +106,15 @@ static const tilemap::map pat = [] {
 class app {
   qsu::main m_q{};
   ec m_ec{};
-  tilemap::map m_pat = pat;
 
   void setup() {
     m_q.set_grid(16, 16);
-    tile::terrain::add_tile(&m_ec, tile::terrain::water, 0, 0);
+    m_q.center_at(8, 8);
+
+    map m{};
+    m.observe_minimal_entropy();
+    m.print(&m_ec);
+
     m_q.fill(&m_ec);
   }
 
