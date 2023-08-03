@@ -2,6 +2,7 @@ export module wgen;
 import casein;
 import hai;
 import prefabs;
+import rng;
 import qsu;
 import tile;
 import tilemap;
@@ -16,6 +17,7 @@ static_assert(max_entropy < 64);
 class eigen {
   unsigned m_entropy = max_entropy;
   traits::ints::uint64_t m_ones = (1 << m_entropy) - 1;
+  unsigned m_value = max_entropy;
 
 public:
   constexpr void set_one(tile::terrain::c c) noexcept {
@@ -26,7 +28,28 @@ public:
     m_ones ^= 1 << (static_cast<unsigned>(c));
     m_entropy--;
   }
+
   [[nodiscard]] constexpr auto entropy() const noexcept { return m_entropy; }
+  [[nodiscard]] constexpr auto value() const noexcept { return m_value; }
+
+  auto observe() {
+    auto r = rng::rand(m_entropy);
+    for (auto bit = 0U; bit < max_entropy; bit++) {
+      if ((m_ones & (1 << bit)) == 0)
+        continue;
+
+      if (--r > 0)
+        continue;
+
+      m_ones = 1 << bit;
+      m_value = bit;
+      return bit;
+    }
+    // Should never happen
+    m_ones = 0;
+    m_value = 0;
+    return 0U;
+  }
 };
 class map {
   static constexpr const auto margin = 2U;
@@ -45,12 +68,17 @@ public:
         auto e = m_states[y][x].entropy();
         if (min_e < e)
           continue;
-        // TODO: randomize if min_e == e;
+
+        // TODO: randomize all with same min_e
+        if (min_e == e && rng::randf() > 0.5)
+          continue;
+
         min_e = e;
         min_x = x;
         min_y = y;
       }
     }
+    m_states[min_y][min_x].observe();
   }
 };
 

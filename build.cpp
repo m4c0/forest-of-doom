@@ -5,6 +5,7 @@
 #include "../missingno/build.hpp"
 #include "../pog/build.hpp"
 #include "../quack/build.hpp"
+#include "../rng/build.hpp"
 #include "../silog/build.hpp"
 #include "../sitime/build.hpp"
 #include "../stubby/build.hpp"
@@ -20,6 +21,7 @@ auto base_app(const char *name) {
   a->add_wsdep("jute", jute());
   a->add_wsdep("missingno", missingno());
   a->add_wsdep("pog", pog());
+  a->add_wsdep("rng", rng());
   a->add_wsdep("quack", quack());
   a->add_wsdep("silog", silog());
   a->add_wsdep("sitime", sitime());
