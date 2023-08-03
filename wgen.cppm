@@ -212,14 +212,15 @@ class app {
   ec m_ec{};
 
   void setup() {
-    m_q.set_grid(16, 16);
-    m_q.center_at(8, 8);
+    m_q.set_grid(32, 32);
+    m_q.center_at(16, 16);
 
     sitime::stopwatch sw{};
     rng::seed(69);
-    map m{};
-    m.observe_minimal_entropy();
-    m.print(&m_ec);
+    auto m = hai::uptr<map>::make();
+    for (auto i = 0; i < 32 * 32; i++)
+      m->observe_minimal_entropy();
+    m->print(&m_ec);
     silog::log(silog::info, "took %dms", sw.millis());
 
     m_q.fill(&m_ec);
