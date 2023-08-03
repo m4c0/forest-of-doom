@@ -143,6 +143,8 @@ public:
           continue;
 
         auto e = m_states[y][x].entropy();
+        if (e == 0)
+          continue;
         if (min_e < e)
           continue;
 
