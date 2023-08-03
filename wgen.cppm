@@ -16,7 +16,7 @@ static_assert(max_entropy < 64);
 
 class eigen {
   unsigned m_entropy = max_entropy;
-  traits::ints::uint64_t m_ones = (1 << m_entropy) - 1;
+  traits::ints::uint64_t m_ones = (1UL << max_entropy) - 1UL;
   unsigned m_value = max_entropy;
 
 public:
