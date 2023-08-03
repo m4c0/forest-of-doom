@@ -4,29 +4,36 @@ import hai;
 import prefabs;
 import rng;
 import qsu;
+import silog;
 import tile;
 import tilemap;
 import traits;
 
+static_assert(static_cast<unsigned>(tile::terrain::last) < 64);
+
 struct ec : tile::terrain::compos {};
 
-static constexpr const auto max_entropy =
-    static_cast<unsigned>(tile::terrain::last);
-static_assert(max_entropy < 64);
+static const auto max_entropy = static_cast<unsigned>(tile::terrain::last);
 
 class eigen {
-  unsigned m_entropy = max_entropy;
-  traits::ints::uint64_t m_ones = (1UL << max_entropy) - 1UL;
-  unsigned m_value = max_entropy;
+  unsigned m_entropy{};
+  traits::ints::uint64_t m_ones{};
+  unsigned m_value{};
 
 public:
-  constexpr void set_one(tile::terrain::c c) noexcept {
-    m_ones |= 1 << (static_cast<unsigned>(c));
+  constexpr void set_one(unsigned c) noexcept {
+    auto mask = 1U << c;
+    if (m_ones & mask)
+      return;
     m_entropy++;
+    m_ones |= mask;
   }
-  constexpr void set_zero(tile::terrain::c c) noexcept {
-    m_ones ^= 1 << (static_cast<unsigned>(c));
-    m_entropy--;
+  constexpr void set_zero(unsigned c) noexcept {
+    auto mask = 1U << c;
+    if (m_ones & mask) {
+      m_ones ^= 1 << c;
+      m_entropy--;
+    }
   }
 
   [[nodiscard]] constexpr auto entropy() const noexcept { return m_entropy; }
@@ -51,12 +58,35 @@ public:
     return 0U;
   }
 };
+
+struct consts {
+  tilemap::map pat;
+  eigen e;
+};
+static const consts cs = [] {
+  tile::terrain::compos tmp{};
+  prefabs::wgen(&tmp, 0, 0);
+
+  tilemap::map pat{};
+  eigen e{};
+  for (auto &[id, t] : tmp.tiles) {
+    auto [x, y, w, h] = area::get(&tmp, id);
+    pat.set(x, y, t);
+    e.set_one(t);
+  }
+  return consts{pat, e};
+}();
+class ieigen : public eigen {
+public:
+  ieigen() : eigen{cs.e} {}
+};
+
 class map {
   static constexpr const auto margin = 2U;
   static constexpr const auto width = tilemap::width;
   static constexpr const auto height = tilemap::height;
 
-  eigen m_states[height][width]{};
+  ieigen m_states[height][width]{};
 
 public:
   void observe_minimal_entropy() {
@@ -91,17 +121,6 @@ public:
     }
   }
 };
-
-static const tilemap::map pat = [] {
-  tile::terrain::compos tmp{};
-  prefabs::wgen(&tmp, 0, 0);
-  tilemap::map pat{};
-  for (auto &[id, t] : tmp.tiles) {
-    auto [x, y, w, h] = area::get(&tmp, id);
-    pat.set(x, y, t);
-  }
-  return pat;
-}();
 
 class app {
   qsu::main m_q{};
