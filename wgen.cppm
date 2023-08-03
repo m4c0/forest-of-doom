@@ -42,6 +42,7 @@ public:
     while (i > 0) {
       if (i & 1)
         m_bit_count++;
+      i >>= 1;
     }
   }
 
@@ -61,6 +62,11 @@ class eigen {
 
 public:
   constexpr void set_one(unsigned c) noexcept { m_bits.set(c); }
+  constexpr void merge(bitmask b) noexcept { m_bits.merge(b); }
+
+  [[nodiscard]] constexpr bool operator[](unsigned bit) const noexcept {
+    return m_bits[bit];
+  }
 
   [[nodiscard]] constexpr auto bits() const noexcept { return m_bits; }
   [[nodiscard]] constexpr auto entropy() const noexcept {
@@ -112,9 +118,11 @@ class ieigen : public eigen {
 public:
   ieigen() : eigen{cs.e} {}
 
+  auto stage() { return m_stage; }
+
   void reset_stage() { m_stage = {}; }
   void set_stage(unsigned i) { m_stage.set(i); }
-  void apply_stage() { bits().merge(m_stage); }
+  void apply_stage() { merge(m_stage); }
 };
 
 class map {
@@ -129,11 +137,6 @@ public:
     unsigned min_x{};
     unsigned min_y{};
     unsigned min_e = max_entropy;
-    for (auto y = 0; y < height; y++) {
-      for (auto x = 0; x < width; x++) {
-        m_states[y][x].reset_stage();
-      }
-    }
     for (auto y = margin; y < height - margin * 2; y++) {
       for (auto x = margin; x < width - margin * 2; x++) {
         auto e = m_states[y][x].entropy();
@@ -150,18 +153,37 @@ public:
       }
     }
     auto n = m_states[min_y][min_x].observe();
+
+    for (auto dx = -1; dx <= 1; dx++) {
+      for (auto dy = -1; dy <= 1; dy++) {
+        m_states[min_y + dy][min_x + dx].reset_stage();
+      }
+    }
+
     cs.pat.for_each([&](int x, int y, unsigned t) {
       if (n != t)
         return;
+      if (x == 0 || x == width - 1)
+        return;
+      if (y == 0 || y == height - 1)
+        return;
 
-      m_states[y][x + 1].set_stage(cs.pat.get(x + 1, y));
-      m_states[y][x - 1].set_stage(cs.pat.get(x + 1, y));
-      m_states[y + 1][x].set_stage(cs.pat.get(x, y + 1));
-      m_states[y - 1][x].set_stage(cs.pat.get(x, y - 1));
+      for (auto dx = -1; dx <= 1; dx++) {
+        for (auto dy = -1; dy <= 1; dy++) {
+          if (!m_states[min_y + dy][min_x + dx][cs.pat.get(x + dx, y + dy)])
+            return;
+        }
+      }
+      for (auto dx = -1; dx <= 1; dx++) {
+        for (auto dy = -1; dy <= 1; dy++) {
+          m_states[min_y + dy][min_x + dx].set_stage(
+              cs.pat.get(x + dx, y + dy));
+        }
+      }
     });
-    for (auto y = 0; y < height; y++) {
-      for (auto x = 0; x < width; x++) {
-        m_states[y][x].apply_stage();
+    for (auto dx = -1; dx <= 1; dx++) {
+      for (auto dy = -1; dy <= 1; dy++) {
+        m_states[min_y + dy][min_x + dx].apply_stage();
       }
     }
   }
