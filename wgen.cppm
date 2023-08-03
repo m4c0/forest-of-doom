@@ -155,6 +155,9 @@ public:
         min_y = y;
       }
     }
+    if (min_e == max_entropy) {
+      return;
+    }
     auto n = m_states[min_y][min_x].observe();
 
     for (auto dx = -1; dx <= 1; dx++) {
