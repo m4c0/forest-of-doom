@@ -171,21 +171,20 @@ public:
     cs.pat.for_each([&](int x, int y, unsigned t) {
       if (n != t)
         return;
-      if (x == 0 || x == tilemap::width - 1)
-        return;
-      if (y == 0 || y == tilemap::height - 1)
-        return;
 
       for (auto dx = -1; dx <= 1; dx++) {
         for (auto dy = -1; dy <= 1; dy++) {
-          if (!m_states[min_y + dy][min_x + dx][cs.pat.get(x + dx, y + dy)])
+          auto px = ((x + dx) + tilemap::width) % tilemap::width;
+          auto py = ((y + dy) + tilemap::height) % tilemap::height;
+          if (!m_states[min_y + dy][min_x + dx][cs.pat.get(px, py)])
             return;
         }
       }
       for (auto dx = -1; dx <= 1; dx++) {
         for (auto dy = -1; dy <= 1; dy++) {
-          m_states[min_y + dy][min_x + dx].set_stage(
-              cs.pat.get(x + dx, y + dy));
+          auto px = ((x + dx) + tilemap::width) % tilemap::width;
+          auto py = ((y + dy) + tilemap::height) % tilemap::height;
+          m_states[min_y + dy][min_x + dx].set_stage(cs.pat.get(px, py));
         }
       }
     });
