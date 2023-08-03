@@ -8,6 +8,7 @@
 #include "../silog/build.hpp"
 #include "../sitime/build.hpp"
 #include "../stubby/build.hpp"
+#include "../traits/build.hpp"
 #include "../yoyo/build.hpp"
 
 using namespace ecow;
@@ -23,6 +24,7 @@ auto base_app(const char *name) {
   a->add_wsdep("silog", silog());
   a->add_wsdep("sitime", sitime());
   a->add_wsdep("stubby", stubby());
+  a->add_wsdep("traits", traits());
   a->add_wsdep("yoyo", yoyo_libc());
   a->add_resource("1_Terrains_and_Fences_16x16.png");
   a->add_resource("11_Camping_16x16.png");

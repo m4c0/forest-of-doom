@@ -5,20 +5,25 @@ import prefabs;
 import qsu;
 import tile;
 import tilemap;
+import traits;
 
 struct ec : tile::terrain::compos {};
 
 class eigen {
-  hai::varray<tile::terrain::c> m_ones{64};
+  static_assert(static_cast<unsigned>(tile::terrain::last) < 64);
+  unsigned m_entropy = static_cast<unsigned>(tile::terrain::last);
+  traits::ints::uint64_t m_ones = (1 << m_entropy) - 1;
 
 public:
-  void set_one(tile::terrain::c c) {
-    for (auto n : m_ones) {
-      if (n == c)
-        return;
-    }
-    m_ones.push_back(c);
+  constexpr void set_one(tile::terrain::c c) noexcept {
+    m_ones |= 1 << (static_cast<unsigned>(c));
+    m_entropy++;
   }
+  constexpr void set_zero(tile::terrain::c c) noexcept {
+    m_ones ^= 1 << (static_cast<unsigned>(c));
+    m_entropy--;
+  }
+  [[nodiscard]] constexpr auto entropy() const noexcept { return m_entropy; }
 };
 
 static const tilemap::map pat = [] {
@@ -30,13 +35,6 @@ static const tilemap::map pat = [] {
     pat.set(x, y, t);
   }
   return pat;
-}();
-static const eigen initial_eigen = [] {
-  eigen res{};
-  pat.for_each([&](auto x, auto y, auto t) {
-    res.set_one(static_cast<tile::terrain::c>(t));
-  });
-  return res;
 }();
 
 class app {
