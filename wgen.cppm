@@ -125,10 +125,10 @@ public:
   void apply_stage() { merge(m_stage); }
 };
 
+static constexpr const auto width = 32;
+static constexpr const auto height = 32;
 class map {
   static constexpr const auto margin = 2U;
-  static constexpr const auto width = tilemap::width;
-  static constexpr const auto height = tilemap::height;
 
   ieigen m_states[height][width]{};
 
@@ -171,9 +171,9 @@ public:
     cs.pat.for_each([&](int x, int y, unsigned t) {
       if (n != t)
         return;
-      if (x == 0 || x == width - 1)
+      if (x == 0 || x == tilemap::width - 1)
         return;
-      if (y == 0 || y == height - 1)
+      if (y == 0 || y == tilemap::height - 1)
         return;
 
       for (auto dx = -1; dx <= 1; dx++) {
@@ -197,8 +197,8 @@ public:
   }
 
   void print(tile::terrain::compos *ec) const {
-    for (auto y = margin; y < height - margin * 2; y++) {
-      for (auto x = margin; x < width - margin * 2; x++) {
+    for (auto y = 0; y < height; y++) {
+      for (auto x = 0; x < width; x++) {
         auto t = static_cast<tile::terrain::c>(m_states[y][x].value());
         if (t > tile::terrain::blank)
           tile::terrain::add_tile(ec, t, x, y);
