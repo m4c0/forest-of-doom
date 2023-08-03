@@ -139,6 +139,9 @@ public:
     unsigned min_e = max_entropy;
     for (auto y = margin; y < height - margin * 2; y++) {
       for (auto x = margin; x < width - margin * 2; x++) {
+        if (m_states[y][x].value())
+          continue;
+
         auto e = m_states[y][x].entropy();
         if (min_e < e)
           continue;
