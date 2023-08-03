@@ -5,6 +5,7 @@ import prefabs;
 import rng;
 import qsu;
 import silog;
+import sitime;
 import tile;
 import tilemap;
 import traits;
@@ -130,9 +131,12 @@ class app {
     m_q.set_grid(16, 16);
     m_q.center_at(8, 8);
 
+    sitime::stopwatch sw{};
+    rng::seed(69);
     map m{};
     m.observe_minimal_entropy();
     m.print(&m_ec);
+    silog::log(silog::info, "took %dms", sw.millis());
 
     m_q.fill(&m_ec);
   }
