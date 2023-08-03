@@ -23,20 +23,24 @@ public:
     m_data[y][x] = t;
   }
 
-  void add_entities(tile::compos *ec, sprite::layers l, float dx,
-                    float dy) const noexcept {
+  void for_each(auto &&fn) const {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
-        auto px = x + dx;
-        auto py = y + dy;
-
-        auto t = m_data[y][x];
-        if (!t)
-          continue;
-
-        add_tile(ec, t, l, px, py);
+        fn(x, y, get(x, y));
       }
     }
+  }
+
+  void add_entities(tile::compos *ec, sprite::layers l, float dx,
+                    float dy) const noexcept {
+    for_each([&](auto x, auto y, auto t) {
+      if (!t)
+        return;
+
+      auto px = x + dx;
+      auto py = y + dy;
+      add_tile(ec, t, l, px, py);
+    });
   }
 };
 } // namespace tilemap
