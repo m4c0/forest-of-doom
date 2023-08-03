@@ -80,7 +80,7 @@ public:
       if (!m_bits[bit])
         continue;
 
-      if (--r > 0)
+      if (r-- > 0)
         continue;
 
       m_bits = {};
