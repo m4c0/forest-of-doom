@@ -16,45 +16,74 @@ struct ec : tile::terrain::compos {};
 
 static const auto max_entropy = static_cast<unsigned>(tile::terrain::last);
 
-class eigen {
-  unsigned m_entropy{};
+class bitmask {
   traits::ints::uint64_t m_ones{};
-  unsigned m_value{};
+  unsigned m_bit_count{};
 
 public:
-  constexpr void set_one(unsigned c) noexcept {
+  constexpr void set(unsigned c) noexcept {
     auto mask = 1U << c;
     if (m_ones & mask)
       return;
-    m_entropy++;
+    m_bit_count++;
     m_ones |= mask;
   }
-  constexpr void set_zero(unsigned c) noexcept {
+  constexpr void reset(unsigned c) noexcept {
     auto mask = 1U << c;
     if (m_ones & mask) {
       m_ones ^= 1 << c;
-      m_entropy--;
+      m_bit_count--;
     }
   }
 
-  [[nodiscard]] constexpr auto entropy() const noexcept { return m_entropy; }
+  constexpr void merge(bitmask b) noexcept {
+    auto i = (m_ones &= b.m_ones);
+    m_bit_count = 0;
+    while (i > 0) {
+      if (i & 1)
+        m_bit_count++;
+    }
+  }
+
+  [[nodiscard]] constexpr bool operator[](unsigned bit) const noexcept {
+    return (m_ones & (1 << bit)) != 0;
+  }
+
+  [[nodiscard]] constexpr auto bits() const noexcept { return m_ones; }
+  [[nodiscard]] constexpr auto bit_count() const noexcept {
+    return m_bit_count;
+  }
+};
+
+class eigen {
+  bitmask m_bits{};
+  unsigned m_value{};
+
+public:
+  constexpr void set_one(unsigned c) noexcept { m_bits.set(c); }
+
+  [[nodiscard]] constexpr auto bits() const noexcept { return m_bits; }
+  [[nodiscard]] constexpr auto entropy() const noexcept {
+    return m_bits.bit_count();
+  }
   [[nodiscard]] constexpr auto value() const noexcept { return m_value; }
 
   auto observe() {
-    auto r = rng::rand(m_entropy);
+    auto r = rng::rand(entropy());
     for (auto bit = 0U; bit < max_entropy; bit++) {
-      if ((m_ones & (1 << bit)) == 0)
+      if (!m_bits[bit])
         continue;
 
       if (--r > 0)
         continue;
 
-      m_ones = 1 << bit;
+      m_bits = {};
+      m_bits.set(bit);
       m_value = bit;
       return bit;
     }
     // Should never happen
-    m_ones = 0;
+    m_bits = {};
     m_value = 0;
     return 0U;
   }
@@ -78,8 +107,14 @@ static const consts cs = [] {
   return consts{pat, e};
 }();
 class ieigen : public eigen {
+  bitmask m_stage{};
+
 public:
   ieigen() : eigen{cs.e} {}
+
+  void reset_stage() { m_stage = {}; }
+  void set_stage(unsigned i) { m_stage.set(i); }
+  void apply_stage() { bits().merge(m_stage); }
 };
 
 class map {
@@ -94,6 +129,11 @@ public:
     unsigned min_x{};
     unsigned min_y{};
     unsigned min_e = max_entropy;
+    for (auto y = 0; y < height; y++) {
+      for (auto x = 0; x < width; x++) {
+        m_states[y][x].reset_stage();
+      }
+    }
     for (auto y = margin; y < height - margin * 2; y++) {
       for (auto x = margin; x < width - margin * 2; x++) {
         auto e = m_states[y][x].entropy();
@@ -109,7 +149,21 @@ public:
         min_y = y;
       }
     }
-    m_states[min_y][min_x].observe();
+    auto n = m_states[min_y][min_x].observe();
+    cs.pat.for_each([&](int x, int y, unsigned t) {
+      if (n != t)
+        return;
+
+      m_states[y][x + 1].set_stage(cs.pat.get(x + 1, y));
+      m_states[y][x - 1].set_stage(cs.pat.get(x + 1, y));
+      m_states[y + 1][x].set_stage(cs.pat.get(x, y + 1));
+      m_states[y - 1][x].set_stage(cs.pat.get(x, y - 1));
+    });
+    for (auto y = 0; y < height; y++) {
+      for (auto x = 0; x < width; x++) {
+        m_states[y][x].apply_stage();
+      }
+    }
   }
 
   void print(tile::terrain::compos *ec) const {
