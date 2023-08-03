@@ -9,9 +9,12 @@ import traits;
 
 struct ec : tile::terrain::compos {};
 
+static constexpr const auto max_entropy =
+    static_cast<unsigned>(tile::terrain::last);
+static_assert(max_entropy < 64);
+
 class eigen {
-  static_assert(static_cast<unsigned>(tile::terrain::last) < 64);
-  unsigned m_entropy = static_cast<unsigned>(tile::terrain::last);
+  unsigned m_entropy = max_entropy;
   traits::ints::uint64_t m_ones = (1 << m_entropy) - 1;
 
 public:
@@ -24,6 +27,31 @@ public:
     m_entropy--;
   }
   [[nodiscard]] constexpr auto entropy() const noexcept { return m_entropy; }
+};
+class map {
+  static constexpr const auto margin = 2U;
+  static constexpr const auto width = tilemap::width;
+  static constexpr const auto height = tilemap::height;
+
+  eigen m_states[height][width]{};
+
+public:
+  void observe_minimal_entropy() {
+    unsigned min_x{};
+    unsigned min_y{};
+    unsigned min_e = max_entropy;
+    for (auto y = margin; y < height - margin * 2; y++) {
+      for (auto x = margin; x < width - margin * 2; x++) {
+        auto e = m_states[y][x].entropy();
+        if (min_e < e)
+          continue;
+        // TODO: randomize if min_e == e;
+        min_e = e;
+        min_x = x;
+        min_y = y;
+      }
+    }
+  }
 };
 
 static const tilemap::map pat = [] {
