@@ -17,6 +17,7 @@ struct ec : tile::terrain::compos {};
 
 static const auto max_entropy = static_cast<unsigned>(tile::terrain::last);
 
+class eigen_decayed {};
 class eigen {
   bitmask m_bits{};
   unsigned m_value{};
@@ -50,9 +51,7 @@ public:
       return bit;
     }
     // Should never happen
-    m_bits = {};
-    m_value = 0;
-    return 0U;
+    throw eigen_decayed{};
   }
 };
 
