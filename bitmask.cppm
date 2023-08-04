@@ -68,6 +68,27 @@ static_assert([] {
 }());
 static_assert([] {
   bitmask a{};
+  a.set(1);
+  a.set(1);
+
+  (a.bit_count() == 1) || fail();
+  a[1] || fail();
+
+  return true;
+}());
+static_assert([] {
+  bitmask a{};
+  a.set(1);
+  a.reset(1);
+  a.reset(1);
+
+  (a.bit_count() == 0) || fail();
+  !a[0] || fail();
+
+  return true;
+}());
+static_assert([] {
+  bitmask a{};
   a.set(2);
   a.set(6);
   a.set(8);
