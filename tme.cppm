@@ -95,7 +95,7 @@ class game {
         continue;
 
       auto [rx, ry, rw, rh] = area::get(&m_ec, id);
-      if (rx != x || ry != y)
+      if (static_cast<int>(rx) != x || static_cast<int>(ry) != y)
         continue;
 
       return id;
@@ -133,7 +133,7 @@ class game {
   }
 
   void flood_fill_at(int x, int y, tile::c_t old) {
-    if (x < 0 || x > 16 || y < 0 || y > 16)
+    if (x < 0 || x >= tilemap::width || y < 0 || y >= tilemap::height)
       return;
 
     if (!replace_tile(x, y, old, m_brush))
@@ -188,7 +188,7 @@ public:
   }
   void mouse_down() {
     auto [x, y] = m_q->mouse_pos();
-    if (x < 0 || x > 16 || y < 0 || y > 16)
+    if (x < 0 || x >= tilemap::width || y < 0 || y >= tilemap::height)
       return;
 
     paint(x, y, m_brush);
