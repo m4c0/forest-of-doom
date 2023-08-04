@@ -182,8 +182,8 @@ public:
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto &st = m_states[y][x];
-        if (st.entropy() > 0 && st.entropy() < 4)
-          silog::log(silog::debug, "%dx%d e=%d b=0x%08ld", x, y, st.entropy(),
+        if (st.entropy() < 4)
+          silog::log(silog::debug, "%dx%d e=%d b=0x%08lx", x, y, st.entropy(),
                      st.bits().bits());
 
         auto t = static_cast<tile::terrain::c>(st.value());
@@ -227,7 +227,7 @@ class app {
 
     m_map = hai::uptr<map>::make();
 
-    for (auto i = 0; i < 73; i++) {
+    for (auto i = 0; i < width * height; i++) {
       if (!m_map->observe_minimal_entropy()) {
         silog::log(silog::info, "reality decayed after %d cycles", i);
         break;
