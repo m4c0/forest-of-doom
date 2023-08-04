@@ -209,19 +209,22 @@ public:
 class app {
   qsu::main m_q{};
   ec m_ec{};
+  hai::uptr<map> m_map;
 
   void setup() {
     m_q.set_grid(32, 32);
     m_q.center_at(16, 16);
 
-    sitime::stopwatch sw{};
     rng::seed(69);
-    auto m = hai::uptr<map>::make();
-    for (auto i = 0; i < 32 * 32; i++)
-      m->observe_minimal_entropy();
-    m->print(&m_ec);
-    silog::log(silog::info, "took %dms", sw.millis());
 
+    m_map = hai::uptr<map>::make();
+    step();
+  }
+
+  void step() {
+    m_ec = {};
+    m_map->observe_minimal_entropy();
+    m_map->print(&m_ec);
     m_q.fill(&m_ec);
   }
 
@@ -232,6 +235,9 @@ public:
     switch (e.type()) {
     case casein::CREATE_WINDOW:
       setup();
+      break;
+    case casein::KEY_DOWN:
+      step();
       break;
     default:
       break;
