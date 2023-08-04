@@ -133,7 +133,7 @@ class map {
   ieigen m_states[height][width]{};
 
 public:
-  void observe_minimal_entropy() {
+  [[nodiscard]] bool observe_minimal_entropy() {
     unsigned min_x{};
     unsigned min_y{};
     unsigned min_e = max_entropy;
@@ -158,7 +158,7 @@ public:
       }
     }
     if (min_e == max_entropy) {
-      return;
+      return false;
     }
     auto n = m_states[min_y][min_x].observe();
 
@@ -190,15 +190,29 @@ public:
     });
     for (auto dx = -1; dx <= 1; dx++) {
       for (auto dy = -1; dy <= 1; dy++) {
-        m_states[min_y + dy][min_x + dx].apply_stage();
+        auto &s = m_states[min_y + dy][min_x + dx];
+        if (s.entropy() == 0)
+          return false;
       }
     }
+    for (auto dx = -1; dx <= 1; dx++) {
+      for (auto dy = -1; dy <= 1; dy++) {
+        auto &s = m_states[min_y + dy][min_x + dx];
+        s.apply_stage();
+      }
+    }
+    return true;
   }
 
   void print(tile::terrain::compos *ec) const {
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
-        auto t = static_cast<tile::terrain::c>(m_states[y][x].value());
+        auto &st = m_states[y][x];
+        if (st.entropy() > 0 && st.entropy() < 4)
+          silog::log(silog::debug, "%dx%d e=%d b=0x%08ld", x, y, st.entropy(),
+                     st.bits().bits());
+
+        auto t = static_cast<tile::terrain::c>(st.value());
 
         if (t != tile::terrain::blank)
           tile::terrain::add_tile(ec, t, x, y);
@@ -229,6 +243,7 @@ class app {
   qsu::main m_q{};
   ec m_ec{};
   hai::uptr<map> m_map;
+  bool m_frozen = false;
 
   void setup() {
     m_q.set_grid(32, 32);
@@ -237,12 +252,25 @@ class app {
     rng::seed(69);
 
     m_map = hai::uptr<map>::make();
-    step();
+
+    for (auto i = 0; i < 73; i++) {
+      if (!m_map->observe_minimal_entropy()) {
+        silog::log(silog::info, "reality decayed after %d cycles", i);
+        break;
+      }
+    }
+
+    m_map->print(&m_ec);
+    m_q.fill(&m_ec);
   }
 
   void step() {
+    if (m_frozen)
+      return;
+
+    m_frozen = !m_map->observe_minimal_entropy();
+
     m_ec = {};
-    m_map->observe_minimal_entropy();
     m_map->print(&m_ec);
     m_q.fill(&m_ec);
   }
