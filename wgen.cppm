@@ -199,8 +199,27 @@ public:
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
         auto t = static_cast<tile::terrain::c>(m_states[y][x].value());
-        if (t > tile::terrain::blank)
+
+        if (t != tile::terrain::blank)
           tile::terrain::add_tile(ec, t, x, y);
+
+        sprite::c s{
+            .layer = sprite::layers::debug,
+            .colour = {0, 0, 0, 0.5},
+            .dim = 1,
+        };
+        rect r{static_cast<float>(x), static_cast<float>(y), 1, 1};
+
+        auto e = m_states[y][x].entropy();
+        if (e < 4) {
+          s.colour.r = e / 4.f;
+        } else if (e < 16) {
+          s.colour.g = e / 16.f;
+        } else {
+          s.colour.b = e / 64.f;
+        }
+
+        sprite::add(ec, s, r);
       }
     }
   }
