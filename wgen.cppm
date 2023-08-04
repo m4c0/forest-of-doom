@@ -55,6 +55,59 @@ public:
     return m_bit_count;
   }
 };
+static_assert([] {
+  auto fail = []() -> bool { throw 0; };
+
+  bitmask a{};
+  a.set(1);
+  a.set(2);
+  a.reset(1);
+
+  (a.bit_count() == 1) || fail();
+  !a[1] || fail();
+  a[2] || fail();
+
+  return true;
+}());
+static_assert([] {
+  auto fail = []() -> bool { throw 0; };
+
+  bitmask a{};
+  a.set(2);
+  a.set(8);
+
+  (!a[1] || fail());
+  (a[2] || fail());
+  (a[8] || fail());
+  (a.bits() == 0b100000100) || fail();
+  (a.bit_count() == 2 || fail());
+
+  return true;
+}());
+static_assert([] {
+  auto fail = []() -> bool { throw 0; };
+
+  bitmask a{};
+  a.set(2);
+  a.set(6);
+  a.set(8);
+
+  bitmask b{};
+  b.set(6);
+  b.set(7);
+  b.set(8);
+
+  a.merge(b);
+
+  (a.bit_count() == 2 || fail());
+
+  (!a[2] || fail());
+  (a[6] || fail());
+  (!a[7] || fail());
+  (a[8] || fail());
+  (a.bits() == 0b101000000) || fail();
+  return true;
+}());
 
 class eigen {
   bitmask m_bits{};
