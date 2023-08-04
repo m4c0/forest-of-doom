@@ -36,8 +36,7 @@ public:
   }
   [[nodiscard]] constexpr auto value() const noexcept { return m_value; }
 
-  auto observe() {
-    auto r = rng::rand(entropy());
+  constexpr auto observe(unsigned r) {
     for (auto bit = 0U; bit < max_entropy; bit++) {
       if (!m_bits[bit])
         continue;
@@ -54,6 +53,20 @@ public:
     throw eigen_decayed{};
   }
 };
+static constexpr auto fail = []() -> bool { throw 0; };
+static_assert([] {
+  eigen e{};
+  e.set_one(12);
+  e.set_one(3);
+  e.set_one(10);
+  e.set_one(9);
+
+  e.observe(2) == 10 || fail();
+  e.value() == 10 || fail();
+  e.entropy() == 1 || fail();
+  e.bits().bits() == 1 << 10 || fail();
+  return true;
+}());
 
 struct consts {
   tilemap::map pat;
@@ -108,7 +121,6 @@ public:
         if (min_e < e)
           continue;
 
-        // TODO: randomize all with same min_e
         if (min_e == e && rng::randf() > 0.5)
           continue;
 
@@ -120,7 +132,9 @@ public:
     if (min_e == max_entropy) {
       return false;
     }
-    auto n = m_states[min_y][min_x].observe();
+    auto &min_s = m_states[min_y][min_x];
+    auto r = rng::rand(min_s.entropy());
+    auto n = min_s.observe(r);
 
     for (auto dx = -1; dx <= 1; dx++) {
       for (auto dy = -1; dy <= 1; dy++) {
