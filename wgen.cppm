@@ -249,6 +249,11 @@ class app {
     m_q.fill(&m_ec);
   }
 
+  void move_map(int dx, int dy) {
+    auto [cx, cy] = m_q.center();
+    m_q.center_at(cx + dx, cy + dy);
+  }
+
 public:
   void process_event(const casein::event &e) {
     m_q.process_event(e);
@@ -259,6 +264,18 @@ public:
       break;
     case casein::KEY_DOWN: {
       switch (*e.as<casein::events::key_down>()) {
+      case casein::K_LEFT:
+        move_map(-1, 0);
+        break;
+      case casein::K_RIGHT:
+        move_map(1, 0);
+        break;
+      case casein::K_UP:
+        move_map(0, 1);
+        break;
+      case casein::K_DOWN:
+        move_map(0, -1);
+        break;
       default:
         step();
         break;
