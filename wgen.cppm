@@ -257,9 +257,14 @@ public:
     case casein::CREATE_WINDOW:
       setup();
       break;
-    case casein::KEY_DOWN:
-      step();
+    case casein::KEY_DOWN: {
+      switch (*e.as<casein::events::key_down>()) {
+      default:
+        step();
+        break;
+      }
       break;
+    }
     default:
       break;
     }
