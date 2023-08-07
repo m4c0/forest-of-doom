@@ -1,10 +1,10 @@
-export module prefabs:wgen;
+export module prefabs:wgen_0;
 import tile;
 
 using namespace tile::terrain;
 
 namespace prefabs {
-export void wgen(compos *ec, float x, float y) {
+export void wgen_0(compos *ec, float x, float y) {
   tile::terrain::add_tile(ec, static_cast<c>(0x00000009), x + 4, y + 5);
   tile::terrain::add_tile(ec, static_cast<c>(0x00000009), x + 5, y + 5);
   tile::terrain::add_tile(ec, static_cast<c>(0x00000009), x + 6, y + 5);
