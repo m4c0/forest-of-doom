@@ -74,4 +74,17 @@ export const consts create_consts(auto &&fn) {
   }
   return consts{pat, e};
 }
+
+export class staged_state : public state {
+  bitmask m_stage{};
+
+public:
+  using state::stage;
+
+  auto stage() { return m_stage; }
+
+  void reset_stage() { m_stage = {}; }
+  void set_stage(unsigned i) { m_stage.set(i); }
+  void apply_stage() { merge(m_stage); }
+};
 } // namespace eigen
