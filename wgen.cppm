@@ -74,7 +74,7 @@ struct consts {
 };
 static const consts cs = [] {
   tile::terrain::compos tmp{};
-  prefabs::wgen(&tmp, 0, 0);
+  prefabs::wgen_0(&tmp, 0, 0);
 
   tilemap::map pat{};
   eigen e{};

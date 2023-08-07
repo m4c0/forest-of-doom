@@ -71,9 +71,9 @@ static auto pals() {
 }
 } // namespace terrain_set
 
-static constexpr const auto prefab = &prefabs::wgen;
-static constexpr const auto fname = "prefabs-wgen.cppm";
-static constexpr const auto mname = "wgen";
+static constexpr const auto prefab = &prefabs::wgen_1;
+static constexpr const auto fname = "prefabs-wgen_1.cppm";
+static constexpr const auto mname = "wgen_1";
 
 using namespace terrain_set;
 
