@@ -1,6 +1,7 @@
 export module wgen;
 import bitmask;
 import casein;
+import eigen;
 import hai;
 import prefabs;
 import rng;
@@ -17,8 +18,8 @@ struct ec : tile::terrain::compos {};
 
 static const auto max_entropy = static_cast<unsigned>(tile::terrain::last);
 
-class eigen_decayed {};
-class eigen {
+using namespace eigen;
+class state {
   bitmask m_bits{};
   unsigned m_value{};
 
@@ -50,12 +51,12 @@ public:
       return bit;
     }
     // Should never happen
-    throw eigen_decayed{};
+    throw world_decayed{};
   }
 };
 static constexpr auto fail = []() -> bool { throw 0; };
 static_assert([] {
-  eigen e{};
+  state e{};
   e.set_one(12);
   e.set_one(3);
   e.set_one(10);
@@ -70,14 +71,14 @@ static_assert([] {
 
 struct consts {
   tilemap::map pat;
-  eigen e;
+  state e;
 };
 static const consts cs = [] {
   tile::terrain::compos tmp{};
   prefabs::wgen_0(&tmp, 0, 0);
 
   tilemap::map pat{};
-  eigen e{};
+  state e{};
   for (auto &[id, t] : tmp.tiles) {
     auto [x, y, w, h] = area::get(&tmp, id);
     pat.set(x, y, t);
@@ -85,11 +86,11 @@ static const consts cs = [] {
   }
   return consts{pat, e};
 }();
-class ieigen : public eigen {
+class ieigen : public state {
   bitmask m_stage{};
 
 public:
-  ieigen() : eigen{cs.e} {}
+  ieigen() : state{cs.e} {}
 
   auto stage() { return m_stage; }
 
