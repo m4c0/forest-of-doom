@@ -1,10 +1,12 @@
 export module eigen;
 import bitmask;
+import tile;
+import tilemap;
 
 namespace eigen {
 export class world_decayed {};
 
-export const auto max_entropy = ~0UL;
+export const auto max_entropy = 64; // number of bits in uint64
 export class state {
   bitmask m_bits{};
   unsigned m_value{};
@@ -54,4 +56,22 @@ static_assert([] {
   e.bits().bits() == 1 << 10 || fail();
   return true;
 }());
+
+export struct consts {
+  tilemap::map pat;
+  state e;
+};
+export const consts create_consts(auto &&fn) {
+  tile::terrain::compos tmp{};
+  fn(&tmp, 0, 0);
+
+  tilemap::map pat{};
+  state e{};
+  for (auto &[id, t] : tmp.tiles) {
+    auto [x, y, w, h] = area::get(&tmp, id);
+    pat.set(x, y, t);
+    e.set_one(t);
+  }
+  return consts{pat, e};
+}
 } // namespace eigen

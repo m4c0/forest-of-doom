@@ -18,23 +18,8 @@ struct ec : tile::terrain::compos {};
 
 using namespace eigen;
 
-struct consts {
-  tilemap::map pat;
-  state e;
-};
-static const consts cs = [] {
-  tile::terrain::compos tmp{};
-  prefabs::wgen_0(&tmp, 0, 0);
+static const consts cs = eigen::create_consts(prefabs::wgen_0);
 
-  tilemap::map pat{};
-  state e{};
-  for (auto &[id, t] : tmp.tiles) {
-    auto [x, y, w, h] = area::get(&tmp, id);
-    pat.set(x, y, t);
-    e.set_one(t);
-  }
-  return consts{pat, e};
-}();
 class ieigen : public state {
   bitmask m_stage{};
 
