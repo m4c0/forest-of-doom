@@ -1,5 +1,7 @@
 export module eigen;
+import area;
 import bitmask;
+import pog;
 import tile;
 import tilemap;
 
@@ -86,5 +88,10 @@ public:
   void reset_stage() { m_stage = {}; }
   void set_stage(unsigned i) { m_stage.set(i); }
   void apply_stage() { merge(m_stage); }
+};
+
+export struct compos : virtual area::compos {
+  pog::sparse_set<state> eigen_states{};
+  pog::sparse_set<bitmask> eigen_stages{};
 };
 } // namespace eigen
