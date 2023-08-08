@@ -81,7 +81,7 @@ export class staged_state : public state {
   bitmask m_stage{};
 
 public:
-  using state::stage;
+  using state::state;
 
   auto stage() { return m_stage; }
 
