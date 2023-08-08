@@ -18,8 +18,8 @@ struct ec : tile::terrain::compos {};
 
 using namespace eigen;
 
+static const consts cs = eigen::create_consts(prefabs::wgen_0);
 class ieigen : public staged_state {
-  static const consts cs = eigen::create_consts(prefabs::wgen_0);
 
 public:
   ieigen() : staged_state{cs.e} {}
