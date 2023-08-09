@@ -44,20 +44,6 @@ public:
     throw world_decayed{};
   }
 };
-static constexpr auto fail = []() -> bool { throw 0; };
-static_assert([] {
-  state e{};
-  e.set_one(12);
-  e.set_one(3);
-  e.set_one(10);
-  e.set_one(9);
-
-  e.observe(2) == 10 || fail();
-  e.value() == 10 || fail();
-  e.entropy() == 1 || fail();
-  e.bits().bits() == 1 << 10 || fail();
-  return true;
-}());
 
 export struct consts {
   tilemap::map pat;
@@ -95,3 +81,19 @@ export struct compos : virtual area::compos {
   pog::sparse_set<bitmask> eigen_stages{};
 };
 } // namespace eigen
+
+module :private;
+static constexpr auto fail = []() -> bool { throw 0; };
+static_assert([] {
+  eigen::state e{};
+  e.set_one(12);
+  e.set_one(3);
+  e.set_one(10);
+  e.set_one(9);
+
+  e.observe(2) == 10 || fail();
+  e.value() == 10 || fail();
+  e.entropy() == 1 || fail();
+  e.bits().bits() == 1 << 10 || fail();
+  return true;
+}());
