@@ -19,10 +19,10 @@ struct ec : tile::terrain::compos {};
 using namespace eigen;
 
 static const consts cs = eigen::create_consts(prefabs::wgen_0);
-class ieigen : public staged_state {
+class ieigen : public eigen::state {
 
 public:
-  ieigen() : staged_state{cs.mask} {}
+  ieigen() : state{cs.mask} {}
 };
 
 static constexpr const auto width = 32;

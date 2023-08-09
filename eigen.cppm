@@ -11,6 +11,7 @@ export class world_decayed {};
 export const auto max_entropy = 64; // number of bits in uint64
 export class state {
   bitmask m_bits{};
+  bitmask m_stage{};
   unsigned m_value{};
 
 public:
@@ -19,6 +20,10 @@ public:
 
   constexpr void set_one(unsigned c) noexcept { m_bits.set(c); }
   constexpr void merge(bitmask b) noexcept { m_bits.merge(b); }
+
+  constexpr void reset_stage() { m_stage = {}; }
+  constexpr void set_stage(unsigned i) { m_stage.set(i); }
+  constexpr void apply_stage() { merge(m_stage); }
 
   [[nodiscard]] constexpr bool operator[](unsigned bit) const noexcept {
     return m_bits[bit];
@@ -65,19 +70,6 @@ export const consts create_consts(auto &&fn) {
   }
   return consts{pat, e};
 }
-
-export class staged_state : public state {
-  bitmask m_stage{};
-
-public:
-  using state::state;
-
-  auto stage() { return m_stage; }
-
-  void reset_stage() { m_stage = {}; }
-  void set_stage(unsigned i) { m_stage.set(i); }
-  void apply_stage() { merge(m_stage); }
-};
 
 export struct compos : virtual area::compos {
   pog::sparse_set<state> eigen_states{};
