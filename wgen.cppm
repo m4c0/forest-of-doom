@@ -22,7 +22,7 @@ static const consts cs = eigen::create_consts(prefabs::wgen_0);
 class ieigen : public staged_state {
 
 public:
-  ieigen() : staged_state{cs.e} {}
+  ieigen() : staged_state{cs.mask} {}
 };
 
 static constexpr const auto width = 32;

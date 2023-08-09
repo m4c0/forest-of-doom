@@ -14,6 +14,9 @@ export class state {
   unsigned m_value{};
 
 public:
+  constexpr state() = default;
+  explicit constexpr state(bitmask b) : m_bits{b} {}
+
   constexpr void set_one(unsigned c) noexcept { m_bits.set(c); }
   constexpr void merge(bitmask b) noexcept { m_bits.merge(b); }
 
@@ -47,18 +50,18 @@ public:
 
 export struct consts {
   tilemap::map pat;
-  state e;
+  bitmask mask;
 };
 export const consts create_consts(auto &&fn) {
   tile::terrain::compos tmp{};
   fn(&tmp, 0, 0);
 
   tilemap::map pat{};
-  state e{};
+  bitmask e{};
   for (auto &[id, t] : tmp.tiles) {
     auto [x, y, w, h] = area::get(&tmp, id);
     pat.set(x, y, t);
-    e.set_one(t);
+    e.set(t);
   }
   return consts{pat, e};
 }
