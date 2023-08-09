@@ -18,18 +18,15 @@ public:
   constexpr state() = default;
   explicit constexpr state(bitmask b) : m_bits{b} {}
 
-  constexpr void set_one(unsigned c) noexcept { m_bits.set(c); }
-  constexpr void merge(bitmask b) noexcept { m_bits.merge(b); }
-
   constexpr void reset_stage() { m_stage = {}; }
   constexpr void set_stage(unsigned i) { m_stage.set(i); }
-  constexpr void apply_stage() { merge(m_stage); }
+  constexpr void apply_stage() { m_bits.merge(m_stage); }
 
   [[nodiscard]] constexpr bool operator[](unsigned bit) const noexcept {
     return m_bits[bit];
   }
 
-  [[nodiscard]] constexpr auto bits() const noexcept { return m_bits; }
+  [[nodiscard]] constexpr auto bits() const noexcept { return m_bits.bits(); }
   [[nodiscard]] constexpr auto entropy() const noexcept {
     return m_bits.bit_count();
   }
@@ -80,15 +77,16 @@ export struct compos : virtual area::compos {
 module :private;
 static constexpr auto fail = []() -> bool { throw 0; };
 static_assert([] {
-  eigen::state e{};
-  e.set_one(12);
-  e.set_one(3);
-  e.set_one(10);
-  e.set_one(9);
+  bitmask b{};
+  b.set(12);
+  b.set(3);
+  b.set(10);
+  b.set(9);
 
+  eigen::state e{b};
   e.observe(2) == 10 || fail();
   e.value() == 10 || fail();
   e.entropy() == 1 || fail();
-  e.bits().bits() == 1 << 10 || fail();
+  e.bits() == 1 << 10 || fail();
   return true;
 }());

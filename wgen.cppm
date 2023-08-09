@@ -111,7 +111,7 @@ public:
         auto &st = m_states[y][x];
         if (st.entropy() < 4)
           silog::log(silog::debug, "%dx%d e=%d b=0x%08lx", x, y, st.entropy(),
-                     st.bits().bits());
+                     st.bits());
 
         auto t = static_cast<tile::terrain::c>(st.value());
 
