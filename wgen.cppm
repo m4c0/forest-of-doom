@@ -20,7 +20,6 @@ using namespace eigen;
 
 static const consts cs = eigen::create_consts(prefabs::wgen_0);
 class ieigen : public eigen::state {
-
 public:
   ieigen() : state{cs.mask} {}
 };
@@ -32,11 +31,13 @@ class map {
 
   ieigen m_states[height][width]{};
 
-public:
-  [[nodiscard]] bool observe_minimal_entropy() {
-    unsigned min_x{};
-    unsigned min_y{};
-    unsigned min_e = max_entropy;
+  [[nodiscard]] auto find_lowest_entropy() {
+    struct {
+      unsigned min_x{};
+      unsigned min_y{};
+      unsigned min_e = max_entropy;
+    } me;
+
     for (auto y = margin; y < height - margin * 2; y++) {
       for (auto x = margin; x < width - margin * 2; x++) {
         if (m_states[y][x].value())
@@ -45,17 +46,27 @@ public:
         auto e = m_states[y][x].entropy();
         if (e == 0)
           continue;
-        if (min_e < e)
+        if (me.min_e < e)
           continue;
 
-        if (min_e == e && rng::randf() > 0.5)
+        if (me.min_e == e && rng::randf() > 0.5)
           continue;
 
-        min_e = e;
-        min_x = x;
-        min_y = y;
+        me.min_e = e;
+        me.min_x = x;
+        me.min_y = y;
       }
     }
+    return me;
+  }
+
+public:
+  [[nodiscard]] bool observe_minimal_entropy() {
+    auto m = find_lowest_entropy();
+    auto min_e = m.min_e;
+    auto min_x = m.min_x;
+    auto min_y = m.min_y;
+
     if (min_e == max_entropy) {
       return false;
     }
@@ -110,7 +121,7 @@ public:
       for (auto x = 0; x < width; x++) {
         auto &st = m_states[y][x];
         if (st.entropy() < 4)
-          silog::log(silog::debug, "%dx%d e=%d b=0x%08lx", x, y, st.entropy(),
+          silog::log(silog::debug, "%dx%d e=%d b=0x%08llx", x, y, st.entropy(),
                      st.bits());
 
         auto t = static_cast<tile::terrain::c>(st.value());
