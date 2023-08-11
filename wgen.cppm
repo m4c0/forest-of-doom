@@ -70,9 +70,8 @@ public:
     if (min_e == max_entropy)
       throw eigen::world_decayed{};
 
-    auto &min_s = m_states[min_y][min_x];
-    auto r = rng::rand(min_s.entropy());
-    auto n = min_s.observe(r);
+    auto r = rng::rand(min_e);
+    auto n = m_states[min_y][min_x].observe(r);
 
     cs.pat.for_each([&](int x, int y, unsigned t) {
       if (n != t)
