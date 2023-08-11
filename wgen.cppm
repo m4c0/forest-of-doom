@@ -27,7 +27,8 @@ public:
 static constexpr const auto width = 32;
 static constexpr const auto height = 32;
 class map {
-  static constexpr const auto margin = 2U;
+  static constexpr const auto sim_m = 1;
+  static constexpr const auto margin = sim_m;
 
   ieigen m_states[height][width]{};
 
@@ -60,18 +61,18 @@ class map {
     return me;
   }
 
-  void check_integrity() {
-    for (auto dx = -1; dx <= 1; dx++) {
-      for (auto dy = -1; dy <= 1; dy++) {
+  void check_integrity(unsigned min_x, unsigned min_y) {
+    for (auto dx = -sim_m; dx <= sim_m; dx++) {
+      for (auto dy = -sim_m; dy <= sim_m; dy++) {
         auto &s = m_states[min_y + dy][min_x + dx];
         if (s.entropy() == 0)
           throw world_decayed{};
       }
     }
   }
-  void apply_staging() {
-    for (auto dx = -1; dx <= 1; dx++) {
-      for (auto dy = -1; dy <= 1; dy++) {
+  void apply_staging(unsigned min_x, unsigned min_y) {
+    for (auto dx = -sim_m; dx <= sim_m; dx++) {
+      for (auto dy = -sim_m; dy <= sim_m; dy++) {
         auto &s = m_states[min_y + dy][min_x + dx];
         s.apply_stage();
       }
@@ -95,24 +96,24 @@ public:
       if (n != t)
         return;
 
-      for (auto dx = -1; dx <= 1; dx++) {
-        for (auto dy = -1; dy <= 1; dy++) {
+      for (auto dx = -sim_m; dx <= sim_m; dx++) {
+        for (auto dy = -sim_m; dy <= sim_m; dy++) {
           auto px = ((x + dx) + tilemap::width) % tilemap::width;
           auto py = ((y + dy) + tilemap::height) % tilemap::height;
           if (!m_states[min_y + dy][min_x + dx][cs.pat.get(px, py)])
             return;
         }
       }
-      for (auto dx = -1; dx <= 1; dx++) {
-        for (auto dy = -1; dy <= 1; dy++) {
+      for (auto dx = -sim_m; dx <= sim_m; dx++) {
+        for (auto dy = -sim_m; dy <= sim_m; dy++) {
           auto px = ((x + dx) + tilemap::width) % tilemap::width;
           auto py = ((y + dy) + tilemap::height) % tilemap::height;
           m_states[min_y + dy][min_x + dx].set_stage(cs.pat.get(px, py));
         }
       }
     });
-    check_integrity();
-    apply_staging();
+    check_integrity(min_x, min_y);
+    apply_staging(min_x, min_y);
   }
 
   void print(tile::terrain::compos *ec) const {
