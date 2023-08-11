@@ -74,12 +74,6 @@ public:
     auto r = rng::rand(min_s.entropy());
     auto n = min_s.observe(r);
 
-    for (auto dx = -1; dx <= 1; dx++) {
-      for (auto dy = -1; dy <= 1; dy++) {
-        m_states[min_y + dy][min_x + dx].reset_stage();
-      }
-    }
-
     cs.pat.for_each([&](int x, int y, unsigned t) {
       if (n != t)
         return;

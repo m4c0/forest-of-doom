@@ -18,9 +18,11 @@ public:
   constexpr state() = default;
   explicit constexpr state(bitmask b) : m_bits{b} {}
 
-  constexpr void reset_stage() { m_stage = {}; }
   constexpr void set_stage(unsigned i) { m_stage.set(i); }
-  constexpr void apply_stage() { m_bits.merge(m_stage); }
+  constexpr void apply_stage() {
+    m_bits.merge(m_stage);
+    m_stage = {};
+  }
 
   [[nodiscard]] constexpr bool operator[](unsigned bit) const noexcept {
     return m_bits[bit];
