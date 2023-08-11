@@ -61,15 +61,15 @@ class map {
   }
 
 public:
-  [[nodiscard]] bool observe_minimal_entropy() {
+  void observe_minimal_entropy() {
     auto m = find_lowest_entropy();
     auto min_e = m.min_e;
     auto min_x = m.min_x;
     auto min_y = m.min_y;
 
-    if (min_e == max_entropy) {
-      return false;
-    }
+    if (min_e == max_entropy)
+      throw eigen::world_decayed{};
+
     auto &min_s = m_states[min_y][min_x];
     auto r = rng::rand(min_s.entropy());
     auto n = min_s.observe(r);
@@ -104,7 +104,7 @@ public:
       for (auto dy = -1; dy <= 1; dy++) {
         auto &s = m_states[min_y + dy][min_x + dx];
         if (s.entropy() == 0)
-          return false;
+          throw world_decayed{};
       }
     }
     for (auto dx = -1; dx <= 1; dx++) {
@@ -113,7 +113,6 @@ public:
         s.apply_stage();
       }
     }
-    return true;
   }
 
   void print(tile::terrain::compos *ec) const {
@@ -166,8 +165,11 @@ class app {
     m_map = hai::uptr<map>::make();
 
     for (auto i = 0; i < width * height; i++) {
-      if (!m_map->observe_minimal_entropy()) {
+      try {
+        m_map->observe_minimal_entropy();
+      } catch (eigen::world_decayed) {
         silog::log(silog::info, "reality decayed after %d cycles", i);
+        m_frozen = true;
         break;
       }
     }
@@ -180,7 +182,11 @@ class app {
     if (m_frozen)
       return;
 
-    m_frozen = !m_map->observe_minimal_entropy();
+    try {
+      m_map->observe_minimal_entropy();
+    } catch (eigen::world_decayed) {
+      m_frozen = true;
+    }
 
     m_ec = {};
     m_map->print(&m_ec);
