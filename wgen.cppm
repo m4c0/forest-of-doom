@@ -60,6 +60,24 @@ class map {
     return me;
   }
 
+  void check_integrity() {
+    for (auto dx = -1; dx <= 1; dx++) {
+      for (auto dy = -1; dy <= 1; dy++) {
+        auto &s = m_states[min_y + dy][min_x + dx];
+        if (s.entropy() == 0)
+          throw world_decayed{};
+      }
+    }
+  }
+  void apply_staging() {
+    for (auto dx = -1; dx <= 1; dx++) {
+      for (auto dy = -1; dy <= 1; dy++) {
+        auto &s = m_states[min_y + dy][min_x + dx];
+        s.apply_stage();
+      }
+    }
+  }
+
 public:
   void observe_minimal_entropy() {
     auto m = find_lowest_entropy();
@@ -93,19 +111,8 @@ public:
         }
       }
     });
-    for (auto dx = -1; dx <= 1; dx++) {
-      for (auto dy = -1; dy <= 1; dy++) {
-        auto &s = m_states[min_y + dy][min_x + dx];
-        if (s.entropy() == 0)
-          throw world_decayed{};
-      }
-    }
-    for (auto dx = -1; dx <= 1; dx++) {
-      for (auto dy = -1; dy <= 1; dy++) {
-        auto &s = m_states[min_y + dy][min_x + dx];
-        s.apply_stage();
-      }
-    }
+    check_integrity();
+    apply_staging();
   }
 
   void print(tile::terrain::compos *ec) const {
