@@ -103,6 +103,7 @@ class app {
     rng::seed(69);
 
     m_map.draw_border(2);
+    m_map.fill();
     print();
   }
 
