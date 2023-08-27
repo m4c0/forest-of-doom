@@ -11,8 +11,7 @@ static_assert(static_cast<unsigned>(tile::terrain::last) < 64);
 
 struct ec : tile::terrain::compos {};
 
-static constexpr const auto width = 32;
-static constexpr const auto height = 32;
+static constexpr const auto map_size = 64;
 
 constexpr const auto pats = [] {
   eigen::pat_list p{};
@@ -60,7 +59,7 @@ constexpr const auto pats = [] {
 class app {
   qsu::main m_q{};
   ec m_ec{};
-  eigen::map m_map{&pats, width, height};
+  eigen::map m_map{&pats, map_size, map_size};
   bool m_frozen = false;
 
   void print(unsigned x, unsigned y, unsigned pat) {
@@ -97,8 +96,8 @@ class app {
   }
 
   void setup() {
-    m_q.set_grid(32, 32);
-    m_q.center_at(16, 16);
+    m_q.set_grid(map_size, map_size);
+    m_q.center_at(map_size / 2, map_size / 2);
 
     rng::seed(69);
 
