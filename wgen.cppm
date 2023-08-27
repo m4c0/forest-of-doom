@@ -63,9 +63,36 @@ class app {
   eigen::map m_map{&pats, width, height};
   bool m_frozen = false;
 
+  void print(unsigned x, unsigned y, unsigned pat) {
+    constexpr const tile::terrain::c tiles[pats.size()]{
+        tile::terrain::grass_tl, tile::terrain::grass_l,
+        tile::terrain::grass_0,  tile::terrain::dirt_0,
+        tile::terrain::grass_bl, tile::terrain::grass_br,
+        tile::terrain::grass_tr, tile::terrain::grass_b,
+        tile::terrain::grass_r,  tile::terrain::grass_t,
+        tile::terrain::dirt_tr,  tile::terrain::dirt_tl,
+        tile::terrain::dirt_bl,  tile::terrain::dirt_br,
+    };
+    if (pat == eigen::nil)
+      return;
+
+    auto t = tiles[pat];
+    tile::terrain::add_tile(&m_ec, t, x, y);
+  }
+
   void print() {
     m_ec = {};
-    // m_map->print(&m_ec);
+
+    unsigned y = 0;
+    for (auto row : m_map) {
+      unsigned x = 0;
+      for (auto col : row) {
+        print(x, y, col);
+        x++;
+      }
+      y++;
+    }
+
     m_q.fill(&m_ec);
   }
 
