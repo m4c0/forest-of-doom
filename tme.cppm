@@ -12,7 +12,7 @@ import silog;
 import sprite;
 import tile;
 import tilemap;
-import yoyo_libc;
+import yoyo;
 
 template <typename C> class palette {
   hai::varray<C> m_tiles;
