@@ -1,3 +1,4 @@
+#pragma leco app
 export module fod;
 
 import animation;

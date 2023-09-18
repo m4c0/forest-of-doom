@@ -1,3 +1,4 @@
+#pragma leco add_resource "11_Camping_16x16.png"
 export module tile:camping;
 import :common;
 import sprite;

@@ -1,3 +1,4 @@
+#pragma leco app
 export module wgen;
 import casein;
 import mapgen;
