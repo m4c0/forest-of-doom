@@ -15,7 +15,6 @@ export void remove(compos *c, pog::eid id) { c->bodies.remove(id); }
 
 export bool move_by(compos *c, pog::eid id, float dx, float dy) {
   auto aabb = c->bodies.get(id);
-  auto old = aabb;
   aabb.a.x += dx;
   aabb.a.y += dy;
   aabb.b.x += dx;
