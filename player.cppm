@@ -1,4 +1,3 @@
-#pragma leco add_resource "Modern_Exteriors_Characters_Scout_16x16_1.png"
 export module player;
 import animation;
 import area;

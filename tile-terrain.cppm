@@ -1,4 +1,3 @@
-#pragma leco add_resource "1_Terrains_and_Fences_16x16.png"
 export module tile:terrain;
 import :common;
 import sprite;

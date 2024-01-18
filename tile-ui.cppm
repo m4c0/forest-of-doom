@@ -1,4 +1,3 @@
-#pragma leco add_resource "Modern_UI_Style_1.png"
 export module tile:ui;
 import :common;
 import sprite;
