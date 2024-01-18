@@ -6,12 +6,13 @@ import quack;
 import silog;
 import sprite;
 import stubby;
+import traits;
 
 namespace qsu {
 class layer {
   static constexpr const auto sprite_sz = 16.0f;
 
-  quack::ilayout m_spr;
+  quack::instance_batch m_spr;
   sprite::layers m_layer;
   jute::view m_atlas_name;
   float m_atlas_w{1};
@@ -26,7 +27,7 @@ class layer {
         .map([this](const auto &img) {
           m_atlas_w = img.width;
           m_atlas_h = img.height;
-          m_spr->load_atlas(img.width, img.height, [&img](auto *p) {
+          m_spr.load_atlas(img.width, img.height, [&img](auto *p) {
             const auto pixies = img.width * img.height;
             const auto data = reinterpret_cast<const decltype(p)>(*img.data);
             for (auto i = 0; i < pixies; i++) {
@@ -45,13 +46,11 @@ class layer {
   }
 
 public:
-  layer(quack::renderer *m_r, sprite::layers l, unsigned max_sprites,
-        jute::view atlas)
-      : m_spr{m_r, max_sprites}, m_layer{l}, m_atlas_name{atlas} {}
+  layer(quack::instance_batch &&ib, sprite::layers l, jute::view atlas)
+      : m_spr{traits::move(ib)}, m_layer{l}, m_atlas_name{atlas} {}
 
+  // TODO; use casein::handler
   void process_event(const casein::event &e) {
-    m_spr.process_event(e);
-
     switch (e.type()) {
     case casein::CREATE_WINDOW:
       create_window();
@@ -65,10 +64,10 @@ public:
   }
 
   void fill(sprite::compos *ec) {
-    auto [px, py] = m_spr->center();
+    auto [px, py] = m_spr.center();
     pog::aabb area{{px - 32, py - 32}, {px + 32, py + 32}};
 
-    m_spr->map_all([&](auto all) {
+    m_spr.map_all([&](auto all) {
       auto cs = all.colours;
       auto ms = all.multipliers;
       auto ps = all.positions;
@@ -96,7 +95,7 @@ public:
         size++;
       });
 
-      m_spr->set_count(size);
+      m_spr.set_count(size);
       if (size > m_max_sprites)
         m_max_sprites = size;
     });

@@ -1,5 +1,5 @@
 export module qsu;
-// import :layer;
+import :layer;
 import area;
 import casein;
 import collision;
@@ -18,6 +18,8 @@ export class main : public voo::casein_thread {
   static constexpr const auto layer_count =
       static_cast<unsigned>(sprite::layers::last);
 
+  layer *m_layers;
+
   void run() override {
     voo::device_and_queue dq{"fod", native_ptr()};
 
@@ -25,9 +27,19 @@ export class main : public voo::casein_thread {
       voo::swapchain_and_stuff sw{dq};
 
       quack::pipeline_stuff ps{dq, sw, layer_count};
+      layer layers[layer_count]{
+          {ps.create_batch(max_sprites), sprite::layers::terrain,
+           "1_Terrains_and_Fences_16x16.png"},
+          {ps.create_batch(max_sprites), sprite::layers::camping,
+           "11_Camping_16x16.png"},
+          {ps.create_batch(max_player_sprites), sprite::layers::scout,
+           "Modern_Exteriors_Characters_Scout_16x16_1.png"},
+          {ps.create_batch(max_sprites), sprite::layers::debug, {}},
+          {ps.create_batch(max_sprites), sprite::layers::ui,
+           "Modern_UI_Style_1.png"},
+      };
 
       /*
-      auto ib = ps.create_batch(2);
       ib.load_atlas(16, 32, atlas_image);
       ib.map_positions([](auto *ps) { ps[0] = {{0, 0}, {1, 1}}; });
       ib.map_colours([](auto *cs) { cs[0] = {0, 0, 0.1, 1.0}; });
@@ -36,17 +48,20 @@ export class main : public voo::casein_thread {
       ib.center_at(0.5, 0.5);
       ib.set_count(2);
       ib.set_grid(1, 1);
-
-      m_ib = &ib;
       */
 
+      m_layers = layers;
       release_init_lock();
       extent_loop(dq, sw, [&] {
-        // ib.submit_buffers(dq.queue());
+        for (auto &l : layers) {
+          (*l).submit_buffers(dq.queue());
+        }
 
         sw.one_time_submit(dq, [&](auto &pcb) {
           auto scb = sw.cmd_render_pass(pcb);
-          // ps.run(*scb, ib);
+          for (auto &l : layers) {
+            ps.run(*scb, *l);
+          }
         });
       });
     }
@@ -61,16 +76,6 @@ public:
   [[nodiscard]] auto hud_grid_size() const noexcept { return dotz::vec2{}; }
 
   /*
-  quack::renderer m_r{layer_count};
-  layer m_layers[layer_count] = {
-      {&m_r, sprite::layers::terrain, max_sprites,
-       "1_Terrains_and_Fences_16x16.png"},
-      {&m_r, sprite::layers::camping, max_sprites, "11_Camping_16x16.png"},
-      {&m_r, sprite::layers::scout, max_player_sprites,
-       "Modern_Exteriors_Characters_Scout_16x16_1.png"},
-      {&m_r, sprite::layers::debug, max_sprites, {}},
-      {&m_r, sprite::layers::ui, max_sprites, "Modern_UI_Style_1.png"},
-  };
   quack::mouse_tracker m_mouse{};
 
   [[nodiscard]] auto &layer_of(sprite::layers l) {
