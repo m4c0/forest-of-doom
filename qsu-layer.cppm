@@ -19,45 +19,15 @@ class layer {
   float m_atlas_h{1};
   unsigned m_max_sprites{};
 
-  void create_window() {
-    if (m_atlas_name == jute::view{})
-      return;
-
-    stbi::load_from_resource(m_atlas_name)
-        .map([this](const auto &img) {
-          m_atlas_w = img.width;
-          m_atlas_h = img.height;
-          m_spr.load_atlas(img.width, img.height, [&img](auto *p) {
-            const auto pixies = img.width * img.height;
-            const auto data = reinterpret_cast<const decltype(p)>(*img.data);
-            for (auto i = 0; i < pixies; i++) {
-              p[i] = data[i];
-            }
-          });
-          silog::log(silog::info, "%dx%d atlas loaded", img.width, img.height);
-        })
-        .take([](auto err) {
-          silog::log(silog::error, "Error loading atlas: %s", err);
-        });
-  }
-
 public:
   layer(quack::instance_batch &&ib, sprite::layers l, jute::view atlas)
-      : m_spr{traits::move(ib)}, m_layer{l}, m_atlas_name{atlas} {}
+      : m_spr{traits::move(ib)}, m_layer{l}, m_atlas_name{atlas} {
+    if (atlas != "")
+      m_spr.load_atlas(atlas);
+  }
   ~layer() {
     silog::log(silog::info, "[qsu] %d sprites for %s", m_max_sprites,
                m_atlas_name.cstr().data());
-  }
-
-  // TODO; use casein::handler
-  void process_event(const casein::event &e) {
-    switch (e.type()) {
-    case casein::CREATE_WINDOW:
-      create_window();
-      break;
-    default:
-      break;
-    }
   }
 
   void fill(sprite::compos *ec) {
