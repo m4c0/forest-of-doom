@@ -271,7 +271,7 @@ extern "C" void casein_handle(const casein::event &e) {
   static game gg{};
 
   static constexpr const auto kmap = [] {
-    casein::key_map res{};
+    casein::key_down_map<> res{};
     res[casein::K_Q] = [](auto) { gg.prev_island_brush(); };
     res[casein::K_W] = [](auto) { gg.next_island_brush(); };
     res[casein::K_A] = [](auto) { gg.prev_lake_brush(); };
