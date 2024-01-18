@@ -40,23 +40,20 @@ class layer {
           silog::log(silog::error, "Error loading atlas: %s", err);
         });
   }
-  void quit() {
-    silog::log(silog::info, "[qsu] %d sprites for %s", m_max_sprites,
-               m_atlas_name.cstr().data());
-  }
 
 public:
   layer(quack::instance_batch &&ib, sprite::layers l, jute::view atlas)
       : m_spr{traits::move(ib)}, m_layer{l}, m_atlas_name{atlas} {}
+  ~layer() {
+    silog::log(silog::info, "[qsu] %d sprites for %s", m_max_sprites,
+               m_atlas_name.cstr().data());
+  }
 
   // TODO; use casein::handler
   void process_event(const casein::event &e) {
     switch (e.type()) {
     case casein::CREATE_WINDOW:
       create_window();
-      break;
-    case casein::QUIT:
-      quit();
       break;
     default:
       break;
