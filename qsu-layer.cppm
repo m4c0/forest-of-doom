@@ -22,8 +22,11 @@ class layer {
 public:
   layer(quack::instance_batch &&ib, sprite::layers l, jute::view atlas)
       : m_spr{traits::move(ib)}, m_layer{l}, m_atlas_name{atlas} {
-    if (atlas != "")
+    if (atlas == "") {
+      m_spr.load_atlas(16, 16, [](auto) {});
+    } else {
       m_spr.load_atlas(atlas);
+    }
   }
   ~layer() {
     silog::log(silog::info, "[qsu] %d sprites for %s", m_max_sprites,
