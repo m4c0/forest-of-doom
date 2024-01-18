@@ -80,7 +80,7 @@ class game {
 
 public:
   void process_event(const casein::event &e) {
-    m_q.process_event(e);
+    m_q.handle(e);
     m_ec.input().process_event(e);
 
     switch (e.type()) {

@@ -292,6 +292,6 @@ extern "C" void casein_handle(const casein::event &e) {
     return res;
   }();
 
-  q.process_event(e);
+  q.handle(e);
   map.handle(e);
 }

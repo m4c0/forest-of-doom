@@ -1,22 +1,66 @@
 export module qsu;
-import :layer;
+// import :layer;
 import area;
 import casein;
 import collision;
+import dotz;
 import pog;
 import quack;
 import sprite;
 import tile;
+import voo;
 
 namespace qsu {
-export class main {
+export class main : public voo::casein_thread {
   static constexpr const auto max_player_sprites = 16;
   static constexpr const auto max_sprites = 4096;
-  static constexpr const auto no_sprite = max_sprites + 1;
 
   static constexpr const auto layer_count =
       static_cast<unsigned>(sprite::layers::last);
 
+  void run() override {
+    voo::device_and_queue dq{"fod", native_ptr()};
+
+    while (!interrupted()) {
+      voo::swapchain_and_stuff sw{dq};
+
+      quack::pipeline_stuff ps{dq, sw, layer_count};
+
+      /*
+      auto ib = ps.create_batch(2);
+      ib.load_atlas(16, 32, atlas_image);
+      ib.map_positions([](auto *ps) { ps[0] = {{0, 0}, {1, 1}}; });
+      ib.map_colours([](auto *cs) { cs[0] = {0, 0, 0.1, 1.0}; });
+      ib.map_uvs([](auto *us) { us[0] = {}; });
+      ib.map_multipliers([](auto *ms) { ms[0] = {1, 1, 1, 1}; });
+      ib.center_at(0.5, 0.5);
+      ib.set_count(2);
+      ib.set_grid(1, 1);
+
+      m_ib = &ib;
+      */
+
+      release_init_lock();
+      extent_loop(dq, sw, [&] {
+        // ib.submit_buffers(dq.queue());
+
+        sw.one_time_submit(dq, [&](auto &pcb) {
+          auto scb = sw.cmd_render_pass(pcb);
+          // ps.run(*scb, ib);
+        });
+      });
+    }
+  }
+
+public:
+  void fill(sprite::compos *ec) {}
+  void set_grid(float w, float h) {}
+  void center_at(float x, float y) {}
+  [[nodiscard]] auto center() const noexcept { return dotz::vec2{}; }
+  [[nodiscard]] auto mouse_pos() const noexcept { return dotz::vec2{}; }
+  [[nodiscard]] auto hud_grid_size() const noexcept { return dotz::vec2{}; }
+
+  /*
   quack::renderer m_r{layer_count};
   layer m_layers[layer_count] = {
       {&m_r, sprite::layers::terrain, max_sprites,
@@ -74,5 +118,6 @@ public:
       l.fill(ec);
     }
   }
-}; // namespace qsu
+  */
+};
 } // namespace qsu
