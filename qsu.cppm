@@ -66,13 +66,13 @@ export class main : voo::casein_thread {
       };
 
       m_layers = layers;
+      release_init_lock();
 
       for_each_ui_layer([](auto &l) {
         l->center_at(0, 0);
         l->set_grid(16, 16);
       });
 
-      release_init_lock();
       extent_loop(dq, sw, [&] {
         for (auto &l : layers) {
           (*l).submit_buffers(dq.queue());
