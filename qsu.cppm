@@ -16,18 +16,32 @@ import tile;
 import voo;
 
 namespace qsu {
-export class main : public voo::casein_thread {
+export class main : voo::casein_thread {
   static constexpr const auto max_player_sprites = 16;
   static constexpr const auto max_sprites = 4096;
 
   static constexpr const auto layer_count =
       static_cast<unsigned>(sprite::layers::last);
+  static constexpr const auto ui_layer_index =
+      static_cast<unsigned>(sprite::layers::ui);
 
   layer *m_layers;
 
   void for_each_layer(auto &&fn) {
     auto lck = wait_init();
     for (auto i = 0; i < layer_count; i++) {
+      fn(&m_layers[i]);
+    }
+  }
+  void for_each_non_ui_layer(auto &&fn) {
+    auto lck = wait_init();
+    for (auto i = 0; i < ui_layer_index; i++) {
+      fn(&m_layers[i]);
+    }
+  }
+  void for_each_ui_layer(auto &&fn) {
+    auto lck = wait_init();
+    for (auto i = ui_layer_index; i < layer_count; i++) {
       fn(&m_layers[i]);
     }
   }
@@ -52,6 +66,12 @@ export class main : public voo::casein_thread {
       };
 
       m_layers = layers;
+
+      for_each_ui_layer([](auto *l) {
+        (*l)->center_at(0, 0);
+        (*l)->set_grid(16, 16);
+      });
+
       release_init_lock();
       extent_loop(dq, sw, [&] {
         for (auto &l : layers) {
@@ -72,54 +92,25 @@ public:
   void fill(sprite::compos *ec) {
     for_each_layer([ec](auto *l) { l->fill(ec); });
   }
-  void set_grid(float w, float h) {}
-  void center_at(float x, float y) {}
-  [[nodiscard]] auto center() const noexcept { return dotz::vec2{}; }
-  [[nodiscard]] auto mouse_pos() const noexcept { return dotz::vec2{}; }
-  [[nodiscard]] auto hud_grid_size() const noexcept { return dotz::vec2{}; }
-
-  /*
-  quack::mouse_tracker m_mouse{};
-
-  [[nodiscard]] auto &layer_of(sprite::layers l) {
-    return m_layers[static_cast<unsigned>(l)];
-  }
-  [[nodiscard]] auto &layer_of(sprite::layers l) const {
-    return m_layers[static_cast<unsigned>(l)];
-  }
-
-public:
-  void process_event(const casein::event &e) {
-    m_r.process_event(e);
-    m_mouse.process_event(e);
-    for (auto &l : m_layers) {
-      l.process_event(e);
-    }
-  }
-
-  void center_at(float x, float y) {
-    for (auto &l : m_layers) {
-      (*l)->center_at(x, y);
-    }
-    (*layer_of(sprite::layers::ui))->center_at(0, 0);
-  }
-  [[nodiscard]] auto center() const noexcept {
-    return (*m_layers[0])->center();
-  }
-
   void set_grid(float w, float h) {
-    for (auto &l : m_layers) {
-      (*l)->set_grid(w, h);
-    }
-    (*layer_of(sprite::layers::ui))->set_grid(16, 16);
+    for_each_non_ui_layer([w, h](auto *l) { (*l)->set_grid(w, h); });
   }
-  [[nodiscard]] auto hud_grid_size() const noexcept {
-    return (*layer_of(sprite::layers::ui))->grid_size();
+  void center_at(float x, float y) {
+    for_each_non_ui_layer([x, y](auto *l) { (*l)->center_at(x, y); });
+  }
+  [[nodiscard]] auto center() noexcept {
+    auto lck = wait_init();
+    return m_layers[0]->center();
+  }
+  [[nodiscard]] auto mouse_pos() const noexcept { return dotz::vec2{}; }
+  [[nodiscard]] auto hud_grid_size() noexcept {
+    auto lck = wait_init();
+    return m_layers[ui_layer_index]->grid_size();
   }
 
-  [[nodiscard]] auto mouse_pos() const noexcept {
-    return m_mouse.current_mouse_pos(&**m_layers[0]);
+  void handle(const casein::event &e) {
+    quack::mouse_tracker::instance().handle(e);
+    casein_thread::handle(e);
   }
-  */
 };
 } // namespace qsu

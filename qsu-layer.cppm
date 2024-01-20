@@ -71,6 +71,8 @@ public:
     });
   }
 
+  [[nodiscard]] constexpr auto *operator->() noexcept { return &m_spr; }
+  [[nodiscard]] constexpr auto *operator->() const noexcept { return &m_spr; }
   [[nodiscard]] constexpr auto &operator*() noexcept { return m_spr; }
   [[nodiscard]] constexpr auto &operator*() const noexcept { return m_spr; }
 };
