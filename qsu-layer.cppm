@@ -15,8 +15,6 @@ class layer {
   quack::instance_batch m_spr;
   sprite::layers m_layer;
   jute::view m_atlas_name;
-  float m_atlas_w{1};
-  float m_atlas_h{1};
   unsigned m_max_sprites{};
 
 public:
@@ -43,6 +41,8 @@ public:
       auto ps = all.positions;
       auto us = all.uvs;
 
+      auto atlas_sz = m_spr.atlas_size();
+
       auto size = 0;
       ec->areas().for_each_in(area, [&](auto id, auto aabb) {
         auto spr = ec->sprites.get(id);
@@ -56,10 +56,10 @@ public:
                             aabb.b.y - aabb.a.y};
 
         *us++ = quack::uv{
-            spr.uv.x * sprite_sz / m_atlas_w,
-            spr.uv.y * sprite_sz / m_atlas_h,
-            (spr.uv.x + spr.uv.w) * sprite_sz / m_atlas_w,
-            (spr.uv.y + spr.uv.h) * sprite_sz / m_atlas_h,
+            spr.uv.x * sprite_sz / atlas_sz.x,
+            spr.uv.y * sprite_sz / atlas_sz.y,
+            (spr.uv.x + spr.uv.w) * sprite_sz / atlas_sz.x,
+            (spr.uv.y + spr.uv.h) * sprite_sz / atlas_sz.y,
         };
 
         size++;
