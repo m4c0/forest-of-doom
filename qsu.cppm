@@ -25,6 +25,13 @@ export class main : public voo::casein_thread {
 
   layer *m_layers;
 
+  void for_each_layer(auto &&fn) {
+    auto lck = wait_init();
+    for (auto i = 0; i < layer_count; i++) {
+      fn(&m_layers[i]);
+    }
+  }
+
   void run() override {
     voo::device_and_queue dq{"fod", native_ptr()};
 
@@ -44,17 +51,6 @@ export class main : public voo::casein_thread {
            "Modern_UI_Style_1.png"},
       };
 
-      /*
-      ib.load_atlas(16, 32, atlas_image);
-      ib.map_positions([](auto *ps) { ps[0] = {{0, 0}, {1, 1}}; });
-      ib.map_colours([](auto *cs) { cs[0] = {0, 0, 0.1, 1.0}; });
-      ib.map_uvs([](auto *us) { us[0] = {}; });
-      ib.map_multipliers([](auto *ms) { ms[0] = {1, 1, 1, 1}; });
-      ib.center_at(0.5, 0.5);
-      ib.set_count(2);
-      ib.set_grid(1, 1);
-      */
-
       m_layers = layers;
       release_init_lock();
       extent_loop(dq, sw, [&] {
@@ -73,7 +69,9 @@ export class main : public voo::casein_thread {
   }
 
 public:
-  void fill(sprite::compos *ec) {}
+  void fill(sprite::compos *ec) {
+    for_each_layer([ec](auto *l) { l->fill(ec); });
+  }
   void set_grid(float w, float h) {}
   void center_at(float x, float y) {}
   [[nodiscard]] auto center() const noexcept { return dotz::vec2{}; }
@@ -121,12 +119,6 @@ public:
 
   [[nodiscard]] auto mouse_pos() const noexcept {
     return m_mouse.current_mouse_pos(&**m_layers[0]);
-  }
-
-  void fill(sprite::compos *ec) {
-    for (auto &l : m_layers) {
-      l.fill(ec);
-    }
   }
   */
 };
