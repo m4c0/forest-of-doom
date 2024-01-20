@@ -29,18 +29,24 @@ export class main : voo::casein_thread {
 
   void for_each_layer(auto &&fn) {
     auto lck = wait_init();
+    if (m_layers == nullptr)
+      return;
     for (auto i = 0; i < layer_count; i++) {
       fn(m_layers[i]);
     }
   }
   void for_each_non_ui_layer(auto &&fn) {
     auto lck = wait_init();
+    if (m_layers == nullptr)
+      return;
     for (auto i = 0; i < ui_layer_index; i++) {
       fn(m_layers[i]);
     }
   }
   void for_each_ui_layer(auto &&fn) {
     auto lck = wait_init();
+    if (m_layers == nullptr)
+      return;
     for (auto i = ui_layer_index; i < layer_count; i++) {
       fn(m_layers[i]);
     }
@@ -85,6 +91,8 @@ export class main : voo::casein_thread {
           }
         });
       });
+
+      m_layers = nullptr;
     }
   }
 
@@ -100,11 +108,15 @@ public:
   }
   [[nodiscard]] auto center() noexcept {
     auto lck = wait_init();
+    if (m_layers == nullptr)
+      return dotz::vec2{};
     return m_layers[0]->center();
   }
   [[nodiscard]] auto mouse_pos() const noexcept { return dotz::vec2{}; }
   [[nodiscard]] auto hud_grid_size() noexcept {
     auto lck = wait_init();
+    if (m_layers == nullptr)
+      return dotz::vec2{1, 1};
     return m_layers[ui_layer_index]->grid_size();
   }
 
