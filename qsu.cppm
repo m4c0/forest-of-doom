@@ -26,6 +26,8 @@ export class main : voo::casein_thread {
       static_cast<unsigned>(sprite::layers::ui);
 
   layer *m_layers;
+  dotz::vec2 m_grid_size;
+  dotz::vec2 m_center;
 
   void for_each_layer(auto &&fn) {
     for (auto i = 0; i < layer_count; i++) {
@@ -63,6 +65,10 @@ export class main : voo::casein_thread {
       };
       m_layers = layers;
 
+      for_each_non_ui_layer([this](auto &l) {
+        l->center_at(m_center.x, m_center.y);
+        l->set_grid(m_grid_size.x, m_grid_size.y);
+      });
       for_each_ui_layer([](auto &l) {
         l->center_at(0, 0);
         l->set_grid(16, 16);
@@ -95,12 +101,14 @@ public:
   }
   void set_grid(float w, float h) {
     auto lck = wait_init();
+    m_grid_size = {w, h};
     if (m_layers == nullptr)
       return;
     for_each_non_ui_layer([w, h](auto &l) { l->set_grid(w, h); });
   }
   void center_at(float x, float y) {
     auto lck = wait_init();
+    m_center = {x, y};
     if (m_layers == nullptr)
       return;
     for_each_non_ui_layer([x, y](auto &l) { l->center_at(x, y); });
