@@ -30,19 +30,19 @@ export class main : voo::casein_thread {
   void for_each_layer(auto &&fn) {
     auto lck = wait_init();
     for (auto i = 0; i < layer_count; i++) {
-      fn(&m_layers[i]);
+      fn(m_layers[i]);
     }
   }
   void for_each_non_ui_layer(auto &&fn) {
     auto lck = wait_init();
     for (auto i = 0; i < ui_layer_index; i++) {
-      fn(&m_layers[i]);
+      fn(m_layers[i]);
     }
   }
   void for_each_ui_layer(auto &&fn) {
     auto lck = wait_init();
     for (auto i = ui_layer_index; i < layer_count; i++) {
-      fn(&m_layers[i]);
+      fn(m_layers[i]);
     }
   }
 
@@ -67,9 +67,9 @@ export class main : voo::casein_thread {
 
       m_layers = layers;
 
-      for_each_ui_layer([](auto *l) {
-        (*l)->center_at(0, 0);
-        (*l)->set_grid(16, 16);
+      for_each_ui_layer([](auto &l) {
+        l->center_at(0, 0);
+        l->set_grid(16, 16);
       });
 
       release_init_lock();
@@ -90,13 +90,13 @@ export class main : voo::casein_thread {
 
 public:
   void fill(sprite::compos *ec) {
-    for_each_layer([ec](auto *l) { l->fill(ec); });
+    for_each_layer([ec](auto &l) { l.fill(ec); });
   }
   void set_grid(float w, float h) {
-    for_each_non_ui_layer([w, h](auto *l) { (*l)->set_grid(w, h); });
+    for_each_non_ui_layer([w, h](auto &l) { l->set_grid(w, h); });
   }
   void center_at(float x, float y) {
-    for_each_non_ui_layer([x, y](auto *l) { (*l)->center_at(x, y); });
+    for_each_non_ui_layer([x, y](auto &l) { l->center_at(x, y); });
   }
   [[nodiscard]] auto center() noexcept {
     auto lck = wait_init();
