@@ -28,25 +28,16 @@ export class main : voo::casein_thread {
   layer *m_layers;
 
   void for_each_layer(auto &&fn) {
-    auto lck = wait_init();
-    if (m_layers == nullptr)
-      return;
     for (auto i = 0; i < layer_count; i++) {
       fn(m_layers[i]);
     }
   }
   void for_each_non_ui_layer(auto &&fn) {
-    auto lck = wait_init();
-    if (m_layers == nullptr)
-      return;
     for (auto i = 0; i < ui_layer_index; i++) {
       fn(m_layers[i]);
     }
   }
   void for_each_ui_layer(auto &&fn) {
-    auto lck = wait_init();
-    if (m_layers == nullptr)
-      return;
     for (auto i = ui_layer_index; i < layer_count; i++) {
       fn(m_layers[i]);
     }
@@ -70,18 +61,17 @@ export class main : voo::casein_thread {
           {ps.create_batch(max_sprites), sprite::layers::ui,
            "Modern_UI_Style_1.png"},
       };
-
       m_layers = layers;
-      release_init_lock();
 
       for_each_ui_layer([](auto &l) {
         l->center_at(0, 0);
         l->set_grid(16, 16);
       });
 
+      release_init_lock();
       extent_loop(dq, sw, [&] {
         for (auto &l : layers) {
-          (*l).submit_buffers(dq.queue());
+          l->submit_buffers(dq);
         }
 
         sw.one_time_submit(dq, [&](auto &pcb) {
@@ -98,12 +88,21 @@ export class main : voo::casein_thread {
 
 public:
   void fill(sprite::compos *ec) {
+    auto lck = wait_init();
+    if (m_layers == nullptr)
+      return;
     for_each_layer([ec](auto &l) { l.fill(ec); });
   }
   void set_grid(float w, float h) {
+    auto lck = wait_init();
+    if (m_layers == nullptr)
+      return;
     for_each_non_ui_layer([w, h](auto &l) { l->set_grid(w, h); });
   }
   void center_at(float x, float y) {
+    auto lck = wait_init();
+    if (m_layers == nullptr)
+      return;
     for_each_non_ui_layer([x, y](auto &l) { l->center_at(x, y); });
   }
   [[nodiscard]] auto center() noexcept {
@@ -112,7 +111,12 @@ public:
       return dotz::vec2{};
     return m_layers[0]->center();
   }
-  [[nodiscard]] auto mouse_pos() const noexcept { return dotz::vec2{}; }
+  [[nodiscard]] auto mouse_pos() noexcept {
+    auto lck = wait_init();
+    if (m_layers == nullptr)
+      return dotz::vec2{};
+    return dotz::vec2{};
+  }
   [[nodiscard]] auto hud_grid_size() noexcept {
     auto lck = wait_init();
     if (m_layers == nullptr)
