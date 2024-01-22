@@ -94,39 +94,39 @@ export class main : voo::casein_thread {
 
 public:
   void fill(sprite::compos *ec) {
-    auto lck = wait_init();
+    wait_init();
     if (m_layers == nullptr)
       return;
     for_each_layer([ec](auto &l) { l.fill(ec); });
   }
   void set_grid(float w, float h) {
-    auto lck = wait_init();
+    wait_init();
     m_grid_size = {w, h};
     if (m_layers == nullptr)
       return;
     for_each_non_ui_layer([w, h](auto &l) { l->set_grid(w, h); });
   }
   void center_at(float x, float y) {
-    auto lck = wait_init();
+    wait_init();
     m_center = {x, y};
     if (m_layers == nullptr)
       return;
     for_each_non_ui_layer([x, y](auto &l) { l->center_at(x, y); });
   }
   [[nodiscard]] auto center() noexcept {
-    auto lck = wait_init();
+    wait_init();
     if (m_layers == nullptr)
       return dotz::vec2{};
     return m_layers[0]->center();
   }
   [[nodiscard]] auto mouse_pos() noexcept {
-    auto lck = wait_init();
+    wait_init();
     if (m_layers == nullptr)
       return dotz::vec2{};
     return dotz::vec2{};
   }
   [[nodiscard]] auto hud_grid_size() noexcept {
-    auto lck = wait_init();
+    wait_init();
     if (m_layers == nullptr)
       return dotz::vec2{1, 1};
     return m_layers[ui_layer_index]->grid_size();
