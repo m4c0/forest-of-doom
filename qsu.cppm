@@ -103,14 +103,8 @@ public:
     if (m_layers == nullptr)
       return;
 
-    for_each_non_ui_layer([ec, this](auto &l) {
-      l.fill(ec, m_center);
-      l.run_once();
-    });
-    for_each_ui_layer([ec](auto &l) {
-      l.fill(ec, {});
-      l.run_once();
-    });
+    for_each_non_ui_layer([ec, this](auto &l) { l.fill(ec, m_center); });
+    for_each_ui_layer([ec](auto &l) { l.fill(ec, {}); });
   }
 
   void center_at(float x, float y) { m_center = {x, y}; }

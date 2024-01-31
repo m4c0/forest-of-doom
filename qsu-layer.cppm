@@ -20,8 +20,6 @@ class layer : voo::update_thread {
   unsigned m_max_sprites{};
 
   void build_cmd_buf(vee::command_buffer cb) override {
-    m_atlas.run_once();
-
     voo::cmd_buf_one_time_submit pcb{cb};
     m_spr.setup_copy(cb);
   }
@@ -31,14 +29,12 @@ public:
         sprite::layers l, jute::view atlas)
       : update_thread(&dq), m_atlas{&dq, &ps, atlas},
         m_spr{ps.create_batch(max_spr)}, m_layer{l} {
-    run_once();
+    m_atlas.run_once();
   }
   ~layer() {
     silog::log(silog::info, "[qsu] %d sprites for %s", m_max_sprites,
                m_atlas.name().cstr().data());
   }
-
-  using update_thread::run_once;
 
   void run(quack::pipeline_stuff &ps, vee::command_buffer cb) {
     m_spr.build_commands(cb);
@@ -84,6 +80,8 @@ public:
       if (m_count > m_max_sprites)
         m_max_sprites = m_count;
     });
+
+    run_once();
   }
 };
 } // namespace qsu
