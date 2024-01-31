@@ -27,6 +27,7 @@ export class main : voo::casein_thread {
 
   layer *m_layers;
   dotz::vec2 m_grid_size;
+  dotz::vec2 m_hud_grid_size;
   dotz::vec2 m_center;
 
   void for_each_layer(auto &&fn) {
@@ -53,39 +54,43 @@ export class main : voo::casein_thread {
 
       quack::pipeline_stuff ps{dq, sw, layer_count};
       layer layers[layer_count]{
-          {ps.create_batch(max_sprites), sprite::layers::terrain,
+          {dq, ps, max_sprites, sprite::layers::terrain,
            "1_Terrains_and_Fences_16x16.png"},
-          {ps.create_batch(max_sprites), sprite::layers::camping,
+          {dq, ps, max_sprites, sprite::layers::camping,
            "11_Camping_16x16.png"},
-          {ps.create_batch(max_player_sprites), sprite::layers::scout,
+          {dq, ps, max_player_sprites, sprite::layers::scout,
            "Modern_Exteriors_Characters_Scout_16x16_1.png"},
-          {ps.create_batch(max_sprites), sprite::layers::debug, {}},
-          {ps.create_batch(max_sprites), sprite::layers::ui,
-           "Modern_UI_Style_1.png"},
+          {dq, ps, max_sprites, sprite::layers::debug, {}},
+          {dq, ps, max_sprites, sprite::layers::ui, "Modern_UI_Style_1.png"},
       };
       m_layers = layers;
 
-      for_each_non_ui_layer([this](auto &l) {
-        l->center_at(m_center.x, m_center.y);
-        l->set_grid(m_grid_size.x, m_grid_size.y);
-      });
-      for_each_ui_layer([](auto &l) {
-        l->center_at(0, 0);
-        l->set_grid(16, 16);
-      });
-
       release_init_lock();
       extent_loop(dq, sw, [&] {
-        for (auto &l : layers) {
-          l->submit_buffers(dq);
-        }
+        auto ui_upc = quack::adjust_aspect(
+            {
+                .grid_pos = {},
+                .grid_size = {16, 16},
+            },
+            sw.aspect());
+        auto map_upc = quack::adjust_aspect(
+            {
+                .grid_pos = m_center,
+                .grid_size = m_grid_size,
+            },
+            sw.aspect());
 
-        sw.one_time_submit(dq, [&](auto &pcb) {
+        {
+          voo::cmd_buf_one_time_submit pcb{sw.command_buffer()};
           auto scb = sw.cmd_render_pass(pcb);
-          for (auto &l : layers) {
-            ps.run(*scb, *l);
-          }
-        });
+
+          ps.cmd_push_vert_frag_constants(*scb, map_upc);
+          for_each_non_ui_layer([&](auto &l) { l.run(ps, *scb); });
+
+          ps.cmd_push_vert_frag_constants(*scb, ui_upc);
+          for_each_ui_layer([&](auto &l) { l.run(ps, *scb); });
+        }
+        sw.queue_submit(dq);
       });
 
       m_layers = nullptr;
@@ -97,39 +102,30 @@ public:
     wait_init();
     if (m_layers == nullptr)
       return;
-    for_each_layer([ec](auto &l) { l.fill(ec); });
+
+    for_each_non_ui_layer([ec, this](auto &l) {
+      l.fill(ec, m_center);
+      l.run_once();
+    });
+    for_each_ui_layer([ec](auto &l) {
+      l.fill(ec, {});
+      l.run_once();
+    });
   }
-  void set_grid(float w, float h) {
-    wait_init();
-    m_grid_size = {w, h};
-    if (m_layers == nullptr)
-      return;
-    for_each_non_ui_layer([w, h](auto &l) { l->set_grid(w, h); });
-  }
-  void center_at(float x, float y) {
-    wait_init();
-    m_center = {x, y};
-    if (m_layers == nullptr)
-      return;
-    for_each_non_ui_layer([x, y](auto &l) { l->center_at(x, y); });
-  }
-  [[nodiscard]] auto center() noexcept {
-    wait_init();
-    if (m_layers == nullptr)
-      return dotz::vec2{};
-    return m_layers[0]->center();
-  }
+
+  void center_at(float x, float y) { m_center = {x, y}; }
+  [[nodiscard]] auto center() noexcept { return m_center; }
+
+  void set_grid(float w, float h) { m_grid_size = {w, h}; }
+
+  [[nodiscard]] auto hud_grid_size() noexcept { return m_hud_grid_size; }
+
+  // TODO: fix mouse
   [[nodiscard]] auto mouse_pos() noexcept {
     wait_init();
     if (m_layers == nullptr)
       return dotz::vec2{};
     return dotz::vec2{};
-  }
-  [[nodiscard]] auto hud_grid_size() noexcept {
-    wait_init();
-    if (m_layers == nullptr)
-      return dotz::vec2{1, 1};
-    return m_layers[ui_layer_index]->grid_size();
   }
 
   void handle(const casein::event &e) {
