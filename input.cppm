@@ -8,23 +8,10 @@ template <casein::keys K> class button {
 public:
   [[nodiscard]] constexpr auto value() const noexcept { return m_down; }
 
-  void process_event(const casein::event &e) {
-    switch (e.type()) {
-    case casein::KEY_DOWN: {
-      auto key = *e.as<casein::events::key_down>();
-      if (key == K)
-        m_down = true;
-      break;
-    }
-    case casein::KEY_UP: {
-      auto key = *e.as<casein::events::key_down>();
-      if (key == K)
-        m_down = false;
-      break;
-    }
-    default:
-      break;
-    }
+  void setup() {
+    using namespace casein;
+    handle(KEY_DOWN, K, [this] { m_down = true; });
+    handle(KEY_UP,   K, [this] { m_down = false; });
   }
 };
 
@@ -34,16 +21,14 @@ template <casein::keys N, casein::keys P> class axis {
 
 public:
   [[nodiscard]] int value() const noexcept {
-    if (m_n.value() && !m_p.value())
-      return -1;
-    if (m_p.value() && !m_n.value())
-      return 1;
+    if (m_n.value() && !m_p.value()) return -1;
+    if (m_p.value() && !m_n.value()) return 1;
     return 0;
   }
 
-  void process_event(const casein::event &e) {
-    m_n.process_event(e);
-    m_p.process_event(e);
+  void setup() {
+    m_n.setup();
+    m_p.setup();
   }
 };
 
@@ -58,9 +43,9 @@ public:
   [[nodiscard]] int h_value() const noexcept { return m_h.value(); }
   [[nodiscard]] int v_value() const noexcept { return m_v.value(); }
 
-  void process_event(const casein::event &e) {
-    m_h.process_event(e);
-    m_v.process_event(e);
+  void setup() {
+    m_h.setup();
+    m_v.setup();
   }
 };
 
@@ -73,9 +58,9 @@ public:
   [[nodiscard]] int v_value() const noexcept { return m_move.v_value(); }
   [[nodiscard]] bool rest() const noexcept { return m_rest.value(); }
 
-  void process_event(const casein::event &e) {
-    m_move.process_event(e);
-    m_rest.process_event(e);
+  void setup() {
+    m_move.setup();
+    m_rest.setup();
   }
 };
 } // namespace input
