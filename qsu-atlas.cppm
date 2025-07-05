@@ -18,7 +18,7 @@ class atlas : public voo::update_thread {
 
   static auto load_image(voo::device_and_queue *dq, jute::view name) {
     if (name == "") {
-      return voo::h2l_image{dq->physical_device(), 16, 16};
+      return voo::h2l_image { dq->physical_device(), 16, 16, VK_FORMAT_R8G8B8A8_SRGB };
     } else {
       return voo::load_sires_image(name, dq->physical_device());
     }
@@ -26,7 +26,7 @@ class atlas : public voo::update_thread {
 
 public:
   atlas(voo::device_and_queue *dq, quack::pipeline_stuff *ps, jute::view name)
-      : update_thread{dq}, m_img{load_image(dq, name)},
+      : update_thread{dq->queue()}, m_img{load_image(dq, name)},
         m_ds{ps->allocate_descriptor_set(m_img.iv(), *m_smp)}, m_name{name} {}
 
   [[nodiscard]] constexpr auto descriptor_set() const noexcept { return m_ds; }
