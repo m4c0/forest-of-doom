@@ -67,7 +67,6 @@ export void update_batteries(compos *ec) {
   constexpr const tile::ui::c levels[]{tile::ui::bat_empty, tile::ui::bat_r_1,
                                        tile::ui::bat_y_2, tile::ui::bat_g_3,
                                        tile::ui::bat_g_4};
-  auto p = ec->player();
   for (auto &[id, _] : ec->batteries()) {
     unsigned val = step(ec->gauges.get(id).value);
     sprite::set_uv(ec, id, tile::uv(levels[val]));
