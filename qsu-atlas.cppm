@@ -25,9 +25,12 @@ class atlas : public voo::update_thread {
   }
 
 public:
-  atlas(voo::device_and_queue *dq, quack::pipeline_stuff *ps, jute::view name)
-      : update_thread{dq->queue()}, m_img{load_image(dq, name)},
-        m_ds{ps->allocate_descriptor_set(m_img.iv(), *m_smp)}, m_name{name} {}
+  atlas(voo::device_and_queue *dq, quack::pipeline_stuff *ps, jute::view name) :
+    update_thread { dq->queue() }
+  , m_img { load_image(dq, name) }
+  , m_ds { ps->allocate_descriptor_set(m_img.iv(), *m_smp) }
+  , m_name { name }
+  {}
 
   [[nodiscard]] constexpr auto descriptor_set() const noexcept { return m_ds; }
   [[nodiscard]] constexpr auto name() const noexcept { return m_name; }
