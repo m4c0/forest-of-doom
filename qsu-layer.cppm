@@ -26,9 +26,12 @@ class layer : voo::update_thread {
 
 public:
   layer(voo::device_and_queue &dq, quack::pipeline_stuff &ps, unsigned max_spr,
-        sprite::layers l, jute::view atlas)
-      : update_thread(&dq), m_atlas{&dq, &ps, atlas},
-        m_spr{ps.create_batch(max_spr)}, m_layer{l} {
+        sprite::layers l, jute::view atlas) :
+    update_thread(&dq),
+    m_atlas { &dq, &ps, atlas },
+    m_spr { ps.create_batch(max_spr) },
+    m_layer { l }
+  {
     m_atlas.run_once();
   }
   ~layer() {
