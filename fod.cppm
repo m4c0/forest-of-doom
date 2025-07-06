@@ -97,7 +97,7 @@ public:
   }
 } * g_g;
 
-static struct app_init {
+struct app_init {
   app_init() {
     using namespace vinyl;
     on(START,  [] { g_g = new game{}; });
