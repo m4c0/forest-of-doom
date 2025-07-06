@@ -1,7 +1,4 @@
-#pragma leco add_resource "1_Terrains_and_Fences_16x16.png"
-#pragma leco add_resource "11_Camping_16x16.png"
-#pragma leco add_resource "Modern_Exteriors_Characters_Scout_16x16_1.png"
-#pragma leco add_resource "Modern_UI_Style_1.png"
+#pragma leco add_resource_dir res
 
 export module qsu;
 import :layer;
