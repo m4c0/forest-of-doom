@@ -6,13 +6,14 @@ template <casein::keys K> class button {
   bool m_down{};
 
 public:
-  [[nodiscard]] constexpr auto value() const noexcept { return m_down; }
-
-  void setup() {
+  button() {
     using namespace casein;
     handle(KEY_DOWN, K, [this] { m_down = true; });
     handle(KEY_UP,   K, [this] { m_down = false; });
   }
+
+  [[nodiscard]] constexpr auto value() const noexcept { return m_down; }
+
 };
 
 template <casein::keys N, casein::keys P> class axis {
@@ -24,11 +25,6 @@ public:
     if (m_n.value() && !m_p.value()) return -1;
     if (m_p.value() && !m_n.value()) return 1;
     return 0;
-  }
-
-  void setup() {
-    m_n.setup();
-    m_p.setup();
   }
 };
 
@@ -42,11 +38,6 @@ class dual_axis {
 public:
   [[nodiscard]] int h_value() const noexcept { return m_h.value(); }
   [[nodiscard]] int v_value() const noexcept { return m_v.value(); }
-
-  void setup() {
-    m_h.setup();
-    m_v.setup();
-  }
 };
 
 class state {
@@ -57,10 +48,5 @@ public:
   [[nodiscard]] int h_value() const noexcept { return m_move.h_value(); }
   [[nodiscard]] int v_value() const noexcept { return m_move.v_value(); }
   [[nodiscard]] bool rest() const noexcept { return m_rest.value(); }
-
-  void setup() {
-    m_move.setup();
-    m_rest.setup();
-  }
 };
 } // namespace input
