@@ -1,4 +1,5 @@
-#pragma leco app
+// TODO: fix build of this or throw it out
+// #pragma leco app
 export module wgen;
 import casein;
 import mapgen;
