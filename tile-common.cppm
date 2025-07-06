@@ -16,9 +16,7 @@ constexpr rect uv(c_t t) {
       .h = static_cast<float>((t >> 0) & 0xFFU),
   };
 }
-struct compos : virtual collision::compos, virtual sprite::compos {
-  pog::sparse_set<c_t> tiles{};
-};
+struct compos : virtual collision::compos, virtual sprite::compos {};
 
 auto add_tile(compos *ec, c_t t, rect uv, sprite::layers l, float x, float y) {
   sprite::c s{
@@ -32,13 +30,10 @@ auto add_tile(compos *ec, c_t t, rect uv, sprite::layers l, float x, float y) {
       .h = s.uv.h,
   };
 
-  auto id = sprite::add(ec, s, r);
-  ec->tiles.add(id, t);
-  return id;
+  return sprite::add(ec, s, r);
 }
 
 void remove_tile(compos *ec, pog::eid id) {
-  ec->tiles.remove(id);
   collision::remove(ec, id);
   sprite::remove(ec, id);
 }
