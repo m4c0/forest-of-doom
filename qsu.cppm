@@ -9,15 +9,15 @@ import area;
 import casein;
 import collision;
 import dotz;
+import hai;
 import pog;
 import quack;
 import sprite;
 import tile;
-import vapp;
 import voo;
 
 namespace qsu {
-export class main : vapp {
+export class main {
   static constexpr const auto max_player_sprites = 16;
   static constexpr const auto max_sprites = 4096;
 
@@ -26,7 +26,21 @@ export class main : vapp {
   static constexpr const auto ui_layer_index =
       static_cast<unsigned>(sprite::layers::ui);
 
-  layer *m_layers;
+  voo::device_and_queue m_dq { "fod", casein::native_ptr };
+  hai::uptr<voo::swapchain_and_stuff> m_sw {};
+  quack::pipeline_stuff m_ps { m_dq, layer_count };
+
+  layer m_layers[layer_count] {
+    { m_dq, m_ps, max_sprites,        sprite::layers::terrain, "1_Terrains_and_Fences_16x16.png" },
+    { m_dq, m_ps, max_sprites,        sprite::layers::camping, "11_Camping_16x16.png" },
+    { m_dq, m_ps, max_player_sprites, sprite::layers::scout,   "Modern_Exteriors_Characters_Scout_16x16_1.png" },
+    { m_dq, m_ps, max_sprites,        sprite::layers::debug,   {} },
+    { m_dq, m_ps, max_sprites,        sprite::layers::ui,      "Modern_UI_Style_1.png" },
+  };
+
+  quack::upc m_ui_upc;
+  quack::upc m_map_upc;
+
   dotz::vec2 m_grid_size;
   dotz::vec2 m_hud_grid_size;
   dotz::vec2 m_center;
@@ -47,65 +61,8 @@ export class main : vapp {
     }
   }
 
-  void run() override {
-    voo::device_and_queue dq{"fod", casein::native_ptr};
-
-    while (!interrupted()) {
-      voo::swapchain_and_stuff sw{dq};
-
-      quack::pipeline_stuff ps { dq, layer_count };
-      layer layers[layer_count] {
-        {dq, ps, max_sprites,        sprite::layers::terrain, "1_Terrains_and_Fences_16x16.png"},
-        {dq, ps, max_sprites,        sprite::layers::camping, "11_Camping_16x16.png"},
-        {dq, ps, max_player_sprites, sprite::layers::scout,   "Modern_Exteriors_Characters_Scout_16x16_1.png"},
-        {dq, ps, max_sprites,        sprite::layers::debug,   {}},
-        {dq, ps, max_sprites,        sprite::layers::ui,      "Modern_UI_Style_1.png"},
-      };
-      m_layers = layers;
-
-      extent_loop(dq.queue(), sw, [&] {
-        auto ui_upc = quack::adjust_aspect(
-            {
-                .grid_pos = {},
-                .grid_size = {16, 16},
-            },
-            sw.aspect());
-        auto map_upc = quack::adjust_aspect(
-            {
-                .grid_pos = m_center,
-                .grid_size = m_grid_size,
-            },
-            sw.aspect());
-
-        sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
-          auto scb = sw.cmd_render_pass({ *pcb });
-
-          for_each_non_ui_layer([&](auto &l) {
-            l.draw(ps, {
-              .sw  = &sw,
-              .scb = *scb,
-              .pc  = &map_upc,
-            }); 
-          });
-
-          for_each_ui_layer([&](auto &l) {
-            l.draw(ps, {
-              .sw  = &sw,
-              .scb = *scb,
-              .pc  = &ui_upc,
-            }); 
-          });
-        });
-      });
-
-      m_layers = nullptr;
-    }
-  }
-
 public:
   void fill(sprite::compos *ec) {
-    if (m_layers == nullptr) return;
-
     for_each_non_ui_layer([ec, this](auto &l) { l.fill(ec, m_center); });
     for_each_ui_layer([ec](auto &l) { l.fill(ec, {}); });
   }
@@ -117,11 +74,45 @@ public:
 
   [[nodiscard]] auto hud_grid_size() noexcept { return m_hud_grid_size; }
 
-  // TODO: fix mouse
   [[nodiscard]] auto mouse_pos() noexcept {
-    if (m_layers == nullptr)
-      return dotz::vec2{};
+    // TODO: fix mouse
     return dotz::vec2{};
   }
+
+  void on_resize() {
+    // Clear swapchains before creating new ones
+    m_sw.reset(nullptr);
+    m_sw.reset(new voo::swapchain_and_stuff { m_dq });
+  }
+  void on_frame() {
+    m_sw->queue_one_time_submit(m_dq.queue(), [this](auto pcb) {
+      auto scb = m_sw->cmd_render_pass({ *pcb });
+
+      auto ui_upc = quack::adjust_aspect({
+        .grid_pos = {},
+        .grid_size = {16, 16},
+      }, m_sw->aspect());
+      auto map_upc = quack::adjust_aspect({
+        .grid_pos = m_center,
+        .grid_size = m_grid_size,
+      }, m_sw->aspect());
+
+      for_each_non_ui_layer([&](auto &l) {
+        l.draw(m_ps, {
+          .sw  = &*m_sw,
+          .scb = *scb,
+          .pc  = &map_upc,
+        }); 
+      });
+
+      for_each_ui_layer([&](auto &l) {
+        l.draw(m_ps, {
+          .sw  = &*m_sw,
+          .scb = *scb,
+          .pc  = &ui_upc,
+        }); 
+      });
+    });
+  }
 };
-} // namespace qsu
+}
