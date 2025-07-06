@@ -85,12 +85,13 @@ public:
     m_sw.reset(new voo::swapchain_and_stuff { m_dq });
   }
   void on_frame() {
+    m_sw->acquire_next_image();
     m_sw->queue_one_time_submit(m_dq.queue(), [this](auto pcb) {
       auto scb = m_sw->cmd_render_pass({ *pcb });
 
       auto ui_upc = quack::adjust_aspect({
-        .grid_pos = {},
-        .grid_size = {16, 16},
+        .grid_pos { 8 * m_sw->aspect(), -8.0f },
+        .grid_size { 32, 32 },
       }, m_sw->aspect());
       auto map_upc = quack::adjust_aspect({
         .grid_pos = m_center,
@@ -113,6 +114,7 @@ public:
         }); 
       });
     });
+    m_sw->queue_present(m_dq.queue());
   }
 };
 }

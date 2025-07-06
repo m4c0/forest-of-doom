@@ -61,8 +61,8 @@ public:
         auto spr = ec->sprites.get(id);
         if (spr.layer != m_layer) return;
 
-        dotz::vec2 aa { aabb.a.x, aabb.a.x };
-        dotz::vec2 bb { aabb.b.x, aabb.b.x };
+        dotz::vec2 aa { aabb.a.x, aabb.a.y };
+        dotz::vec2 bb { aabb.b.x, aabb.b.y };
 
         dotz::vec2 uv    { spr.uv.x, spr.uv.y };
         dotz::vec2 uv_sz { spr.uv.w, spr.uv.h };

@@ -44,7 +44,7 @@ class game {
     player::add_entity(&m_ec);
     hud::add_entities(&m_ec);
 
-    m_q.set_grid(8, 8);
+    m_q.set_grid(16, 16);
     repaint();
     m_ec.reset_watch();
   }
