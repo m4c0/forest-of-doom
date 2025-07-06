@@ -13,10 +13,11 @@ import pog;
 import quack;
 import sprite;
 import tile;
+import vapp;
 import voo;
 
 namespace qsu {
-export class main : voo::casein_thread {
+export class main : vapp {
   static constexpr const auto max_player_sprites = 16;
   static constexpr const auto max_sprites = 4096;
 
@@ -47,26 +48,22 @@ export class main : voo::casein_thread {
   }
 
   void run() override {
-    voo::device_and_queue dq{"fod", native_ptr()};
+    voo::device_and_queue dq{"fod", casein::native_ptr};
 
     while (!interrupted()) {
       voo::swapchain_and_stuff sw{dq};
 
-      quack::pipeline_stuff ps{dq, sw, layer_count};
-      layer layers[layer_count]{
-          {dq, ps, max_sprites, sprite::layers::terrain,
-           "1_Terrains_and_Fences_16x16.png"},
-          {dq, ps, max_sprites, sprite::layers::camping,
-           "11_Camping_16x16.png"},
-          {dq, ps, max_player_sprites, sprite::layers::scout,
-           "Modern_Exteriors_Characters_Scout_16x16_1.png"},
-          {dq, ps, max_sprites, sprite::layers::debug, {}},
-          {dq, ps, max_sprites, sprite::layers::ui, "Modern_UI_Style_1.png"},
+      quack::pipeline_stuff ps { dq, layer_count };
+      layer layers[layer_count] {
+        {dq, ps, max_sprites,        sprite::layers::terrain, "1_Terrains_and_Fences_16x16.png"},
+        {dq, ps, max_sprites,        sprite::layers::camping, "11_Camping_16x16.png"},
+        {dq, ps, max_player_sprites, sprite::layers::scout,   "Modern_Exteriors_Characters_Scout_16x16_1.png"},
+        {dq, ps, max_sprites,        sprite::layers::debug,   {}},
+        {dq, ps, max_sprites,        sprite::layers::ui,      "Modern_UI_Style_1.png"},
       };
       m_layers = layers;
 
-      release_init_lock();
-      extent_loop(dq, sw, [&] {
+      extent_loop(dq.queue(), sw, [&] {
         auto ui_upc = quack::adjust_aspect(
             {
                 .grid_pos = {},
@@ -80,17 +77,25 @@ export class main : voo::casein_thread {
             },
             sw.aspect());
 
-        {
-          voo::cmd_buf_one_time_submit pcb{sw.command_buffer()};
-          auto scb = sw.cmd_render_pass(pcb);
+        sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
+          auto scb = sw.cmd_render_pass({ *pcb });
 
-          ps.cmd_push_vert_frag_constants(*scb, map_upc);
-          for_each_non_ui_layer([&](auto &l) { l.run(ps, *scb); });
+          for_each_non_ui_layer([&](auto &l) {
+            l.draw(ps, {
+              .sw  = &sw,
+              .scb = *scb,
+              .pc  = &map_upc,
+            }); 
+          });
 
-          ps.cmd_push_vert_frag_constants(*scb, ui_upc);
-          for_each_ui_layer([&](auto &l) { l.run(ps, *scb); });
-        }
-        sw.queue_submit(dq);
+          for_each_ui_layer([&](auto &l) {
+            l.draw(ps, {
+              .sw  = &sw,
+              .scb = *scb,
+              .pc  = &ui_upc,
+            }); 
+          });
+        });
       });
 
       m_layers = nullptr;
@@ -99,9 +104,7 @@ export class main : voo::casein_thread {
 
 public:
   void fill(sprite::compos *ec) {
-    wait_init();
-    if (m_layers == nullptr)
-      return;
+    if (m_layers == nullptr) return;
 
     for_each_non_ui_layer([ec, this](auto &l) { l.fill(ec, m_center); });
     for_each_ui_layer([ec](auto &l) { l.fill(ec, {}); });
@@ -116,15 +119,9 @@ public:
 
   // TODO: fix mouse
   [[nodiscard]] auto mouse_pos() noexcept {
-    wait_init();
     if (m_layers == nullptr)
       return dotz::vec2{};
     return dotz::vec2{};
-  }
-
-  void handle(const casein::event &e) {
-    quack::mouse_tracker::instance().handle(e);
-    casein_thread::handle(e);
   }
 };
 } // namespace qsu
