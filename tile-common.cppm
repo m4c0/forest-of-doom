@@ -32,9 +32,4 @@ auto add_tile(compos *ec, c_t t, rect uv, sprite::layers l, float x, float y) {
 
   return sprite::add(ec, s, r);
 }
-
-void remove_tile(compos *ec, pog::eid id) {
-  collision::remove(ec, id);
-  sprite::remove(ec, id);
 }
-} // namespace tile
