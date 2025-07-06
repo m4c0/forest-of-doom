@@ -16,6 +16,7 @@ import qsu;
 import silog;
 import sitime;
 import tile;
+import vinyl;
 
 struct ec : debug::compos,
             hud::compos,
@@ -56,6 +57,7 @@ class game {
   }
 
   void tick() {
+    // TODO: move most of these out of the on_frame code 
     player::tick(&m_ec);
     animation::update_animes(&m_ec);
     movement::update_sprites(&m_ec);
@@ -79,30 +81,29 @@ class game {
   }
 
 public:
-  void process_event(const casein::event &e) {
-    m_q.handle(e);
-    m_ec.input().process_event(e);
-
-    switch (e.type()) {
-    case casein::CREATE_WINDOW:
-      setup();
-      break;
-    case casein::REPAINT:
-      tick();
-      break;
-    case casein::RESIZE_WINDOW:
-      window_changed();
-      break;
-    case casein::QUIT:
-      dump_stats();
-      break;
-    default:
-      break;
-    }
+  game() {
+    setup();
   }
-};
+  ~game() {
+    dump_stats();
+  }
 
-extern "C" void casein_handle(const casein::event &e) {
-  static game gg{};
-  gg.process_event(e);
-}
+  void on_resize() {
+    m_q.on_resize();
+    window_changed();
+  }
+  void on_frame() {
+    m_q.on_frame();
+    tick();
+  }
+} * g_g;
+
+static struct app_init {
+  app_init() {
+    using namespace vinyl;
+    on(START,  [] { g_g = new game{}; });
+    on(RESIZE, [] { g_g->on_resize(); });
+    on(FRAME,  [] { g_g->on_frame();  });
+    on(STOP,   [] { delete g_g;       });
+  }
+} i;
