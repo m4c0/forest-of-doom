@@ -22,8 +22,8 @@ namespace prefabs {
     dotz::vec4 collision;
   };
 
-  export constexpr const auto width = 32;
-  export constexpr const auto height = 32;
+  export constexpr const auto width = 16;
+  export constexpr const auto height = 16;
 
   export class tilemap {
     hai::array<tiledef> m_data { width * height };
