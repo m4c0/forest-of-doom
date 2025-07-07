@@ -27,8 +27,18 @@ void load_prefab(ec * ec, jute::view name, int dx, int dy) {
   try {
     // TODO: cache? instance?
     auto o0 = prefabs::load(name);
-    o0.for_each([&](auto x, auto y, const auto & def) {
-      tile::terrain::add_tile(ec, static_cast<tile::terrain::c>(def.tile), x + dx, y + dy);
+    o0.for_each([&](float x, float y, const auto & def) {
+      sprite::c s {
+        .uv { def.tile.x, def.tile.y, def.tile.z, def.tile.w },
+        .layer = sprite::layers::terrain,
+      };
+      rect r { dx + x, dy + y, def.tile.z, def.tile.w };
+      auto id = sprite::add(ec, s, r);
+      collision::add(ec, id,
+          r.x + def.collision.x,
+          r.y + def.collision.y,
+          def.collision.z,
+          def.collision.w);
     });
   } catch (const prefabs::error & e) {
     silog::log(silog::error, "%s:%d: %s", name.cstr().begin(), e.line_number, e.msg.begin());

@@ -5,6 +5,7 @@ import traits;
 
 namespace prefabs {
   constexpr static dotz::vec4 parse_vec4(jute::view v) {
+    // TODO: validate if all values are defined
     auto [x, a] = v.split(' ');
     auto [y, b] = a.split(' ');
     auto [z, w] = b.split(' ');
@@ -24,7 +25,7 @@ namespace prefabs {
 
     void copy(tiledef o) {
       auto & c = current();
-      if (o.tile) c.tile = o.tile;
+      if (dotz::length(o.tile) > 0) c.tile = o.tile;
       if (dotz::length(o.collision) > 0) c.collision = o.collision;
     }
 
@@ -44,7 +45,7 @@ namespace prefabs {
       auto [cmd, args] = line.split(' ');
       args = args.trim();
 
-           if (cmd == "tile")      current().tile      = jute::to_u32(args);
+           if (cmd == "tile")      current().tile      = parse_vec4(args);
       else if (cmd == "collision") current().collision = parse_vec4(args);
       else if (cmd == "copy")      copy((*this)[args]);
       else throw error { "unknown command: "_hs + cmd };

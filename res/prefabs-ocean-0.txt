@@ -1,15 +1,10 @@
 define O
-  tile 28
-.
-
-// A single collisor for the whole chunk
-define *
-  copy O
-  collision 0 0 16 16
+  tile 12 8 1 1
+  collision 0 0 1 1
 .
 
 map
-*OOOOOOOOOOOOOOO
+OOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOO
 OOOOOOOOOOOOOOOO
