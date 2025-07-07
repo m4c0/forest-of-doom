@@ -6,31 +6,31 @@ define *
 
 // Water-to-Land
 define A
-  tile 14
+  tile 8 6 1 1
 .
 define B
-  tile 15
+  tile 9 6 1 1
 .
 define C
-  tile 16
+  tile 10 6 1 1
 .
 define D
-  tile 17
+  tile 8 7 1 1
 .
 define .
-  tile 18
+  tile 9 7 1 1
 .
 define E
-  tile 20
+  tile 10 7 1 1
 .
 define F
-  tile 0
+  tile 8 8 1 1
 .
 define G
-  tile 0
+  tile 9 8 1 1
 .
 define H
-  tile 0
+  tile 10 8 1 1
 .
 
 define f
