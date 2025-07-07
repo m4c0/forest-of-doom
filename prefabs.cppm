@@ -1,7 +1,5 @@
 #pragma leco add_impl prefabs_impl.cpp
 export module prefabs;
-export import :island_0;
-export import :island_1;
 import dotz;
 import jute;
 import hai;

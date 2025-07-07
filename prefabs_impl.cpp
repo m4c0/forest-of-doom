@@ -56,7 +56,7 @@ namespace prefabs {
         throw error { msg + " for tiledef [" + c.id + "]" };
       };
 
-      if (c.tile != 28) err("TBD: tiles other than 28"_hs);
+      //if (c.tile != 28) err("TBD: tiles other than 28"_hs);
     }
   };
 

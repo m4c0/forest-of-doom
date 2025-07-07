@@ -1,0 +1,86 @@
+// Water
+define *
+  tile 28
+  collision 0 0 1 1
+.
+
+// Water-to-Land
+define A
+  tile 14
+.
+define B
+  tile 15
+.
+define C
+  tile 16
+.
+define D
+  tile 17
+.
+define .
+  tile 18
+.
+define E
+  tile 20
+.
+define F
+  tile 0
+.
+define G
+  tile 0
+.
+define H
+  tile 0
+.
+
+define f
+  tile 26
+.
+
+// Land-to-road
+define L
+  tile 37
+.
+define M
+  tile 35
+.
+define N
+  tile 38
+.
+define O
+  tile 33
+.
+define ;
+  tile 41
+.
+define P
+  tile 32
+.
+define R
+  tile 39
+.
+define S
+  tile 30
+.
+define T
+  tile 40
+.
+
+map
+ABBBBBBBBBBC****
+D..........fBBBC
+D..............E
+D..............E
+D..LMMMMMMMMN..E
+D..O;;;;;;;;P..E
+D..O;;;;;;;;P..E
+D..O;;;;;;;;P..E
+D..O;;;;;;;;P..E
+D..O;;;;;;;;P..E
+D..RSSSSSSSST..E
+D..............*
+D..............*
+*..............*
+*..............*
+*..............*
+.

@@ -51,8 +51,8 @@ class game {
     load_prefab(&m_ec, "prefabs-ocean-0.txt",   0,  16);
     load_prefab(&m_ec, "prefabs-ocean-0.txt",  16,  16);
 
-    auto *ect = static_cast<tile::terrain::compos *>(&m_ec);
-    prefabs::island_0(ect, 0, 0);
+    load_prefab(&m_ec, "prefabs-island-0.txt", 0, 0);
+
     looting::add_backpack(&m_ec, tile::camping::backpack_a, 9, 7);
     looting::add_backpack(&m_ec, tile::camping::backpack_b, 10, 7);
     looting::add_backpack(&m_ec, tile::camping::backpack_c, 11, 7);
