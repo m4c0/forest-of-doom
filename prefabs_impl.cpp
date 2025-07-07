@@ -62,7 +62,7 @@ namespace prefabs {
 
   class parser {
     void (parser::*m_liner)(jute::view) = &parser::take_command;
-    unsigned m_map_row = 1;
+    unsigned m_map_row = 0;
    
     tiledefs m_tdefs {};
     tilemap m_map {};
@@ -96,8 +96,8 @@ namespace prefabs {
       unsigned x = 0;
       unsigned y = m_map_row++;
       for (auto c : line) {
-        x++;
         if (c != ' ') m_map(x, y) = m_tdefs[c];
+        x++;
       }
     }
 
@@ -113,7 +113,7 @@ namespace prefabs {
 
       if (cmd == "map") {
         m_liner = &parser::read_map;
-        m_map_row = 1;
+        m_map_row = 0;
         return;
       }
     

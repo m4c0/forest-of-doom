@@ -31,11 +31,14 @@ class game {
 
     try {
       auto o0 = prefabs::load("prefabs-ocean-0.txt");
+      o0.for_each([&](auto x, auto y, const auto & def) {
+        tile::terrain::add_tile(ect, static_cast<tile::terrain::c>(def.tile), x - 16, y);
+      });
     } catch (const prefabs::error & e) {
       silog::log(silog::error, "prefabs-ocean-0.txt:%d: %s", e.line_number, e.msg.begin());
     }
+
     prefabs::island_0(ect, 0, 0);
-    prefabs::ocean_0(ect, -16, 0);
     prefabs::ocean_0(ect, 16, 0);
     prefabs::ocean_0(ect, -16, -16);
     prefabs::ocean_0(ect, 0, -16);
