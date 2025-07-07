@@ -6,6 +6,7 @@ import debug;
 import hud;
 import gauge;
 import input;
+import jute;
 import looting;
 import misc;
 import movement;
@@ -22,30 +23,36 @@ struct ec : debug::compos,
             looting::compos,
             tile::terrain::compos {};
 
+void load_prefab(ec * ec, jute::view name, int dx, int dy) {
+  try {
+    // TODO: cache? instance?
+    auto o0 = prefabs::load(name);
+    o0.for_each([&](auto x, auto y, const auto & def) {
+      tile::terrain::add_tile(ec, static_cast<tile::terrain::c>(def.tile), x + dx, y + dy);
+    });
+  } catch (const prefabs::error & e) {
+    silog::log(silog::error, "%s:%d: %s", name.cstr().begin(), e.line_number, e.msg.begin());
+  }
+}
+
 class game {
   qsu::main m_q{};
   ec m_ec{};
 
   void setup() {
+    // TODO: speed of character depends on FPS
+ 
+    load_prefab(&m_ec, "prefabs-ocean-0.txt", -16, -16);
+    load_prefab(&m_ec, "prefabs-ocean-0.txt",   0, -16);
+    load_prefab(&m_ec, "prefabs-ocean-0.txt",  16, -16);
+    load_prefab(&m_ec, "prefabs-ocean-0.txt", -16,   0);
+    load_prefab(&m_ec, "prefabs-ocean-0.txt",  16,   0);
+    load_prefab(&m_ec, "prefabs-ocean-0.txt", -16,  16);
+    load_prefab(&m_ec, "prefabs-ocean-0.txt",   0,  16);
+    load_prefab(&m_ec, "prefabs-ocean-0.txt",  16,  16);
+
     auto *ect = static_cast<tile::terrain::compos *>(&m_ec);
-
-    try {
-      auto o0 = prefabs::load("prefabs-ocean-0.txt");
-      o0.for_each([&](auto x, auto y, const auto & def) {
-        tile::terrain::add_tile(ect, static_cast<tile::terrain::c>(def.tile), x - 16, y);
-      });
-    } catch (const prefabs::error & e) {
-      silog::log(silog::error, "prefabs-ocean-0.txt:%d: %s", e.line_number, e.msg.begin());
-    }
-
     prefabs::island_0(ect, 0, 0);
-    prefabs::ocean_0(ect, 16, 0);
-    prefabs::ocean_0(ect, -16, -16);
-    prefabs::ocean_0(ect, 0, -16);
-    prefabs::ocean_0(ect, 16, -16);
-    prefabs::ocean_0(ect, -16, 16);
-    prefabs::ocean_0(ect, 0, 16);
-    prefabs::ocean_0(ect, 16, 16);
     looting::add_backpack(&m_ec, tile::camping::backpack_a, 9, 7);
     looting::add_backpack(&m_ec, tile::camping::backpack_b, 10, 7);
     looting::add_backpack(&m_ec, tile::camping::backpack_c, 11, 7);
