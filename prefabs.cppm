@@ -32,13 +32,12 @@ namespace prefabs {
   class tilemap {
   };
 
-  class loader {
-    void (loader::*m_liner)(jute::view) = &loader::take_command;
-    unsigned m_line_number = 1;
+  class parser {
+    void (parser::*m_liner)(jute::view) = &parser::take_command;
     unsigned m_map_row = 1;
    
-    tiledefs m_tdefs {};
-    tilemap m_map {};
+    //tiledefs m_tdefs {};
+    //tilemap m_map {};
 
     void cmd_version(jute::view arg) {
       arg = arg.trim();
@@ -46,23 +45,23 @@ namespace prefabs {
     }
 
     void cmd_define(jute::view arg) {
-      m_tdefs.add(arg);
-      m_liner = &loader::read_define;
+      //m_tdefs.add(arg);
+      m_liner = &parser::read_define;
     }
 
     void read_define(jute::view line) {
       line = line.trim();
       if (line == ".") {
-        m_tdefs.validate_last();
-        m_liner = &loader::take_command;
+        //m_tdefs.validate_last();
+        m_liner = &parser::take_command;
         return;
       }
-      m_tdefs.parse(line);
+      //m_tdefs.parse(line);
     }
     
     void read_map(jute::view line) {
       if (line == ".") {
-        m_liner = &loader::take_command;
+        m_liner = &parser::take_command;
         return;
       }
 
@@ -70,7 +69,7 @@ namespace prefabs {
       unsigned y = m_map_row++;
       for (auto c : line) {
         x++;
-        if (c != ' ') m_map(x, y) = m_tdefs[c];
+        //if (c != ' ') m_map(x, y) = m_tdefs[c];
       }
     }
 
@@ -85,7 +84,7 @@ namespace prefabs {
       if (cmd == "define")  return cmd_define(args);
 
       if (cmd == "map") {
-        m_liner = &loader::read_map;
+        m_liner = &parser::read_map;
         m_map_row = 1;
         return;
       }
@@ -94,18 +93,23 @@ namespace prefabs {
     }
 
   public:
-    explicit loader(jute::view filename) try {
-      jojo::readlines(filename, [this](auto line) {
-        (this->*m_liner)(line);
-        m_line_number++;
+    void parse(jute::view line) { (this->*m_liner)(line); }
+
+    //[[nodiscard]] constexpr auto take() { return traits::move(m_map); }
+  };
+
+  export [[nodiscard]] auto load(jute::view filename) {
+    unsigned line_number = 1;
+    try {
+      parser p {};
+      jojo::readlines(filename, [&](auto line) {
+        p.parse(line);
+        line_number++;
       });
+      //return p.take();
     } catch (error & e) {
-      e.line_number = m_line_number;
+      e.line_number = line_number;
       throw traits::move(e);
     }
-
-    [[nodiscard]] constexpr auto take() {
-      return traits::move(m_map);
-    }
-  };
+  }
 }
