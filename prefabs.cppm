@@ -4,6 +4,7 @@ export import :island_1;
 export import :ocean_0;
 export import :wgen_0;
 export import :wgen_1;
+import dotz;
 import jojo;
 import jute;
 import hai;
@@ -20,15 +21,59 @@ namespace prefabs {
   };
 
   struct tiledef {
-    hai::cstr id;
+    jute::heap id;
+    unsigned   tile;
+    dotz::vec4 collision;
   };
+
+  static dotz::vec4 parse_vec4(jute::view v) {
+    throw error { "parse vec4 TBD"_hs };
+  } 
 
   class tiledefs {
     static constexpr const auto max = 128;
 
     hai::varray<tiledef> m_defs { max };
 
+    [[nodiscard]] constexpr auto & current() { return m_defs[m_defs.size() - 1]; }
+
+    void copy(tiledef o) {
+      auto & c = current();
+      if (o.tile) c.tile = o.tile;
+      if (dotz::length(o.collision) > 0) c.collision = o.collision;
+    }
+
+    [[nodiscard]] constexpr auto & operator[](jute::view id) const {
+      for (auto & d: m_defs) if (d.id == id) return d;
+      throw error("undefined tiledef: "_hs + id);
+    }
+
+  public:
+    [[nodiscard]] constexpr auto & operator[](char id) const {
+      jute::view v { &id, 1 };
+      return (*this)[v];
+    };
+
+    void add(jute::view arg) { m_defs.push_back(tiledef { arg.trim() }); }
+    void parse(jute::view line) {
+      auto [cmd, args] = line.split(' ');
+      args = args.trim();
+
+           if (cmd == "tile")      current().tile      = jute::to_u32(args);
+      else if (cmd == "collision") current().collision = parse_vec4(args);
+      else throw error { "unknown command: "_hs + cmd };
+    }
+
+    void validate_last() {
+      auto & c = current();
+      const auto err = [&](jute::heap msg) {
+        throw error { msg + " for tiledef [" + c.id + "]" };
+      };
+
+      if (c.tile != 28) err("TBD: tiles other than 28"_hs);
+    }
   };
+
   class tilemap {
   };
 
@@ -36,7 +81,7 @@ namespace prefabs {
     void (parser::*m_liner)(jute::view) = &parser::take_command;
     unsigned m_map_row = 1;
    
-    //tiledefs m_tdefs {};
+    tiledefs m_tdefs {};
     //tilemap m_map {};
 
     void cmd_version(jute::view arg) {
@@ -45,18 +90,18 @@ namespace prefabs {
     }
 
     void cmd_define(jute::view arg) {
-      //m_tdefs.add(arg);
+      m_tdefs.add(arg);
       m_liner = &parser::read_define;
     }
 
     void read_define(jute::view line) {
       line = line.trim();
       if (line == ".") {
-        //m_tdefs.validate_last();
+        m_tdefs.validate_last();
         m_liner = &parser::take_command;
         return;
       }
-      //m_tdefs.parse(line);
+      m_tdefs.parse(line);
     }
     
     void read_map(jute::view line) {
