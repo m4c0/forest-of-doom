@@ -28,6 +28,12 @@ class game {
 
   void setup() {
     auto *ect = static_cast<tile::terrain::compos *>(&m_ec);
+
+    try {
+      auto o0 = prefabs::load("prefabs-ocean-0.txt");
+    } catch (const prefabs::error & e) {
+      silog::log(silog::error, "prefabs-ocean-0.txt:%d: %s", e.line_number, e.msg.begin());
+    }
     prefabs::island_0(ect, 0, 0);
     prefabs::ocean_0(ect, -16, 0);
     prefabs::ocean_0(ect, 16, 0);

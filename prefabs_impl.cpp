@@ -1,5 +1,6 @@
 module prefabs;
 import jojo;
+import sires;
 import traits;
 
 namespace prefabs {
@@ -45,6 +46,7 @@ namespace prefabs {
 
            if (cmd == "tile")      current().tile      = jute::to_u32(args);
       else if (cmd == "collision") current().collision = parse_vec4(args);
+      else if (cmd == "copy")      copy((*this)[args]);
       else throw error { "unknown command: "_hs + cmd };
     }
 
@@ -124,11 +126,11 @@ namespace prefabs {
     [[nodiscard]] constexpr auto take() { return traits::move(m_map); }
   };
 
-  auto load(jute::view filename) {
+  tilemap load(jute::view filename) {
     unsigned line_number = 1;
     try {
       parser p {};
-      jojo::readlines(filename, [&](auto line) {
+      jojo::readlines(sires::real_path_name(filename), [&](auto line) {
         p.parse(line);
         line_number++;
       });
