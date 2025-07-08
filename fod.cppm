@@ -18,9 +18,9 @@ import sitime;
 import tile;
 import v;
 
-struct ec : hud::compos, looting::compos {};
+struct ec : hud::compos, looting::compos {} g_ec;
 
-void load_prefab(ec * ec, jute::view name, int dx, int dy) {
+void load_prefab(jute::view name, int dx, int dy) {
   try {
     // TODO: cache? instance?
     auto o0 = prefabs::load(name);
@@ -30,9 +30,9 @@ void load_prefab(ec * ec, jute::view name, int dx, int dy) {
         .layer = sprite::layers::terrain,
       };
       rect r { dx + x, dy + y, def.tile.z, def.tile.w };
-      auto id = sprite::add(ec, s, r);
+      auto id = sprite::add(&g_ec, s, r);
       if (dotz::length(def.collision) > 0) {
-        collision::add(ec, id,
+        collision::add(&g_ec, id,
             r.x + def.collision.x,
             r.y + def.collision.y,
             def.collision.z,
@@ -44,77 +44,67 @@ void load_prefab(ec * ec, jute::view name, int dx, int dy) {
   }
 }
 
-class game {
-  qsu::main m_q{};
-  ec m_ec{};
+qsu::main * g_q {};
 
-  void setup() {
-    // TODO: speed of character depends on FPS
- 
-    load_prefab(&m_ec, "prefabs-ocean-0.txt", -16, -16);
-    load_prefab(&m_ec, "prefabs-ocean-0.txt",   0, -16);
-    load_prefab(&m_ec, "prefabs-ocean-0.txt",  16, -16);
-    load_prefab(&m_ec, "prefabs-ocean-0.txt", -16,   0);
-    load_prefab(&m_ec, "prefabs-ocean-0.txt",  16,   0);
-    load_prefab(&m_ec, "prefabs-ocean-0.txt", -16,  16);
-    load_prefab(&m_ec, "prefabs-ocean-0.txt",   0,  16);
-    load_prefab(&m_ec, "prefabs-ocean-0.txt",  16,  16);
+static void repaint() {
+  misc::follow_player(g_q, &g_ec);
+  g_q->fill(&g_ec);
+}
 
-    load_prefab(&m_ec, "prefabs-island-0.txt", 0, 0);
+static void on_start() {
+  g_q = new qsu::main {};
 
-    looting::add_backpack(&m_ec, tile::camping::backpack_a, 9, 7);
-    looting::add_backpack(&m_ec, tile::camping::backpack_b, 10, 7);
-    looting::add_backpack(&m_ec, tile::camping::backpack_c, 11, 7);
+  load_prefab("prefabs-ocean-0.txt", -16, -16);
+  load_prefab("prefabs-ocean-0.txt",   0, -16);
+  load_prefab("prefabs-ocean-0.txt",  16, -16);
+  load_prefab("prefabs-ocean-0.txt", -16,   0);
+  load_prefab("prefabs-ocean-0.txt",  16,   0);
+  load_prefab("prefabs-ocean-0.txt", -16,  16);
+  load_prefab("prefabs-ocean-0.txt",   0,  16);
+  load_prefab("prefabs-ocean-0.txt",  16,  16);
 
-    player::add_entity(&m_ec);
-    hud::add_entities(&m_ec);
+  load_prefab("prefabs-island-0.txt", 0, 0);
 
-    m_q.set_grid(32, 32);
-    repaint();
-    m_ec.reset_watch();
-  }
+  looting::add_backpack(&g_ec, tile::camping::backpack_a, 9, 7);
+  looting::add_backpack(&g_ec, tile::camping::backpack_b, 10, 7);
+  looting::add_backpack(&g_ec, tile::camping::backpack_c, 11, 7);
 
-  void repaint() {
-    misc::follow_player(&m_q, &m_ec);
-    m_q.fill(&m_ec);
-  }
+  player::add_entity(&g_ec);
+  hud::add_entities(&g_ec);
 
-  void tick() {
-    // TODO: move most of these out of the on_frame code 
-    player::tick(&m_ec);
-    animation::update_animes(&m_ec);
-    movement::update_sprites(&m_ec);
-    gauge::run_drains(&m_ec);
-    hud::update_batteries(&m_ec);
-    looting::mark_lootable(&m_ec);
-    repaint();
-    m_ec.reset_watch();
-  }
+  g_q->set_grid(32, 32);
+  repaint();
+  g_ec.reset_watch();
+}
 
-  void window_changed() {
-    auto [gw, gh] = m_q.hud_grid_size();
-    hud::update_layout(&m_ec, gw, gh);
-  }
+static void on_frame() {
+  // TODO: speed of character depends on FPS
+  // TODO: move most of these out of the on_frame code 
+  player::tick(&g_ec);
+  animation::update_animes(&g_ec);
+  movement::update_sprites(&g_ec);
+  gauge::run_drains(&g_ec);
+  hud::update_batteries(&g_ec);
+  looting::mark_lootable(&g_ec);
+  repaint();
+  g_ec.reset_watch();
+  g_q->on_frame();
+}
 
-public:
-  game() {
-    setup();
-  }
+static void on_resize() {
+  auto [gw, gh] = g_q->hud_grid_size();
+  hud::update_layout(&g_ec, gw, gh);
+}
 
-  void on_resize() {
-    window_changed();
-  }
-  void on_frame() {
-    m_q.on_frame();
-    tick();
-  }
-} * g_g;
+static void on_stop() {
+  delete g_q;
+}
 
 struct app_init {
   app_init() {
-    v::on_start  = [] { g_g = new game{}; };
-    v::on_resize = [] { g_g->on_resize(); };
-    v::on_frame  = [] { g_g->on_frame();  };
-    v::on_stop   = [] { delete g_g;       };
+    v::on_start  = on_start;
+    v::on_resize = on_resize;
+    v::on_frame  = on_frame;
+    v::on_stop   = on_stop;
   }
 } i;
