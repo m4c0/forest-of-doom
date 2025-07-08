@@ -16,7 +16,7 @@ import qsu;
 import silog;
 import sitime;
 import tile;
-import vinyl;
+import v;
 
 struct ec : hud::compos,
             looting::compos,
@@ -98,23 +98,12 @@ class game {
     hud::update_layout(&m_ec, gw, gh);
   }
 
-  void dump_stats() {
-    silog::log(silog::debug, "Max entities: %d", m_ec.e().max_elements());
-    silog::log(silog::debug, "Animations: %d", m_ec.animations().size());
-    silog::log(silog::debug, "Gauges: %d", m_ec.gauges.size());
-    silog::log(silog::debug, "Movements: %d", m_ec.movements().size());
-  }
-
 public:
   game() {
     setup();
   }
-  ~game() {
-    dump_stats();
-  }
 
   void on_resize() {
-    m_q.on_resize();
     window_changed();
   }
   void on_frame() {
@@ -125,10 +114,9 @@ public:
 
 struct app_init {
   app_init() {
-    using namespace vinyl;
-    on(START,  [] { g_g = new game{}; });
-    on(RESIZE, [] { g_g->on_resize(); });
-    on(FRAME,  [] { g_g->on_frame();  });
-    on(STOP,   [] { delete g_g;       });
+    v::on_start  = [] { g_g = new game{}; };
+    v::on_resize = [] { g_g->on_resize(); };
+    v::on_frame  = [] { g_g->on_frame();  };
+    v::on_stop   = [] { delete g_g;       };
   }
 } i;

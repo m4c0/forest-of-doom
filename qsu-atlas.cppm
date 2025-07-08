@@ -1,6 +1,7 @@
 export module qsu:atlas;
 import jute;
 import quack;
+import v;
 import vee;
 import voo;
 
@@ -16,14 +17,14 @@ class atlas : public voo::update_thread {
     m_img.setup_copy(cb);
   }
 
-  static auto load_image(voo::device_and_queue *dq, jute::view name) {
-    return voo::load_sires_image(name, dq->physical_device());
+  static auto load_image(jute::view name) {
+    return voo::load_sires_image(name, v::dq()->physical_device());
   }
 
 public:
-  atlas(voo::device_and_queue *dq, quack::pipeline_stuff *ps, jute::view name) :
-    update_thread { dq->queue() }
-  , m_img { load_image(dq, name) }
+  atlas(quack::pipeline_stuff *ps, jute::view name) :
+    update_thread { v::dq()->queue() }
+  , m_img { load_image(name) }
   , m_ds { ps->allocate_descriptor_set(m_img.iv(), *m_smp) }
   , m_name { name }
   {}

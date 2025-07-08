@@ -6,6 +6,7 @@ import pog;
 import quack;
 import silog;
 import sprite;
+import v;
 import vee;
 import voo;
 
@@ -27,11 +28,10 @@ class layer : voo::update_thread {
   }
 
 public:
-  layer(voo::device_and_queue &dq, quack::pipeline_stuff &ps, unsigned max_spr,
-        sprite::layers l, jute::view atlas) :
-    update_thread { dq.queue() },
-    m_atlas { &dq, &ps, atlas },
-    m_spr { dq.physical_device(), max_spr * instance_size },
+  layer(quack::pipeline_stuff &ps, unsigned max_spr, sprite::layers l, jute::view atlas) :
+    update_thread { v::dq()->queue() },
+    m_atlas { &ps, atlas },
+    m_spr { v::dq()->physical_device(), max_spr * instance_size },
     m_layer { l }
   {
     m_atlas.run_once();

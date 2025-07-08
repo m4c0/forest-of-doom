@@ -11,6 +11,7 @@ import pog;
 import quack;
 import sprite;
 import tile;
+import v;
 import voo;
 
 namespace qsu {
@@ -23,15 +24,13 @@ export class main {
   static constexpr const auto ui_layer_index =
       static_cast<unsigned>(sprite::layers::ui);
 
-  voo::device_and_queue m_dq { "fod", casein::native_ptr };
-  hai::uptr<voo::swapchain_and_stuff> m_sw {};
-  quack::pipeline_stuff m_ps { m_dq, layer_count };
+  quack::pipeline_stuff m_ps { *v::dq(), layer_count };
 
   layer m_layers[layer_count] {
-    { m_dq, m_ps, max_sprites,        sprite::layers::terrain, "1_Terrains_and_Fences_16x16.png" },
-    { m_dq, m_ps, max_sprites,        sprite::layers::camping, "11_Camping_16x16.png" },
-    { m_dq, m_ps, max_player_sprites, sprite::layers::scout,   "Modern_Exteriors_Characters_Scout_16x16_1.png" },
-    { m_dq, m_ps, max_sprites,        sprite::layers::ui,      "Modern_UI_Style_1.png" },
+    { m_ps, max_sprites,        sprite::layers::terrain, "1_Terrains_and_Fences_16x16.png" },
+    { m_ps, max_sprites,        sprite::layers::camping, "11_Camping_16x16.png" },
+    { m_ps, max_player_sprites, sprite::layers::scout,   "Modern_Exteriors_Characters_Scout_16x16_1.png" },
+    { m_ps, max_sprites,        sprite::layers::ui,      "Modern_UI_Style_1.png" },
   };
 
   quack::upc m_ui_upc;
@@ -75,28 +74,23 @@ public:
     return dotz::vec2{};
   }
 
-  void on_resize() {
-    // Clear swapchains before creating new ones
-    m_sw.reset(nullptr);
-    m_sw.reset(new voo::swapchain_and_stuff { m_dq });
-  }
   void on_frame() {
-    m_sw->acquire_next_image();
-    m_sw->queue_one_time_submit(m_dq.queue(), [this](auto pcb) {
-      auto scb = m_sw->cmd_render_pass({ *pcb });
+    v::sw()->acquire_next_image();
+    v::sw()->queue_one_time_submit(v::dq()->queue(), [this](auto pcb) {
+      auto scb = v::sw()->cmd_render_pass({ *pcb });
 
       auto ui_upc = quack::adjust_aspect({
-        .grid_pos { 8 * m_sw->aspect(), -8.0f },
+        .grid_pos { 8 * v::sw()->aspect(), -8.0f },
         .grid_size { 32, 32 },
-      }, m_sw->aspect());
+      }, v::sw()->aspect());
       auto map_upc = quack::adjust_aspect({
         .grid_pos = m_center,
         .grid_size = m_grid_size,
-      }, m_sw->aspect());
+      }, v::sw()->aspect());
 
       for_each_non_ui_layer([&](auto &l) {
         l.draw(m_ps, {
-          .sw  = &*m_sw,
+          .sw  = v::sw(),
           .scb = *scb,
           .pc  = &map_upc,
         }); 
@@ -104,13 +98,13 @@ public:
 
       for_each_ui_layer([&](auto &l) {
         l.draw(m_ps, {
-          .sw  = &*m_sw,
+          .sw  = v::sw(),
           .scb = *scb,
           .pc  = &ui_upc,
         }); 
       });
     });
-    m_sw->queue_present(m_dq.queue());
+    v::sw()->queue_present(v::dq()->queue());
   }
 };
 }
