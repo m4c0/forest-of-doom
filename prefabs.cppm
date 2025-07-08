@@ -15,9 +15,9 @@ namespace prefabs {
   };
 
   export struct tiledef {
-    jute::heap id;
-    dotz::vec4 tile;
-    dotz::vec4 collision;
+    jute::heap id {};
+    dotz::vec4 tile {};
+    dotz::vec4 collision {};
   };
 
   export constexpr const auto width = 16;

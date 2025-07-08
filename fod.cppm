@@ -2,6 +2,7 @@
 export module fod;
 
 import animation;
+import dotz;
 import hud;
 import gauge;
 import input;
@@ -32,11 +33,13 @@ void load_prefab(ec * ec, jute::view name, int dx, int dy) {
       };
       rect r { dx + x, dy + y, def.tile.z, def.tile.w };
       auto id = sprite::add(ec, s, r);
-      collision::add(ec, id,
-          r.x + def.collision.x,
-          r.y + def.collision.y,
-          def.collision.z,
-          def.collision.w);
+      if (dotz::length(def.collision) > 0) {
+        collision::add(ec, id,
+            r.x + def.collision.x,
+            r.y + def.collision.y,
+            def.collision.z,
+            def.collision.w);
+      }
     });
   } catch (const prefabs::error & e) {
     silog::log(silog::error, "%s:%d: %s", name.cstr().begin(), e.line_number, e.msg.begin());

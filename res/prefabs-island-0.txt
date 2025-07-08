@@ -51,7 +51,7 @@ define O
   tile 33
 .
 define ;
-  tile 41
+  tile 28 9 1 1
 .
 define P
   tile 32
