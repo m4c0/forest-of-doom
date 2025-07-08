@@ -31,7 +31,6 @@ export class main {
     { m_dq, m_ps, max_sprites,        sprite::layers::terrain, "1_Terrains_and_Fences_16x16.png" },
     { m_dq, m_ps, max_sprites,        sprite::layers::camping, "11_Camping_16x16.png" },
     { m_dq, m_ps, max_player_sprites, sprite::layers::scout,   "Modern_Exteriors_Characters_Scout_16x16_1.png" },
-    { m_dq, m_ps, max_sprites,        sprite::layers::debug,   {} },
     { m_dq, m_ps, max_sprites,        sprite::layers::ui,      "Modern_UI_Style_1.png" },
   };
 

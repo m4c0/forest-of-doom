@@ -4,7 +4,7 @@ import pog;
 export import rect;
 
 export namespace sprite {
-enum class layers { terrain, camping, scout, debug, ui, last };
+enum class layers { terrain, camping, scout, ui, last };
 
 struct colour {
   float r;

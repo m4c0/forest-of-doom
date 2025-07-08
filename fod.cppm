@@ -2,7 +2,6 @@
 export module fod;
 
 import animation;
-import debug;
 import hud;
 import gauge;
 import input;
@@ -18,8 +17,7 @@ import sitime;
 import tile;
 import vinyl;
 
-struct ec : debug::compos,
-            hud::compos,
+struct ec : hud::compos,
             looting::compos,
             tile::terrain::compos {};
 
@@ -70,14 +68,13 @@ class game {
     player::add_entity(&m_ec);
     hud::add_entities(&m_ec);
 
-    m_q.set_grid(16, 16);
+    m_q.set_grid(32, 32);
     repaint();
     m_ec.reset_watch();
   }
 
   void repaint() {
-    auto [cx, cy] = misc::follow_player(&m_q, &m_ec);
-    debug::show_collisions_around(&m_ec, cx, cy, 8);
+    misc::follow_player(&m_q, &m_ec);
     m_q.fill(&m_ec);
   }
 

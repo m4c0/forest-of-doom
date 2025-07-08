@@ -17,11 +17,7 @@ class atlas : public voo::update_thread {
   }
 
   static auto load_image(voo::device_and_queue *dq, jute::view name) {
-    if (name == "") {
-      return voo::h2l_image { dq->physical_device(), 16, 16, VK_FORMAT_R8G8B8A8_SRGB };
-    } else {
-      return voo::load_sires_image(name, dq->physical_device());
-    }
+    return voo::load_sires_image(name, dq->physical_device());
   }
 
 public:
