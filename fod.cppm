@@ -18,9 +18,7 @@ import sitime;
 import tile;
 import v;
 
-struct ec : hud::compos,
-            looting::compos,
-            tile::terrain::compos {};
+struct ec : hud::compos, looting::compos {};
 
 void load_prefab(ec * ec, jute::view name, int dx, int dy) {
   try {
