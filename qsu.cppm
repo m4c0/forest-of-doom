@@ -87,7 +87,6 @@ public:
     for_each_non_ui_layer([&](auto &l) {
       l.draw(m_ps, {
         .sw  = v::sw(),
-        .scb = v::sw()->command_buffer(),
         .pc  = &map_upc,
       }); 
     });
@@ -95,7 +94,6 @@ public:
     for_each_ui_layer([&](auto &l) {
       l.draw(m_ps, {
         .sw  = v::sw(),
-        .scb = v::sw()->command_buffer(),
         .pc  = &ui_upc,
       }); 
     });
