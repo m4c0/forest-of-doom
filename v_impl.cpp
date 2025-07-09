@@ -24,7 +24,11 @@ static void on_resize() {
   v::on_resize();
 }
 static void on_frame() {
-  v::on_frame();
+  v::sw()->acquire_next_image();
+  v::sw()->queue_one_time_submit(v::dq()->queue(), [](auto pcb) {
+    v::on_frame();
+  });
+  v::sw()->queue_present(v::dq()->queue());
 }
 static void on_stop() {
   v::on_stop();

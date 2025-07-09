@@ -75,36 +75,32 @@ public:
   }
 
   void on_frame() {
-    v::sw()->acquire_next_image();
-    v::sw()->queue_one_time_submit(v::dq()->queue(), [this](auto pcb) {
-      auto scb = v::sw()->cmd_render_pass({ *pcb });
+    auto scb = v::sw()->cmd_render_pass({ v::sw()->command_buffer() });
 
-      auto ui_upc = quack::adjust_aspect({
-        .grid_pos { 8 * v::sw()->aspect(), -8.0f },
-        .grid_size { 32, 32 },
-      }, v::sw()->aspect());
-      auto map_upc = quack::adjust_aspect({
-        .grid_pos = m_center,
-        .grid_size = m_grid_size,
-      }, v::sw()->aspect());
+    auto ui_upc = quack::adjust_aspect({
+      .grid_pos { 8 * v::sw()->aspect(), -8.0f },
+      .grid_size { 32, 32 },
+    }, v::sw()->aspect());
+    auto map_upc = quack::adjust_aspect({
+      .grid_pos = m_center,
+      .grid_size = m_grid_size,
+    }, v::sw()->aspect());
 
-      for_each_non_ui_layer([&](auto &l) {
-        l.draw(m_ps, {
-          .sw  = v::sw(),
-          .scb = *scb,
-          .pc  = &map_upc,
-        }); 
-      });
-
-      for_each_ui_layer([&](auto &l) {
-        l.draw(m_ps, {
-          .sw  = v::sw(),
-          .scb = *scb,
-          .pc  = &ui_upc,
-        }); 
-      });
+    for_each_non_ui_layer([&](auto &l) {
+      l.draw(m_ps, {
+        .sw  = v::sw(),
+        .scb = *scb,
+        .pc  = &map_upc,
+      }); 
     });
-    v::sw()->queue_present(v::dq()->queue());
+
+    for_each_ui_layer([&](auto &l) {
+      l.draw(m_ps, {
+        .sw  = v::sw(),
+        .scb = *scb,
+        .pc  = &ui_upc,
+      }); 
+    });
   }
 };
 }
