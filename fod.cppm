@@ -27,6 +27,7 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
     auto o0 = prefabs::load(name);
     o0.for_each([&](float x, float y, const auto & def) {
       *m += fox::sprite {
+        .pos { dx + x, dy + y },
       };
 
       sprite::c s {
