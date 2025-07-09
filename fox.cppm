@@ -2,6 +2,7 @@
 #pragma leco add_shader fox.frag
 export module fox;
 import dotz;
+import sires;
 import traits;
 import v;
 import voo;
@@ -23,6 +24,8 @@ namespace fox {
   };
 
   export class main {
+    vee::sampler m_smp = vee::create_sampler(vee::nearest_sampler);
+    voo::bound_image m_img {};
     voo::bound_buffer m_buf = voo::bound_buffer::create_from_host(
         v::dq()->physical_device(),
         max_sprites * sizeof(sprite),
@@ -31,7 +34,10 @@ namespace fox {
 
     voo::one_quad m_quad { v::dq()->physical_device() };
 
-    vee::pipeline_layout m_pl = vee::create_pipeline_layout(vee::vertex_push_constant_range<upc>());
+    voo::single_frag_dset m_dset { 1 };
+    vee::pipeline_layout m_pl = vee::create_pipeline_layout(
+        m_dset.descriptor_set_layout(),
+        vee::vertex_push_constant_range<upc>());
     vee::gr_pipeline m_ppl = vee::create_graphics_pipeline({
       .pipeline_layout = *m_pl,
       .render_pass = v::dq()->render_pass(),
@@ -52,6 +58,14 @@ namespace fox {
     });
 
   public:
+    main() {
+      auto img = sires::real_path_name("1_Terrains_and_Fences_16x16.png");
+      auto pd = v::dq()->physical_device();
+      auto q = v::dq()->queue();
+      voo::load_image(img, pd, q, &m_img, [this] {
+        vee::update_descriptor_set(m_dset.descriptor_set(), 0, *m_img.iv, *m_smp);
+      });
+    }
     void load(auto && fn) {
       voo::memiter<sprite> m { *m_buf.memory, &m_count };
       fn(&m);
@@ -67,6 +81,7 @@ namespace fox {
       vee::cmd_bind_gr_pipeline(cb, *m_ppl);
       vee::cmd_bind_vertex_buffers(cb, 1, *m_buf.buffer);
       vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset.descriptor_set());
       m_quad.run(cb, 0, m_count);
     }
   };
