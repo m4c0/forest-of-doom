@@ -26,6 +26,7 @@ static void on_resize() {
 static void on_frame() {
   v::sw()->acquire_next_image();
   v::sw()->queue_one_time_submit(v::dq()->queue(), [](auto pcb) {
+    auto rp = v::sw()->cmd_render_pass();
     v::on_frame();
   });
   v::sw()->queue_present(v::dq()->queue());

@@ -97,6 +97,7 @@ static void on_frame() {
   repaint();
   g_ec.reset_watch();
   g_q->on_frame();
+  g_fox->on_frame();
 }
 
 static void on_resize() {

@@ -75,8 +75,6 @@ public:
   }
 
   void on_frame() {
-    auto scb = v::sw()->cmd_render_pass();
-
     auto ui_upc = quack::adjust_aspect({
       .grid_pos { 8 * v::sw()->aspect(), -8.0f },
       .grid_size { 32, 32 },
@@ -89,7 +87,7 @@ public:
     for_each_non_ui_layer([&](auto &l) {
       l.draw(m_ps, {
         .sw  = v::sw(),
-        .scb = *scb,
+        .scb = v::sw()->command_buffer(),
         .pc  = &map_upc,
       }); 
     });
@@ -97,7 +95,7 @@ public:
     for_each_ui_layer([&](auto &l) {
       l.draw(m_ps, {
         .sw  = v::sw(),
-        .scb = *scb,
+        .scb = v::sw()->command_buffer(),
         .pc  = &ui_upc,
       }); 
     });

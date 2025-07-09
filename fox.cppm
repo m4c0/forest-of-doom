@@ -48,7 +48,8 @@ namespace fox {
       fn(&m);
     }
 
-    void render(vee::command_buffer cb) {
+    void on_frame() {
+      auto cb = v::sw()->command_buffer();
       vee::cmd_bind_gr_pipeline(cb, *m_ppl);
       vee::cmd_bind_vertex_buffers(cb, 1, *m_buf.buffer);
       m_quad.run(cb, 0, m_count);
