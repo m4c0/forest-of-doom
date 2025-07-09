@@ -11,6 +11,8 @@ namespace fox {
 
   export struct sprite {
     dotz::vec2 pos;
+    dotz::vec2 uv;
+    dotz::vec2 size;
   };
 
   export using memiter = voo::memiter<sprite>;
@@ -44,6 +46,8 @@ namespace fox {
       .attributes {
         voo::one_quad::vertex_attribute(0),
         vee::vertex_attribute_vec2(1, traits::offset_of(&sprite::pos)),
+        vee::vertex_attribute_vec2(1, traits::offset_of(&sprite::uv)),
+        vee::vertex_attribute_vec2(1, traits::offset_of(&sprite::size)),
       },
     });
 
