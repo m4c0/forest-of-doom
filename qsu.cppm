@@ -75,7 +75,7 @@ public:
   }
 
   void on_frame() {
-    auto scb = v::sw()->cmd_render_pass({ v::sw()->command_buffer() });
+    auto scb = v::sw()->cmd_render_pass();
 
     auto ui_upc = quack::adjust_aspect({
       .grid_pos { 8 * v::sw()->aspect(), -8.0f },
