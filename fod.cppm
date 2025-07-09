@@ -3,6 +3,7 @@ export module fod;
 
 import animation;
 import dotz;
+import fox;
 import hud;
 import gauge;
 import input;
@@ -20,11 +21,14 @@ import v;
 
 struct ec : hud::compos, looting::compos {} g_ec;
 
-void load_prefab(jute::view name, int dx, int dy) {
+void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
   try {
     // TODO: cache? instance?
     auto o0 = prefabs::load(name);
     o0.for_each([&](float x, float y, const auto & def) {
+      *m += fox::sprite {
+      };
+
       sprite::c s {
         .uv { def.tile.x, def.tile.y, def.tile.z, def.tile.w },
         .layer = sprite::layers::terrain,
@@ -44,6 +48,7 @@ void load_prefab(jute::view name, int dx, int dy) {
   }
 }
 
+fox::main * g_fox {};
 qsu::main * g_q {};
 
 static void repaint() {
@@ -53,17 +58,20 @@ static void repaint() {
 
 static void on_start() {
   g_q = new qsu::main {};
-
-  load_prefab("prefabs-ocean-0.txt", -16, -16);
-  load_prefab("prefabs-ocean-0.txt",   0, -16);
-  load_prefab("prefabs-ocean-0.txt",  16, -16);
-  load_prefab("prefabs-ocean-0.txt", -16,   0);
-  load_prefab("prefabs-ocean-0.txt",  16,   0);
-  load_prefab("prefabs-ocean-0.txt", -16,  16);
-  load_prefab("prefabs-ocean-0.txt",   0,  16);
-  load_prefab("prefabs-ocean-0.txt",  16,  16);
-
-  load_prefab("prefabs-island-0.txt", 0, 0);
+  g_fox = new fox::main {};
+  
+  g_fox->load([](auto * m) {
+    load_prefab(m, "prefabs-ocean-0.txt", -16, -16);
+    load_prefab(m, "prefabs-ocean-0.txt",   0, -16);
+    load_prefab(m, "prefabs-ocean-0.txt",  16, -16);
+    load_prefab(m, "prefabs-ocean-0.txt", -16,   0);
+    load_prefab(m, "prefabs-ocean-0.txt",  16,   0);
+    load_prefab(m, "prefabs-ocean-0.txt", -16,  16);
+    load_prefab(m, "prefabs-ocean-0.txt",   0,  16);
+    load_prefab(m, "prefabs-ocean-0.txt",  16,  16);
+  
+    load_prefab(m, "prefabs-island-0.txt", 0, 0);
+  });
 
   looting::add_backpack(&g_ec, tile::camping::backpack_a, 9, 7);
   looting::add_backpack(&g_ec, tile::camping::backpack_b, 10, 7);
@@ -98,6 +106,7 @@ static void on_resize() {
 
 static void on_stop() {
   delete g_q;
+  delete g_fox;
 }
 
 struct app_init {
