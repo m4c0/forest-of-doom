@@ -16,6 +16,7 @@ namespace fox {
   export using memiter = voo::memiter<sprite>;
 
   struct upc {
+    dotz::vec2 grid_pos;
     dotz::vec2 grid_size;
   };
 
@@ -52,8 +53,9 @@ namespace fox {
       fn(&m);
     }
 
-    void on_frame() {
+    void on_frame(dotz::vec2 center) {
       upc pc {
+        .grid_pos = center,
         .grid_size = dotz::vec2 { v::sw()->aspect(), 1.0f } * 16,
       };
 
