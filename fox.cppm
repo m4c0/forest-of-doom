@@ -23,8 +23,16 @@ namespace fox {
     dotz::vec2 grid_size;
   };
 
+  static auto create_sampler() {
+    auto info = vee::sampler_create_info {};
+    info.address_mode(VK_SAMPLER_ADDRESS_MODE_REPEAT);
+    info.nearest();
+    info.unnormalizedCoordinates = 1;
+    return vee::create_sampler(info);
+  }
+
   export class main {
-    vee::sampler m_smp = vee::create_sampler(vee::nearest_sampler);
+    vee::sampler m_smp = create_sampler();
     voo::bound_image m_img {};
     voo::bound_buffer m_buf = voo::bound_buffer::create_from_host(
         v::dq()->physical_device(),
