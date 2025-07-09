@@ -25,22 +25,19 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
     // TODO: cache? instance?
     auto o0 = prefabs::load(name);
     o0.for_each([&](float x, float y, const auto & def) {
+      dotz::vec2 pos { dx + x, dy + y };
+
       *m += fox::sprite {
-        .pos { dx + x, dy + y },
+        .pos  = pos,
         .uv   = def.tile.xy(),
         .size = def.tile.zw(),
       };
 
-      sprite::c s {
-        .uv { def.tile.x, def.tile.y, def.tile.z, def.tile.w },
-        .layer = sprite::layers::terrain,
-      };
-      rect r { dx + x, dy + y, def.tile.z, def.tile.w };
-      auto id = sprite::add(&g_ec, s, r);
       if (dotz::length(def.collision) > 0) {
+        auto id = g_ec.e().alloc();
         collision::add(&g_ec, id,
-            r.x + def.collision.x,
-            r.y + def.collision.y,
+            pos.x + def.collision.x,
+            pos.y + def.collision.y,
             def.collision.z,
             def.collision.w);
       }
@@ -99,8 +96,8 @@ static void on_frame() {
   looting::mark_lootable(&g_ec);
   repaint();
   g_ec.reset_watch();
-  g_q->on_frame();
   g_fox->on_frame(player::center(&g_ec));
+  g_q->on_frame();
 }
 
 static void on_resize() {

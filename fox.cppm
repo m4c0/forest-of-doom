@@ -6,6 +6,7 @@ import sires;
 import traits;
 import v;
 import voo;
+import wagen;
 
 namespace fox {
   static constexpr const auto max_sprites = 256 * 9 * 4;
@@ -25,9 +26,9 @@ namespace fox {
 
   static auto create_sampler() {
     auto info = vee::sampler_create_info {};
-    info.address_mode(VK_SAMPLER_ADDRESS_MODE_REPEAT);
+    info.address_mode(VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE);
     info.nearest();
-    info.unnormalizedCoordinates = 1;
+    info.unnormalizedCoordinates = wagen::vk_true;
     return vee::create_sampler(info);
   }
 
@@ -82,7 +83,7 @@ namespace fox {
     void on_frame(dotz::vec2 center) {
       upc pc {
         .grid_pos = center,
-        .grid_size = dotz::vec2 { v::sw()->aspect(), 1.0f } * 16,
+        .grid_size = dotz::vec2 { v::sw()->aspect(), 1.0f } * 16 / 2,
       };
 
       auto cb = v::sw()->command_buffer();

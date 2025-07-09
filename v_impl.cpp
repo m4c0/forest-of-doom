@@ -27,6 +27,9 @@ static void on_frame() {
   v::sw()->acquire_next_image();
   v::sw()->queue_one_time_submit(v::dq()->queue(), [](auto pcb) {
     auto rp = v::sw()->cmd_render_pass();
+    auto cb = v::sw()->command_buffer();
+    vee::cmd_set_viewport(cb, v::sw()->extent());
+    vee::cmd_set_scissor(cb, v::sw()->extent());
     v::on_frame();
   });
   v::sw()->queue_present(v::dq()->queue());
