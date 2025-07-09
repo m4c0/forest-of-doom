@@ -2,6 +2,7 @@ export module player;
 import animation;
 import area;
 import collision;
+import dotz;
 import gauge;
 import input;
 import movement;
@@ -209,5 +210,12 @@ export void tick(compos *ec) {
 
   ec->collisions.remove(pid);
   ec->movements().update(pid, {sx, sy});
+}
+
+export dotz::vec2 center(player::compos * ec) {
+  auto area = get_area(ec);
+  auto x = area.x + area.w / 2;
+  auto y = area.y + area.h / 2;
+  return { x, y };
 }
 } // namespace player

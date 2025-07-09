@@ -9,7 +9,6 @@ import gauge;
 import input;
 import jute;
 import looting;
-import misc;
 import movement;
 import player;
 import prefabs;
@@ -53,7 +52,8 @@ fox::main * g_fox {};
 qsu::main * g_q {};
 
 static void repaint() {
-  misc::follow_player(g_q, &g_ec);
+  auto [x, y] = player::center(&g_ec);
+  g_q->center_at(x, y);
   g_q->fill(&g_ec);
 }
 
