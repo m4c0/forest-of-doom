@@ -1,6 +1,6 @@
 // Water
 define *
-  tile 28
+  tile 12 8 1 1
   collision 0 0 1 1
 .
 
@@ -25,16 +25,23 @@ define E
 .
 define F
   tile 8 8 1 1
+  collision 0 0.5 1 0.5
 .
 define G
   tile 9 8 1 1
+  collision 0 0.5 1 0.5
 .
 define H
   tile 10 8 1 1
+  collision 0 0.5 1 0.5
 .
 
+define c
+  tile 12 6 1 1
+.
 define f
-  tile 26
+  tile 11 7 1 1
+  collision 0.9 0.9 0.1 0.1
 .
 
 // Land-to-road
@@ -78,9 +85,9 @@ D..O;;;;;;;;P..E
 D..O;;;;;;;;P..E
 D..O;;;;;;;;P..E
 D..RSSSSSSSST..E
-D..............*
-D..............*
-*..............*
-*..............*
-*..............*
+D..............E
+FGGGc..........E
+****D..........E
+****D..........E
+****FGGGGGGGGGGH
 .
