@@ -4,6 +4,7 @@
 import casein;
 import dotz;
 import fox;
+import silog;
 import voo;
 import v;
 
@@ -21,7 +22,7 @@ static void load() {
       .pos { 0, 0 },
       .uv { 0, 0 },
       .size { 32, 32 },
-      .alpha = 0.3,
+      .alpha = 0.7,
     };
   });
 }
@@ -52,6 +53,10 @@ const int i = [] {
   handle(KEY_DOWN, K_RIGHT, cursor(+1, 0));
   handle(KEY_DOWN, K_UP,    cursor(0, -1));
   handle(KEY_DOWN, K_DOWN,  cursor(0, +1));
+
+  handle(KEY_DOWN, K_ENTER, [] {
+    silog::log(silog::info, "> tile %d %d 1 1", g_cursor.x, g_cursor.y);
+  });
 
   return 0;
 }();
