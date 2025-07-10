@@ -13,14 +13,15 @@ dotz::ivec2 g_cursor;
 static void load() {
   g_fox->load([](auto * m) {
     *m += {
-      .pos { 0, 0 },
-      .uv { 0, 0 },
-      .size { 32, 32 },
-    };
-    *m += {
       .pos = g_cursor,
       .uv = g_cursor,
       .size { 1, 1 },
+    };
+    *m += {
+      .pos { 0, 0 },
+      .uv { 0, 0 },
+      .size { 32, 32 },
+      .alpha = 0.3,
     };
   });
 }
