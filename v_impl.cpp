@@ -25,7 +25,7 @@ static void on_resize() {
 }
 static void on_frame() {
   v::sw()->acquire_next_image();
-  v::sw()->queue_one_time_submit(v::dq()->queue(), [](auto pcb) {
+  v::sw()->queue_one_time_submit(v::dq()->queue(), [] {
     auto rp = v::sw()->cmd_render_pass();
     auto cb = v::sw()->command_buffer();
     vee::cmd_set_viewport(cb, v::sw()->extent());
