@@ -36,6 +36,9 @@ define H
   collision 0 0.5 1 0.5
 .
 
+define ,
+  tile 1 17 1 1
+.
 define c
   tile 12 6 1 1
 .
@@ -46,38 +49,38 @@ define f
 
 // Land-to-road
 define L
-  tile 37
+  tile 3 16 1 1
 .
 define M
-  tile 35
+  tile 1 18 1 1
 .
 define N
-  tile 38
+  tile 4 16 1 1
 .
 define O
-  tile 33
+  tile 2 17 1 1
 .
 define ;
   tile 28 9 1 1
 .
 define P
-  tile 32
+  tile 0 17 1 1
 .
 define R
-  tile 39
+  tile 3 17 1 1
 .
 define S
-  tile 30
+  tile 1 16 1 1
 .
 define T
-  tile 40
+  tile 4 17 1 1
 .
 
 map
 ABBBBBBBBBBC****
-D..........fBBBC
-D..............E
-D..............E
+D..,.,.,.,,fBBBC
+D.,.,.,..,.,.,.E
+D..,,..,..,.,..E
 D..LMMMMMMMMN..E
 D..O;;;;;;;;P..E
 D..O;;;;;;;;P..E
