@@ -3,6 +3,9 @@ import jojo;
 import sires;
 import traits;
 
+// TODO: random tiles (example: automatically apply different grass tiles)
+// TODO: layers?
+
 namespace prefabs {
   constexpr static dotz::vec4 parse_vec4(jute::view v) {
     // TODO: validate if all values are defined
