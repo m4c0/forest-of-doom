@@ -80,10 +80,10 @@ namespace fox {
       fn(&m);
     }
 
-    void on_frame(dotz::vec2 center) {
+    void on_frame(float grid_size, dotz::vec2 center) {
       upc pc {
         .grid_pos = center,
-        .grid_size = dotz::vec2 { v::sw()->aspect(), 1.0f } * 16 / 2,
+        .grid_size = dotz::vec2 { v::sw()->aspect(), 1.0f } * grid_size / 2,
       };
 
       auto cb = v::sw()->command_buffer();

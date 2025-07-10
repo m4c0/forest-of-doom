@@ -96,7 +96,7 @@ static void on_frame() {
   looting::mark_lootable(&g_ec);
   repaint();
   g_ec.reset_watch();
-  g_fox->on_frame(player::center(&g_ec));
+  g_fox->on_frame(16, player::center(&g_ec));
   g_q->on_frame();
 }
 

@@ -20,7 +20,7 @@ const int i = [] {
     });
   };
   v::on_frame = [] {
-    g_fox->on_frame({ 16, 16 });
+    g_fox->on_frame(32, { 16, 16 });
   };
   v::on_resize = [] {};
   v::on_stop = [] {
