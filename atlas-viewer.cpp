@@ -2,30 +2,55 @@
 #pragma leco app
 
 import casein;
+import dotz;
 import fox;
 import voo;
 import v;
 
 fox::main * g_fox;
+dotz::ivec2 g_cursor;
+
+static void load() {
+  g_fox->load([](auto * m) {
+    *m += {
+      .pos { 0, 0 },
+      .uv { 0, 0 },
+      .size { 32, 32 },
+    };
+    *m += {
+      .pos = g_cursor,
+      .uv = g_cursor,
+      .size { 1, 1 },
+    };
+  });
+}
+static constexpr const auto cursor(int dx, int dy) {
+  return [=] {
+    g_cursor = g_cursor + dotz::ivec2 { dx, dy };
+    if (g_cursor.x < 0) g_cursor.x = 0;
+    if (g_cursor.y < 0) g_cursor.y = 0;
+    load();
+  };
+}
 
 const int i = [] {
   v::on_start = [] {
     g_fox = new fox::main {};
-    g_fox->load([](auto * m) {
-      *m += {
-        .pos { 0, 0 },
-        .uv { 0, 0 },
-        .size { 32, 32 },
-      };
-    });
+    load();
   };
   v::on_frame = [] {
-    g_fox->on_frame(32, { 16, 16 });
+    g_fox->on_frame(32, g_cursor);
   };
   v::on_resize = [] {};
   v::on_stop = [] {
     delete g_fox;
   };
+
+  using namespace casein;
+  handle(KEY_DOWN, K_LEFT,  cursor(-1, 0));
+  handle(KEY_DOWN, K_RIGHT, cursor(+1, 0));
+  handle(KEY_DOWN, K_UP,    cursor(0, -1));
+  handle(KEY_DOWN, K_DOWN,  cursor(0, +1));
 
   return 0;
 }();
