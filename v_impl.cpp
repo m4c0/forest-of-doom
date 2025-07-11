@@ -5,13 +5,15 @@ import vinyl;
 
 static struct app_globals {
   voo::device_and_queue dq { "fod", casein::native_ptr };
+  vee::render_pass rp = voo::single_att_render_pass(dq);
 } * g_ag;
 
 static struct extent_globals {
-  voo::swapchain_and_stuff sw { g_ag->dq };
+  voo::swapchain_and_stuff sw { g_ag->dq, *g_ag->rp };
 } * g_eg;
 
 voo::device_and_queue * v::dq() { return &g_ag->dq; }
+vee::render_pass::type v::rp() { return *g_ag->rp; }
 voo::swapchain_and_stuff * v::sw() { return &g_eg->sw; }
 
 static void on_start() {

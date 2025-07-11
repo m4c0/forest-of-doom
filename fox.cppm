@@ -50,7 +50,7 @@ namespace fox {
         vee::vertex_push_constant_range<upc>());
     vee::gr_pipeline m_ppl = vee::create_graphics_pipeline({
       .pipeline_layout = *m_pl,
-      .render_pass = v::dq()->render_pass(),
+      .render_pass = v::rp(),
       .shaders {
         voo::shader("fox.vert.spv").pipeline_vert_stage(),
         voo::shader("fox.frag.spv").pipeline_frag_stage(),
