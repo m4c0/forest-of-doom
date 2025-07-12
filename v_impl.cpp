@@ -42,12 +42,11 @@ static void on_stop() {
   delete g_ag;
 }
 
-struct app_init {
-  app_init() {
-    using namespace vinyl;
-    on(START,  on_start);
-    on(RESIZE, on_resize);
-    on(FRAME,  on_frame);
-    on(STOP,   on_stop);
-  }
-} i;
+const int v_init = [] {
+  using namespace vinyl;
+  on(START,  on_start);
+  on(RESIZE, on_resize);
+  on(FRAME,  on_frame);
+  on(STOP,   on_stop);
+  return 0;
+}();

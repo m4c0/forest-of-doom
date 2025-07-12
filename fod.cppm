@@ -110,11 +110,10 @@ static void on_stop() {
   delete g_fox;
 }
 
-struct app_init {
-  app_init() {
-    v::on_start  = on_start;
-    v::on_resize = on_resize;
-    v::on_frame  = on_frame;
-    v::on_stop   = on_stop;
-  }
-} i;
+const int i = [] {
+  v::on_start  = on_start;
+  v::on_resize = on_resize;
+  v::on_frame  = on_frame;
+  v::on_stop   = on_stop;
+  return 0;
+}();
