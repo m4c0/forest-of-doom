@@ -12,6 +12,7 @@ import wagen;
 
 namespace fox {
   static constexpr const auto max_sprites = 256 * 9 * 4;
+  static constexpr const auto uber_dset_smps = 8;
 
   export struct sprite {
     dotz::vec2 pos;
@@ -29,9 +30,11 @@ namespace fox {
   };
 
   class uber_dset {
+    static constexpr const auto imgs = uber_dset_smps;
+
     vee::sampler m_smp;
     voo::single_dset m_dset;
-    voo::bound_image m_img;
+    voo::bound_image m_img[imgs];
 
   public:
     uber_dset();
