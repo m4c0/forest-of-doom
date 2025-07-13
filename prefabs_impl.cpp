@@ -59,13 +59,6 @@ namespace prefabs {
       throw error("undefined tiledef: "_hs + id);
     }
 
-    void validate_behaviour(auto & err) {
-      auto b = current().behaviour;
-      if (b == ""_hs) return;
-      if (b == "backpack"_hs) return;
-      err("unknown behaviour: "_hs + b);
-    }
-
   public:
     [[nodiscard]] constexpr auto & operator[](char id) const {
       jute::view v { &id, 1 };
@@ -91,10 +84,9 @@ namespace prefabs {
         throw error { msg + " for tiledef [" + c.id + "]" };
       };
 
+      // TODO: validate uvs against atlas sizes
       if (dotz::length(c.tile.size) == 0) err("missing size of tile"_hs);
       if (dotz::length(c.collision.xy()) != 0 && dotz::length(c.collision.zw()) == 0) err("missing size of collisio"_hs);
-
-      validate_behaviour(err);
     }
   };
 
