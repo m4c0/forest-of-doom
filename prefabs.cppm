@@ -45,5 +45,5 @@ namespace prefabs {
     }
   };
 
-  export [[nodiscard]] tilemap load(jute::view filename);
+  export [[nodiscard]] const tilemap * load(jute::view filename);
 }

@@ -1,4 +1,5 @@
 module prefabs;
+import hashley;
 import jojo;
 import sires;
 import traits;
@@ -133,7 +134,12 @@ namespace prefabs {
     [[nodiscard]] constexpr auto take() { return traits::move(m_map); }
   };
 
-  tilemap load(jute::view filename) {
+  // TODO: eviction rules
+  hashley::fin<tilemap> g_cache { 127 };
+
+  const tilemap * load(jute::view filename) {
+    if (g_cache.has(filename)) return &g_cache[filename];
+
     unsigned line_number = 1;
     try {
       parser p {};
@@ -141,7 +147,8 @@ namespace prefabs {
         p.parse(line);
         line_number++;
       });
-      return p.take();
+      g_cache[filename] = p.take();
+      return &g_cache[filename];
     } catch (error & e) {
       e.line_number = line_number;
       throw traits::move(e);

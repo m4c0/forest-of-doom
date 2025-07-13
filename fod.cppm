@@ -22,9 +22,8 @@ struct ec : hud::compos, looting::compos {} g_ec;
 
 void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
   try {
-    // TODO: cache? instance?
     auto o0 = prefabs::load(name);
-    o0.for_each([&](float x, float y, const auto & def) {
+    o0->for_each([&](float x, float y, const auto & def) {
       dotz::vec2 pos { dx + x, dy + y };
 
       *m += fox::sprite {
