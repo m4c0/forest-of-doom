@@ -1,9 +1,10 @@
 module fox;
 import jute;
+import silog;
 
 static constexpr const jute::view images[fox::uber_dset_smps] {
-  "11_Camping_16x16.png",
   "1_Terrains_and_Fences_16x16.png",
+  "11_Camping_16x16.png",
 };
 static_assert(images[fox::uber_dset_smps - 1] != "");
 
@@ -32,7 +33,8 @@ fox::uber_dset::uber_dset() :
     auto pd = v::dq()->physical_device();
     auto q = v::dq()->queue();
     voo::load_image(img, pd, q, &m_img[i], [this, i] {
-      vee::update_descriptor_set(descriptor_set(), 0, i, *m_img[i].iv, *m_smp);
+      silog::log(silog::info, "Loaded %s", images[i].cstr().begin());
+      vee::update_descriptor_set(m_dset.descriptor_set(), 0, i, *m_img[i].iv);
     });
   }
 }

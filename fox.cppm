@@ -71,6 +71,7 @@ namespace fox {
         vee::vertex_attribute_vec2(1, traits::offset_of(&sprite::uv)),
         vee::vertex_attribute_vec2(1, traits::offset_of(&sprite::size)),
         vee::vertex_attribute_float(1, traits::offset_of(&sprite::alpha)),
+        vee::vertex_attribute_uint(1, traits::offset_of(&sprite::texid)),
       },
     });
 
