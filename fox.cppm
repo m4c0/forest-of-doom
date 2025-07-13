@@ -1,5 +1,6 @@
 #pragma leco add_shader fox.vert
 #pragma leco add_shader fox.frag
+#pragma leco add_impl fox_uber_dset.cpp
 export module fox;
 import dotz;
 import hai;
@@ -11,13 +12,13 @@ import wagen;
 
 namespace fox {
   static constexpr const auto max_sprites = 256 * 9 * 4;
-  static constexpr const auto uber_dset_smps = 8;
 
   export struct sprite {
     dotz::vec2 pos;
     dotz::vec2 uv;
     dotz::vec2 size;
     float alpha = 1;
+    unsigned texid = 0;
   };
 
   export using memiter = voo::memiter<sprite>;
@@ -27,17 +28,19 @@ namespace fox {
     dotz::vec2 grid_size;
   };
 
-  static auto create_sampler() {
-    auto info = vee::sampler_create_info {};
-    info.address_mode(VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE);
-    info.nearest();
-    info.unnormalizedCoordinates = wagen::vk_true;
-    return vee::create_sampler(info);
-  }
+  class uber_dset {
+    vee::sampler m_smp;
+    voo::single_dset m_dset;
+    voo::bound_image m_img;
+
+  public:
+    uber_dset();
+
+    constexpr const auto descriptor_set() const { return m_dset.descriptor_set(); }
+    constexpr const auto descriptor_set_layout() const { return m_dset.descriptor_set_layout(); }
+  };
 
   export class main {
-    vee::sampler m_smp = create_sampler();
-    voo::bound_image m_img {};
     voo::bound_buffer m_buf = voo::bound_buffer::create_from_host(
         v::dq()->physical_device(),
         max_sprites * sizeof(sprite),
@@ -46,14 +49,7 @@ namespace fox {
 
     voo::one_quad m_quad { v::dq()->physical_device() };
 
-    voo::single_dset m_dset {
-      vee::dsl_fragment_samplers([this] {
-        hai::array<vee::sampler::type> res { uber_dset_smps };
-        for (auto & s : res) s = *m_smp;
-        return res;
-      }()),
-      vee::combined_image_sampler(uber_dset_smps),
-    };
+    uber_dset m_dset {};
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
         m_dset.descriptor_set_layout(),
         vee::vertex_push_constant_range<upc>());
@@ -78,16 +74,6 @@ namespace fox {
     });
 
   public:
-    main() {
-      auto img = sires::real_path_name("1_Terrains_and_Fences_16x16.png");
-      auto pd = v::dq()->physical_device();
-      auto q = v::dq()->queue();
-      voo::load_image(img, pd, q, &m_img, [this] {
-        for (auto i = 0; i < uber_dset_smps; i++) {
-          vee::update_descriptor_set(m_dset.descriptor_set(), 0, i, *m_img.iv, *m_smp);
-        }
-      });
-    }
     void load(auto && fn) {
       voo::memiter<sprite> m { *m_buf.memory, &m_count };
       fn(&m);
