@@ -17,12 +17,14 @@ static void load() {
       .pos = g_cursor,
       .uv = g_cursor,
       .size { 1, 1 },
+      .texid = 1,
     };
     *m += {
       .pos { 0, 0 },
       .uv { 0, 0 },
-      .size { 32, 32 },
+      .size { 64, 64 },
       .alpha = 0.7,
+      .texid = 1,
     };
   });
 }
@@ -41,7 +43,7 @@ const int i = [] {
     load();
   };
   v::on_frame = [] {
-    g_fox->on_frame(32, g_cursor);
+    g_fox->on_frame(16, g_cursor);
   };
   v::on_resize = [] {};
   v::on_stop = [] {
