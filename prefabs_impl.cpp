@@ -21,6 +21,24 @@ namespace prefabs {
   static_assert(parse_vec4("0 1 2 3").w == 3);
   static_assert(dotz::sq_length(parse_vec4("")) == 0);
 
+  constexpr static sprite parse_tile(jute::view v) {
+    // TODO: validate if all values are defined
+    auto [x, a] = v.split(' ');
+    auto [y, b] = a.split(' ');
+    auto [z, c] = b.split(' ');
+    auto [w, t] = c.split(' ');
+    return {
+      .uv   { jute::to_f(x), jute::to_f(y) },
+      .size { jute::to_f(z), jute::to_f(w) },
+      .texid = jute::to_u32(t),
+    };
+  } 
+  static_assert(parse_tile("0 1 2 3 4").uv.x   == 0);
+  static_assert(parse_tile("0 1 2 3 4").uv.y   == 1);
+  static_assert(parse_tile("0 1 2 3 4").size.x == 2);
+  static_assert(parse_tile("0 1 2 3 4").size.y == 3);
+  static_assert(parse_tile("0 1 2 3 4").texid  == 4);
+
   class tiledefs {
     static constexpr const auto max = 128;
 
@@ -30,7 +48,7 @@ namespace prefabs {
 
     void copy(tiledef o) {
       auto & c = current();
-      if (dotz::length(o.tile) > 0) c.tile = o.tile;
+      if (dotz::length(o.tile.size) > 0) c.tile = o.tile;
       if (dotz::length(o.collision) > 0) c.collision = o.collision;
     }
 
@@ -50,8 +68,8 @@ namespace prefabs {
       auto [cmd, args] = line.split(' ');
       args = args.trim();
 
-           if (cmd == "tile")      current().tile      = parse_vec4(args);
-      else if (cmd == "entity")    current().entity    = parse_vec4(args);
+           if (cmd == "tile")      current().tile      = parse_tile(args);
+      else if (cmd == "entity")    current().entity    = parse_tile(args);
       else if (cmd == "collision") current().collision = parse_vec4(args);
       else if (cmd == "copy")      copy((*this)[args]);
       else throw error { "unknown command: "_hs + cmd };
@@ -63,7 +81,7 @@ namespace prefabs {
         throw error { msg + " for tiledef [" + c.id + "]" };
       };
 
-      if (dotz::length(c.tile.zw()) == 0) err("missing size of tile"_hs);
+      if (dotz::length(c.tile.size) == 0) err("missing size of tile"_hs);
       if (dotz::length(c.collision.xy()) != 0 && dotz::length(c.collision.zw()) == 0) err("missing size of collisio"_hs);
     }
   };

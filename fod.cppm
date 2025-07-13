@@ -26,18 +26,18 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
     o0->for_each([&](float x, float y, const auto & def) {
       *m += fox::sprite {
         .pos   { dx + x, dy + y },
-        .uv    = def.tile.xy(),
-        .size  = def.tile.zw(),
-        .texid = 0,
+        .uv    = def.tile.uv,
+        .size  = def.tile.size,
+        .texid = def.tile.texid,
       };
     });
     o0->for_each([&](float x, float y, const auto & def) {
-      if (dotz::length(def.entity) > 0) {
+      if (dotz::length(def.entity.size) > 0) {
         *m += fox::sprite {
           .pos   { dx + x, dy + y },
-          .uv    = def.entity.xy(),
-          .size  = def.entity.zw(),
-          .texid = 1
+          .uv    = def.entity.uv,
+          .size  = def.entity.size,
+          .texid = def.entity.texid,
         };
       }
 

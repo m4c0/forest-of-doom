@@ -14,10 +14,16 @@ namespace prefabs {
     error(jute::heap h) : msg { (*h).cstr() } {}
   };
 
+  export struct sprite {
+    dotz::vec2 uv {};
+    dotz::vec2 size {};
+    unsigned texid {};
+  };
+
   export struct tiledef {
     jute::heap id {};
-    dotz::vec4 tile {};
-    dotz::vec4 entity {};
+    sprite tile {};
+    sprite entity {};
     dotz::vec4 collision {};
   };
 

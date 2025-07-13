@@ -1,92 +1,96 @@
 // Water
 define *
-  tile 12 8 1 1
+  tile 12 8 1 1 0
   collision 0 0 1 1
 .
 
 // Water-to-Land
 define A
-  tile 8 6 1 1
+  tile 8 6 1 1 0
 .
 define B
-  tile 9 6 1 1
+  tile 9 6 1 1 0
 .
 define C
-  tile 10 6 1 1
+  tile 10 6 1 1 0
 .
 define D
-  tile 8 7 1 1
+  tile 8 7 1 1 0
 .
 define .
-  tile 9 7 1 1
+  tile 9 7 1 1 0
 .
 define E
-  tile 10 7 1 1
+  tile 10 7 1 1 0
 .
 define F
-  tile 8 8 1 1
+  tile 8 8 1 1 0
   collision 0 0.5 1 0.5
 .
 define G
-  tile 9 8 1 1
+  tile 9 8 1 1 0
   collision 0 0.5 1 0.5
 .
 define H
-  tile 10 8 1 1
+  tile 10 8 1 1 0
   collision 0 0.5 1 0.5
 .
 
 define ,
-  tile 1 17 1 1
+  tile 1 17 1 1 0
 .
 define c
-  tile 12 6 1 1
+  tile 12 6 1 1 0
 .
 define f
-  tile 11 7 1 1
+  tile 11 7 1 1 0
   collision 0.9 0.9 0.1 0.1
 .
 
 // Land-to-road
 define L
-  tile 3 16 1 1
+  tile 3 16 1 1 0
 .
 define M
-  tile 1 18 1 1
+  tile 1 18 1 1 0
 .
 define N
-  tile 4 16 1 1
+  tile 4 16 1 1 0
 .
 define O
-  tile 2 17 1 1
+  tile 2 17 1 1 0
 .
 define ;
-  tile 28 9 1 1
+  tile 28 9 1 1 0
 .
 define P
-  tile 0 17 1 1
+  tile 0 17 1 1 0
 .
 define R
-  tile 3 17 1 1
+  tile 3 17 1 1 0
 .
 define S
-  tile 1 16 1 1
+  tile 1 16 1 1 0
 .
 define T
-  tile 4 17 1 1
+  tile 4 17 1 1 0
 .
 
+define backpack
+  copy ;
+  collision 0 0.7 1 0.4
+.
 define 1
-  copy .
-  entity 16 34 1 2
+  copy backpack
+  entity 16 34 1 2 1
 .
 define 2
-  copy .
-  entity 17 34 1 2
+  copy backpack
+  entity 17 34 1 2 1
 .
 define 3
-  copy .
-  entity 18 34 1 2
+  copy backpack
+  entity 18 34 1 2 1
 .
 
 

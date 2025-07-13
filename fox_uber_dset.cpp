@@ -2,6 +2,7 @@ module fox;
 import jute;
 import silog;
 
+// TODO: make this dynamic, extracting from prefabs
 static constexpr const jute::view images[fox::uber_dset_smps] {
   "1_Terrains_and_Fences_16x16.png",
   "11_Camping_16x16.png",
