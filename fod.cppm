@@ -24,18 +24,17 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
   try {
     auto o0 = prefabs::load(name);
     o0->for_each([&](float x, float y, const auto & def) {
-      dotz::vec2 pos { dx + x, dy + y };
-
       *m += fox::sprite {
-        .pos   = pos,
+        .pos   { dx + x, dy + y },
         .uv    = def.tile.xy(),
         .size  = def.tile.zw(),
         .texid = 0,
       };
-
+    });
+    o0->for_each([&](float x, float y, const auto & def) {
       if (dotz::length(def.entity) > 0) {
         *m += fox::sprite {
-          .pos   = pos,
+          .pos   { dx + x, dy + y },
           .uv    = def.entity.xy(),
           .size  = def.entity.zw(),
           .texid = 1
@@ -45,8 +44,8 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
       if (dotz::length(def.collision) > 0) {
         auto id = g_ec.e().alloc();
         collision::add(&g_ec, id,
-            pos.x + def.collision.x,
-            pos.y + def.collision.y,
+            dx + x + def.collision.x,
+            dy + y + def.collision.y,
             def.collision.z,
             def.collision.w);
       }
