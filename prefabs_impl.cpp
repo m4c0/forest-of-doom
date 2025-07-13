@@ -48,13 +48,22 @@ namespace prefabs {
 
     void copy(tiledef o) {
       auto & c = current();
-      if (dotz::length(o.tile.size) > 0) c.tile = o.tile;
+      if (o.behaviour.size()) c.behaviour = o.behaviour;
       if (dotz::length(o.collision) > 0) c.collision = o.collision;
+      if (dotz::length(o.entity.size) > 0) c.entity = o.entity;
+      if (dotz::length(o.tile.size) > 0) c.tile = o.tile;
     }
 
     [[nodiscard]] constexpr auto & operator[](jute::view id) const {
       for (auto & d: m_defs) if (d.id == id) return d;
       throw error("undefined tiledef: "_hs + id);
+    }
+
+    void validate_behaviour(auto & err) {
+      auto b = current().behaviour;
+      if (b == ""_hs) return;
+      if (b == "backpack"_hs) return;
+      err("unknown behaviour: "_hs + b);
     }
 
   public:
@@ -68,9 +77,10 @@ namespace prefabs {
       auto [cmd, args] = line.split(' ');
       args = args.trim();
 
-           if (cmd == "tile")      current().tile      = parse_tile(args);
-      else if (cmd == "entity")    current().entity    = parse_tile(args);
+      if      (cmd == "behaviour") current().behaviour = args;
       else if (cmd == "collision") current().collision = parse_vec4(args);
+      else if (cmd == "entity")    current().entity    = parse_tile(args);
+      else if (cmd == "tile")      current().tile      = parse_tile(args);
       else if (cmd == "copy")      copy((*this)[args]);
       else throw error { "unknown command: "_hs + cmd };
     }
@@ -83,6 +93,8 @@ namespace prefabs {
 
       if (dotz::length(c.tile.size) == 0) err("missing size of tile"_hs);
       if (dotz::length(c.collision.xy()) != 0 && dotz::length(c.collision.zw()) == 0) err("missing size of collisio"_hs);
+
+      validate_behaviour(err);
     }
   };
 

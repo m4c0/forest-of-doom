@@ -79,6 +79,7 @@ define T
 define backpack
   copy ;
   collision 0 0.7 1 0.4
+  behaviour backpack
 .
 define 1
   copy backpack
