@@ -18,6 +18,7 @@ namespace prefabs {
   static_assert(parse_vec4("0 1 2 3").y == 1);
   static_assert(parse_vec4("0 1 2 3").z == 2);
   static_assert(parse_vec4("0 1 2 3").w == 3);
+  static_assert(dotz::sq_length(parse_vec4("")) == 0);
 
   class tiledefs {
     static constexpr const auto max = 128;
@@ -60,7 +61,8 @@ namespace prefabs {
         throw error { msg + " for tiledef [" + c.id + "]" };
       };
 
-      //if (c.tile != 28) err("TBD: tiles other than 28"_hs);
+      if (dotz::length(c.tile.zw()) == 0) err("missing size of tile"_hs);
+      if (dotz::length(c.collision.xy()) != 0 && dotz::length(c.collision.zw()) == 0) err("missing size of collisio"_hs);
     }
   };
 
