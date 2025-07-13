@@ -2,16 +2,16 @@
 #pragma leco add_shader fox.frag
 export module fox;
 import dotz;
+import hai;
 import sires;
 import traits;
 import v;
 import voo;
 import wagen;
 
-// TODO: uber-dset
-
 namespace fox {
   static constexpr const auto max_sprites = 256 * 9 * 4;
+  static constexpr const auto uber_dset_smps = 8;
 
   export struct sprite {
     dotz::vec2 pos;
@@ -46,7 +46,14 @@ namespace fox {
 
     voo::one_quad m_quad { v::dq()->physical_device() };
 
-    voo::single_frag_dset m_dset { 1 };
+    voo::single_dset m_dset {
+      vee::dsl_fragment_samplers([this] {
+        hai::array<vee::sampler::type> res { uber_dset_smps };
+        for (auto & s : res) s = *m_smp;
+        return res;
+      }()),
+      vee::combined_image_sampler(uber_dset_smps),
+    };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
         m_dset.descriptor_set_layout(),
         vee::vertex_push_constant_range<upc>());
@@ -76,7 +83,9 @@ namespace fox {
       auto pd = v::dq()->physical_device();
       auto q = v::dq()->queue();
       voo::load_image(img, pd, q, &m_img, [this] {
-        vee::update_descriptor_set(m_dset.descriptor_set(), 0, *m_img.iv, *m_smp);
+        for (auto i = 0; i < uber_dset_smps; i++) {
+          vee::update_descriptor_set(m_dset.descriptor_set(), 0, i, *m_img.iv, *m_smp);
+        }
       });
     }
     void load(auto && fn) {
