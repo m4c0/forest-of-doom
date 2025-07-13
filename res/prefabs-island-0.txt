@@ -76,6 +76,20 @@ define T
   tile 4 17 1 1
 .
 
+define 1
+  copy .
+  entity 16 34 1 2
+.
+define 2
+  copy .
+  entity 17 34 1 2
+.
+define 3
+  copy .
+  entity 18 34 1 2
+.
+
+
 map
 ABBBBBBBBBBC****
 D..,.,.,.,,fBBBC
@@ -84,7 +98,7 @@ D..,,..,..,.,..E
 D..LMMMMMMMMN..E
 D..O;;;;;;;;P..E
 D..O;;;;;;;;P..E
-D..O;;;;;;;;P..E
+D..O;;;;;123P..E
 D..O;;;;;;;;P..E
 D..O;;;;;;;;P..E
 D..RSSSSSSSST..E

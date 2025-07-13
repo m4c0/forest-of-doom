@@ -17,6 +17,7 @@ namespace prefabs {
   export struct tiledef {
     jute::heap id {};
     dotz::vec4 tile {};
+    dotz::vec4 entity {};
     dotz::vec4 collision {};
   };
 

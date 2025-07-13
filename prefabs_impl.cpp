@@ -50,6 +50,7 @@ namespace prefabs {
       args = args.trim();
 
            if (cmd == "tile")      current().tile      = parse_vec4(args);
+      else if (cmd == "entity")    current().entity    = parse_vec4(args);
       else if (cmd == "collision") current().collision = parse_vec4(args);
       else if (cmd == "copy")      copy((*this)[args]);
       else throw error { "unknown command: "_hs + cmd };

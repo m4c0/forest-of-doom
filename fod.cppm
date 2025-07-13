@@ -28,10 +28,20 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
       dotz::vec2 pos { dx + x, dy + y };
 
       *m += fox::sprite {
-        .pos  = pos,
-        .uv   = def.tile.xy(),
-        .size = def.tile.zw(),
+        .pos   = pos,
+        .uv    = def.tile.xy(),
+        .size  = def.tile.zw(),
+        .texid = 0,
       };
+
+      if (dotz::length(def.entity) > 0) {
+        *m += fox::sprite {
+          .pos   = pos,
+          .uv    = def.entity.xy(),
+          .size  = def.entity.zw(),
+          .texid = 1
+        };
+      }
 
       if (dotz::length(def.collision) > 0) {
         auto id = g_ec.e().alloc();
@@ -73,9 +83,9 @@ static void on_start() {
     load_prefab(m, "prefabs-island-0.txt", 0, 0);
   });
 
-  looting::add_backpack(&g_ec, tile::camping::backpack_a, 9, 7);
-  looting::add_backpack(&g_ec, tile::camping::backpack_b, 10, 7);
-  looting::add_backpack(&g_ec, tile::camping::backpack_c, 11, 7);
+  //looting::add_backpack(&g_ec, tile::camping::backpack_a, 9, 7);
+  //looting::add_backpack(&g_ec, tile::camping::backpack_b, 10, 7);
+  //looting::add_backpack(&g_ec, tile::camping::backpack_c, 11, 7);
 
   player::add_entity(&g_ec);
   hud::add_entities(&g_ec);
