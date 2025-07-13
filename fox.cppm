@@ -19,7 +19,7 @@ namespace fox {
     dotz::vec2 uv;
     dotz::vec2 size;
     float alpha = 1;
-    unsigned texid = 1;
+    unsigned texid = 0;
   };
 
   export using memiter = voo::memiter<sprite>;

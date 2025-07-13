@@ -11,5 +11,5 @@ layout(location = 2) in flat uint f_texid;
 layout(location = 0) out vec4 colour;
 
 void main() {
-  colour = textureLod(tex[f_texid], f_uv * 16, 0) * f_alpha;
+  colour = texelFetch(tex[f_texid], ivec2(f_uv * 16), 0) * f_alpha;
 }
