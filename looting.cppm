@@ -4,15 +4,10 @@ import sprite;
 import tile;
 
 namespace looting {
-export struct compos : virtual player::compos, virtual tile::compos {
+export struct compos : virtual player::compos {
   pog::eid selected_lootable{};
   pog::sparse_set<pog::marker> lootable{};
 };
-
-export void add_backpack(compos *ec, tile::camping::c c, float x, float y) {
-  auto id = tile::camping::add_tile(ec, c, x, y);
-  ec->lootable.add(id, {});
-}
 
 pog::eid select_lootable(compos *ec) {
   auto pid = ec->player().eid;

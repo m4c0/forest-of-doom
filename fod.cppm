@@ -48,6 +48,7 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
             dy + y + def.collision.y,
             def.collision.z,
             def.collision.w);
+        // if (entity == backpack) ec->lootable.add(id, {});
       }
     });
   } catch (const prefabs::error & e) {
@@ -80,10 +81,6 @@ static void on_start() {
   
     load_prefab(m, "prefabs-island-0.txt", 0, 0);
   });
-
-  //looting::add_backpack(&g_ec, tile::camping::backpack_a, 9, 7);
-  //looting::add_backpack(&g_ec, tile::camping::backpack_b, 10, 7);
-  //looting::add_backpack(&g_ec, tile::camping::backpack_c, 11, 7);
 
   player::add_entity(&g_ec);
   hud::add_entities(&g_ec);
