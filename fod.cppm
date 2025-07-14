@@ -2,6 +2,7 @@
 export module fod;
 
 import animation;
+import backpack;
 import dotz;
 import fox;
 import hud;
@@ -32,15 +33,6 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
       };
     });
     o0->for_each([&](float x, float y, const auto & def) {
-      if (dotz::length(def.entity.size) > 0) {
-        *m += fox::sprite {
-          .pos   { dx + x, dy + y },
-          .uv    = def.entity.uv,
-          .size  = def.entity.size,
-          .texid = def.entity.texid,
-        };
-      }
-
       if (dotz::length(def.collision) > 0) {
         auto id = g_ec.e().alloc();
         collision::add(&g_ec, id,
@@ -48,8 +40,15 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
             dy + y + def.collision.y,
             def.collision.z,
             def.collision.w);
-        // if (entity == backpack) ec->lootable.add(id, {});
+
       }
+
+      if (*def.behaviour == "backpack") backpack::add(fox::sprite {
+        .pos   { dx + x, dy + y },
+        .uv    = def.entity.uv,
+        .size  = def.entity.size,
+        .texid = def.entity.texid,
+      });
     });
   } catch (const prefabs::error & e) {
     silog::log(silog::error, "%s:%d: %s", name.cstr().begin(), e.line_number, e.msg.begin());
@@ -80,6 +79,8 @@ static void on_start() {
     load_prefab(m, "prefabs-ocean-0.txt",  16,  16);
   
     load_prefab(m, "prefabs-island-0.txt", 0, 0);
+
+    backpack::load(m);
   });
 
   player::add_entity(&g_ec);
