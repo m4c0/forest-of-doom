@@ -9,7 +9,6 @@ import hud;
 import gauge;
 import input;
 import jute;
-import looting;
 import movement;
 import player;
 import prefabs;
@@ -19,7 +18,7 @@ import sitime;
 import tile;
 import v;
 
-struct ec : hud::compos, looting::compos {} g_ec;
+struct ec : hud::compos {} g_ec;
 
 void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
   try {
@@ -80,9 +79,6 @@ static void on_start() {
   
     load_prefab(m, "prefabs-island-0.txt", 0, 0);
   });
-  g_fox->load(fox::layers::entities, [](auto * m) {
-    backpack::load(m);
-  });
 
   player::add_entity(&g_ec);
   hud::add_entities(&g_ec);
@@ -100,10 +96,15 @@ static void on_frame() {
   movement::update_sprites(&g_ec);
   gauge::run_drains(&g_ec);
   hud::update_batteries(&g_ec);
-  looting::mark_lootable(&g_ec);
   repaint();
   g_ec.reset_watch();
+
+  g_fox->load(fox::layers::entities, [](auto * m) {
+    auto p = player::center(&g_ec);
+    backpack::load(p, m);
+  });
   g_fox->on_frame(16, player::center(&g_ec));
+
   g_q->on_frame();
 }
 
