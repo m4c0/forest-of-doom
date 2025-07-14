@@ -6,6 +6,8 @@ import silog;
 static constexpr const jute::view images[fox::uber_dset_smps] {
   "1_Terrains_and_Fences_16x16.png",
   "11_Camping_16x16.png",
+  "Modern_Exteriors_Characters_Scout_16x16_1.png",
+  "Modern_UI_Style_1.png",
 };
 static_assert(images[fox::uber_dset_smps - 1] != "");
 

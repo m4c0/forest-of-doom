@@ -20,7 +20,7 @@ namespace fox {
 
   constexpr const auto max_sprites = 256 * 9 * 4;
   constexpr const auto max_layers = static_cast<unsigned>(layers::max);
-  constexpr const auto uber_dset_smps = 2;
+  constexpr const auto uber_dset_smps = 4;
 
   export struct sprite {
     dotz::vec2 pos;
