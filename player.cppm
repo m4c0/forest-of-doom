@@ -27,6 +27,13 @@ namespace player {
     unsigned frame = 0;
   };
 
+  enum side {
+    p_right = 0,
+    p_up,
+    p_left,
+    p_down,
+  };
+
   struct state {
     fox::sprite sprite {
       .pos { 8, 8 },
@@ -34,21 +41,15 @@ namespace player {
       .texid = 2,
     };
     anim anim;
+    side side;
   } g_state;
   
   export void load(fox::memiter * m) {
     *m += g_state.sprite;
   }
 
-export enum side {
-  p_right = 0,
-  p_up,
-  p_left,
-  p_down,
-};
 export struct c {
   pog::eid eid;
-  side side;
 
   pog::eid energy;
   pog::eid happyness;
@@ -94,14 +95,6 @@ export void add_entity(compos *ec) {
   collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
 }
 
-export rect get_area(compos *ec) {
-  auto pid = ec->player().eid;
-  return area::get(ec, pid);
-}
-
-auto get_side(compos *ec) { return ec->player().side; }
-void set_side(compos *ec, side s) { ec->player().side = s; }
-
 void starve(compos *ec, float val_per_sec) {
   gauge::add_drain(ec, ec->player().health, val_per_sec);
 }
@@ -129,7 +122,7 @@ bool update_animation(compos *ec, unsigned s, anim a) {
 }
 void update_animation(compos *ec, side s, anim a) {
   if (update_animation(ec, static_cast<unsigned>(s), a))
-    set_side(ec, s);
+    g_state.side = s;
 }
 
 void set_idle_animation(compos *ec, side s) {
@@ -147,7 +140,7 @@ void set_sit_animation(compos *ec) {
       .num_frames = 6,
       .frames_per_sec = 6,
   };
-  update_animation(ec, get_side(ec) / 2U, a);
+  update_animation(ec, g_state.side / 2U, a);
 }
 void set_walk_animation(compos *ec, side s) {
   constexpr const anim a{
@@ -167,7 +160,7 @@ void set_pick_animation(compos *ec) {
       .num_frames = 12,
       .frames_per_sec = 12,
   };
-  update_animation(ec, get_side(ec), a);
+  update_animation(ec, g_state.side, a);
 }
 
 void update_anims(compos *ec) {
@@ -217,7 +210,7 @@ export void tick(compos *ec) {
 
   auto h = input::state(input::axis::X);
   auto v = input::state(input::axis::Y);
-  auto s = ec->player().side;
+  auto s = g_state.side;
   if (v != 0) {
     s = v > 0 ? p_down : p_up;
   } else if (h != 0) {
