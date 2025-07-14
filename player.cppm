@@ -196,7 +196,6 @@ void update_sprites(compos *c, float sx, float sy) {
     return;
   }
 
-  sprite::move_by(c, id, dx, dy);
   g_state.sprite.pos = g_state.sprite.pos + dotz::vec2 { dx, dy };
 }
 export void tick(compos *ec) {
@@ -253,10 +252,7 @@ export void tick(compos *ec) {
   update_sprites(ec, sx, sy);
 }
 
-export dotz::vec2 center(player::compos * ec) {
-  auto area = get_area(ec);
-  auto x = area.x + area.w / 2;
-  auto y = area.y + area.h / 2;
-  return { x, y };
-}
+  export dotz::vec2 center() {
+    return g_state.sprite.pos + g_state.sprite.size / 2.0;
+  }
 } // namespace player

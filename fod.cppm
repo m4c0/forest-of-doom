@@ -57,7 +57,7 @@ fox::main * g_fox {};
 qsu::main * g_q {};
 
 static void repaint() {
-  auto [x, y] = player::center(&g_ec);
+  auto [x, y] = player::center();
   g_q->center_at(x, y);
   g_q->fill(&g_ec);
 }
@@ -97,13 +97,13 @@ static void on_frame() {
   g_ec.reset_watch();
 
   g_fox->load(fox::layers::entities, [](auto * m) {
-    auto p = player::center(&g_ec);
+    auto p = player::center();
     backpack::load(p, m);
   });
   g_fox->load(fox::layers::player, [](auto * m) {
     player::load(m);
   });
-  g_fox->on_frame(16, player::center(&g_ec));
+  g_fox->on_frame(16, player::center());
 
   g_q->on_frame();
 }
