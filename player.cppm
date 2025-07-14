@@ -2,6 +2,7 @@ export module player;
 import area;
 import collision;
 import dotz;
+import fox;
 import gauge;
 import input;
 import ranged;
@@ -10,6 +11,18 @@ import sprite;
 import stopwatch;
 
 namespace player {
+  struct state {
+    fox::sprite sprite {
+      .pos { 8, 8 },
+      .size { 1, 2 },
+      .texid = 2,
+    };
+  } g_state;
+  
+  export void load(fox::memiter * m) {
+    *m += g_state.sprite;
+  }
+
 constexpr const auto energy_lost_per_sec = 0.025f;
 constexpr const auto food_lost_per_sec = 0.1f;
 constexpr const auto energy_gain_per_sec = food_lost_per_sec * 2.0f;
@@ -64,6 +77,7 @@ export void add_entity(compos *ec) {
   sprite::c spr{
       .uv = {0, 2, 1, 2},
       .layer = sprite::layers::scout,
+      .dim = 1,
   };
   anim a{
       .start_x = 0,
@@ -171,6 +185,7 @@ void update_anims(compos *ec) {
   auto u = a.start_x + (frame % a.num_frames);
   const auto id = ec->player().eid;
   sprite::set_uv(ec, id, u, a.y);
+  g_state.sprite.uv = { u, a.y };
 }
 void update_sprites(compos *c) {
   float ms = c->current_millis();
@@ -190,6 +205,7 @@ void update_sprites(compos *c) {
   }
 
   sprite::move_by(c, id, dx, dy);
+  g_state.sprite.pos = g_state.sprite.pos + dotz::vec2 { dx, dy };
 }
 export void tick(compos *ec) {
   constexpr const auto blocks_per_sec = 4.0f;

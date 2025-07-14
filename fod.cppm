@@ -100,6 +100,9 @@ static void on_frame() {
     auto p = player::center(&g_ec);
     backpack::load(p, m);
   });
+  g_fox->load(fox::layers::player, [](auto * m) {
+    player::load(m);
+  });
   g_fox->on_frame(16, player::center(&g_ec));
 
   g_q->on_frame();
