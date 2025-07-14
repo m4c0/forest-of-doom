@@ -55,6 +55,7 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
 
 fox::main * g_fox {};
 qsu::main * g_q {};
+sitime::stopwatch g_timer {};
 
 static void repaint() {
   auto [x, y] = player::center();
@@ -84,17 +85,18 @@ static void on_start() {
 
   g_q->set_grid(32, 32);
   repaint();
-  g_ec.reset_watch();
+  g_timer = {};
 }
 
 static void on_frame() {
   // TODO: speed of character depends on FPS
   // TODO: move most of these out of the on_frame code 
-  player::tick(&g_ec);
-  gauge::run_drains(&g_ec);
+  float ms = g_timer.millis();
+  player::tick(&g_ec, ms);
+  gauge::run_drains(&g_ec, ms);
   hud::update_batteries(&g_ec);
   repaint();
-  g_ec.reset_watch();
+  g_timer = {};
 
   g_fox->load(fox::layers::entities, [](auto * m) {
     auto p = player::center();

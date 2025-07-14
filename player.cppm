@@ -8,7 +8,6 @@ import input;
 import ranged;
 import pog;
 import sprite;
-import stopwatch;
 
 namespace player {
   static constexpr const auto energy_lost_per_sec = 0.025f;
@@ -60,8 +59,7 @@ export struct c {
 export class compos : public virtual gauge::compos,
                       public virtual collision::compos,
                       public virtual pog::entity_provider,
-                      public virtual sprite::compos,
-                      public virtual stopwatch {
+                      public virtual sprite::compos {
   c m_player;
 
 public:
@@ -163,17 +161,15 @@ void set_pick_animation(compos *ec) {
   update_animation(ec, g_state.side, a);
 }
 
-void update_anims(compos *ec) {
-  auto millis = ec->current_millis();
-  g_state.anim.frame += millis * g_state.anim.frames_per_sec;
+void update_anims(compos *ec, float ms) {
+  g_state.anim.frame += ms * g_state.anim.frames_per_sec;
 
   auto frame = g_state.anim.frame / 1000;
 
   auto u = g_state.anim.start_x + (frame % g_state.anim.num_frames);
   g_state.sprite.uv = { u, g_state.anim.y };
 }
-void update_sprites(compos *c, float sx, float sy) {
-  float ms = c->current_millis();
+void update_sprites(compos *c, float sx, float sy, float ms) {
   auto dx = sx * ms;
   auto dy = sy * ms;
 
@@ -191,7 +187,7 @@ void update_sprites(compos *c, float sx, float sy) {
 
   g_state.sprite.pos = g_state.sprite.pos + dotz::vec2 { dx, dy };
 }
-export void tick(compos *ec) {
+export void tick(compos *ec, float ms) {
   constexpr const auto blocks_per_sec = 4.0f;
   constexpr const auto speed = blocks_per_sec / 1000.0f;
   const auto pid = ec->player().eid;
@@ -204,7 +200,7 @@ export void tick(compos *ec) {
       rest(ec, energy_gain_per_sec);
     }
     set_sit_animation(ec);
-    update_anims(ec);
+    update_anims(ec, ms);
     return;
   }
 
@@ -217,7 +213,7 @@ export void tick(compos *ec) {
     s = h > 0 ? p_right : p_left;
   } else {
     set_idle_animation(ec, s);
-    update_anims(ec);
+    update_anims(ec, ms);
     return;
   }
 
@@ -229,7 +225,7 @@ export void tick(compos *ec) {
   if (energy == 0) {
     // TODO: use "hurt" animation or something
     set_idle_animation(ec, s);
-    update_anims(ec);
+    update_anims(ec, ms);
     return;
   }
 
@@ -241,8 +237,8 @@ export void tick(compos *ec) {
   exercise(ec, energy_lost_per_sec);
 
   ec->collisions.remove(pid);
-  update_anims(ec);
-  update_sprites(ec, sx, sy);
+  update_anims(ec, ms);
+  update_sprites(ec, sx, sy, ms);
 }
 
   export dotz::vec2 center() {
