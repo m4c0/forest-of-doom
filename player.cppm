@@ -11,33 +11,35 @@ import sprite;
 import stopwatch;
 
 namespace player {
+  static constexpr const auto energy_lost_per_sec = 0.025f;
+  static constexpr const auto food_lost_per_sec = 0.1f;
+  static constexpr const auto energy_gain_per_sec = food_lost_per_sec * 2.0f;
+
+  static constexpr const auto starvation_limit = 0.25f;
+  static constexpr const auto starvation_mental_loss_per_sec = 0.1f;
+  static constexpr const auto starvation_health_loss_per_sec = 0.1f;
+
+  struct anim {
+    unsigned start_x;
+    unsigned y;
+    unsigned num_frames;
+    unsigned frames_per_sec;
+    unsigned frame = 0;
+  };
+
   struct state {
     fox::sprite sprite {
       .pos { 8, 8 },
       .size { 1, 2 },
       .texid = 2,
     };
+    anim anim;
   } g_state;
   
   export void load(fox::memiter * m) {
     *m += g_state.sprite;
   }
 
-constexpr const auto energy_lost_per_sec = 0.025f;
-constexpr const auto food_lost_per_sec = 0.1f;
-constexpr const auto energy_gain_per_sec = food_lost_per_sec * 2.0f;
-
-constexpr const auto starvation_limit = 0.25f;
-constexpr const auto starvation_mental_loss_per_sec = 0.1f;
-constexpr const auto starvation_health_loss_per_sec = 0.1f;
-
-export struct anim {
-  unsigned start_x;
-  unsigned y;
-  unsigned num_frames;
-  unsigned frames_per_sec;
-  unsigned frame{};
-};
 export enum side {
   p_right = 0,
   p_up,
@@ -60,13 +62,9 @@ export class compos : public virtual gauge::compos,
                       public virtual sprite::compos,
                       public virtual stopwatch {
   c m_player;
-  anim m_animation;
-  dotz::vec2 m_movement;
 
 public:
   c &player() noexcept { return m_player; }
-  anim &animation() noexcept { return m_animation; }
-  auto &movement() noexcept { return m_movement; }
 };
 
 export void add_entity(compos *ec) {
@@ -92,8 +90,7 @@ export void add_entity(compos *ec) {
       .health = gauge::add_gauge(ec),
       .satiation = gauge::add_gauge(ec),
   };
-  ec->animation() = a;
-  ec->movement() = {};
+  g_state.anim = a;
   collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
 }
 
@@ -122,14 +119,12 @@ void burn_callories(compos *ec, float val_per_sec) {
 bool update_animation(compos *ec, unsigned s, anim a) {
   a.start_x = s * a.num_frames;
 
-  auto cur_a = ec->animation();
-  if (a.start_x == cur_a.start_x && a.y == cur_a.y) {
-    cur_a.frames_per_sec = a.frames_per_sec;
-    ec->animation() = cur_a;
+  if (a.start_x == g_state.anim.start_x && a.y == g_state.anim.y) {
+    g_state.anim.frames_per_sec = a.frames_per_sec;
     return false;
   }
 
-  ec->animation() = a;
+  g_state.anim = a;
   return true;
 }
 void update_animation(compos *ec, side s, anim a) {
@@ -177,20 +172,17 @@ void set_pick_animation(compos *ec) {
 
 void update_anims(compos *ec) {
   auto millis = ec->current_millis();
-  auto & a = ec->animation();
-  a.frame += millis * a.frames_per_sec;
+  g_state.anim.frame += millis * g_state.anim.frames_per_sec;
 
-  auto frame = a.frame / 1000;
+  auto frame = g_state.anim.frame / 1000;
 
-  auto u = a.start_x + (frame % a.num_frames);
-  const auto id = ec->player().eid;
-  sprite::set_uv(ec, id, u, a.y);
-  g_state.sprite.uv = { u, a.y };
+  auto u = g_state.anim.start_x + (frame % g_state.anim.num_frames);
+  g_state.sprite.uv = { u, g_state.anim.y };
 }
-void update_sprites(compos *c) {
+void update_sprites(compos *c, float sx, float sy) {
   float ms = c->current_millis();
-  auto dx = c->movement().x * ms;
-  auto dy = c->movement().y * ms;
+  auto dx = sx * ms;
+  auto dy = sy * ms;
 
   const auto id = c->player().eid;
 
@@ -220,7 +212,6 @@ export void tick(compos *ec) {
       rest(ec, energy_gain_per_sec);
     }
     set_sit_animation(ec);
-    ec->movement() = {};
     update_anims(ec);
     return;
   }
@@ -234,7 +225,6 @@ export void tick(compos *ec) {
     s = h > 0 ? p_right : p_left;
   } else {
     set_idle_animation(ec, s);
-    ec->movement() = {};
     update_anims(ec);
     return;
   }
@@ -247,7 +237,6 @@ export void tick(compos *ec) {
   if (energy == 0) {
     // TODO: use "hurt" animation or something
     set_idle_animation(ec, s);
-    ec->movement() = {};
     update_anims(ec);
     return;
   }
@@ -260,9 +249,8 @@ export void tick(compos *ec) {
   exercise(ec, energy_lost_per_sec);
 
   ec->collisions.remove(pid);
-  ec->movement() = {sx, sy};
   update_anims(ec);
-  update_sprites(ec);
+  update_sprites(ec, sx, sy);
 }
 
 export dotz::vec2 center(player::compos * ec) {
