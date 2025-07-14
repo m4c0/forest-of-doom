@@ -5,7 +5,6 @@ import dotz;
 import fox;
 import gauge;
 import input;
-import ranged;
 import pog;
 import sprite;
 

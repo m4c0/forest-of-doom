@@ -1,7 +1,6 @@
 export module hud;
 import player;
 import pog;
-import ranged;
 import sprite;
 import tile;
 
