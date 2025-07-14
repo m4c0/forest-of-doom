@@ -6,7 +6,6 @@ import collision;
 import dotz;
 import fox;
 import hud;
-import gauge;
 import input;
 import jute;
 import player;
@@ -93,7 +92,6 @@ static void on_frame() {
   // TODO: move most of these out of the on_frame code 
   float ms = g_timer.millis();
   player::tick(&g_ec, ms);
-  gauge::run_drains(&g_ec, ms);
   hud::update_batteries(&g_ec);
   repaint();
   g_timer = {};

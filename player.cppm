@@ -3,7 +3,6 @@ import area;
 import collision;
 import dotz;
 import fox;
-import gauge;
 import input;
 import pog;
 import sprite;
@@ -40,6 +39,10 @@ namespace player {
     };
     anim anim {};
     side side;
+    float energy = 1;
+    float happyness = 1;
+    float health = 1;
+    float satiation = 1;
   } g_state;
   
   export void load(fox::memiter * m) {
@@ -48,15 +51,9 @@ namespace player {
 
 export struct c {
   pog::eid eid;
-
-  pog::eid energy;
-  pog::eid happyness;
-  pog::eid health;
-  pog::eid satiation;
 };
 
-export class compos : public virtual gauge::compos,
-                      public virtual collision::compos,
+export class compos : public virtual collision::compos,
                       public virtual pog::entity_provider,
                       public virtual sprite::compos {
   c m_player;
@@ -69,27 +66,18 @@ export void add_entity(compos *ec) {
   auto pid = ec->e().alloc();
   ec->player() = c{
       .eid = pid,
-      .energy = gauge::add_gauge(ec),
-      .happyness = gauge::add_gauge(ec),
-      .health = gauge::add_gauge(ec),
-      .satiation = gauge::add_gauge(ec),
   };
   collision::add(ec, pid, g_state.sprite.pos.x, g_state.sprite.pos.y + 0.9f, 1, 1);
 }
 
-void starve(compos *ec, float val_per_sec) {
-  gauge::add_drain(ec, ec->player().health, val_per_sec);
-}
-void depress(compos *ec, float val_per_sec) {
-  gauge::add_drain(ec, ec->player().happyness, val_per_sec);
-}
-void exercise(compos *ec, float val_per_sec) {
-  gauge::add_drain(ec, ec->player().energy, val_per_sec);
-}
-void rest(compos *ec, float val_per_sec) { exercise(ec, -val_per_sec); }
-void burn_callories(compos *ec, float val_per_sec) {
-  gauge::add_drain(ec, ec->player().satiation, val_per_sec);
-}
+  static void drain(float & f, float vps, float ms) {
+    f = dotz::clamp(f - vps * ms / 1000.0f, 0.f, 1.f);
+  }
+  static void starve(float vps, float ms) { drain(g_state.health, vps, ms); }
+  static void depress(float vps, float ms) { drain(g_state.happyness, vps, ms); }
+  static void exercise(float vps, float ms) { drain(g_state.energy, vps, ms); }
+  static void rest(float vps, float ms) { exercise(-vps, ms); }
+  static void burn_callories(float vps, float ms) { drain(g_state.satiation, vps, ms); }
 
 bool update_animation(compos *ec, unsigned s, anim a) {
   a.start_x = s * a.num_frames;
@@ -131,9 +119,8 @@ void set_walk_animation(compos *ec, side s) {
       .frames_per_sec = 24,
   };
 
-  auto energy = ec->gauges.get(ec->player().energy).value;
   auto aa = a;
-  aa.frames_per_sec = static_cast<unsigned>(a.frames_per_sec * energy);
+  aa.frames_per_sec = static_cast<unsigned>(a.frames_per_sec * g_state.energy);
   update_animation(ec, s, aa);
 }
 void set_pick_animation(compos *ec) {
@@ -175,13 +162,11 @@ export void tick(compos *ec, float ms) {
   constexpr const auto blocks_per_sec = 4.0f;
   constexpr const auto speed = blocks_per_sec / 1000.0f;
   const auto pid = ec->player().eid;
-  const auto energy = ec->gauges.get(ec->player().energy).value;
-  const auto satiation = ec->gauges.get(ec->player().satiation).value;
 
   if (input::state(input::buttons::REST)) {
-    if (energy < 1 && satiation > 0) {
-      burn_callories(ec, food_lost_per_sec);
-      rest(ec, energy_gain_per_sec);
+    if (g_state.energy < 1 && g_state.satiation > 0) {
+      burn_callories(food_lost_per_sec, ms);
+      rest(energy_gain_per_sec, ms);
     }
     set_sit_animation(ec);
     update_anims(ec, ms);
@@ -201,24 +186,24 @@ export void tick(compos *ec, float ms) {
     return;
   }
 
-  if (energy == 0 && satiation < starvation_limit) {
-    auto adj_food = 1.0f - (satiation - starvation_limit) / starvation_limit;
-    depress(ec, adj_food * starvation_mental_loss_per_sec);
-    starve(ec, adj_food * starvation_health_loss_per_sec);
+  if (g_state.energy == 0 && g_state.satiation < starvation_limit) {
+    auto adj_food = 1.0f - (g_state.satiation - starvation_limit) / starvation_limit;
+    depress(adj_food * starvation_mental_loss_per_sec, ms);
+    starve(adj_food * starvation_health_loss_per_sec, ms);
   }
-  if (energy == 0) {
+  if (g_state.energy == 0) {
     // TODO: use "hurt" animation or something
     set_idle_animation(ec, s);
     update_anims(ec, ms);
     return;
   }
 
-  float f_speed = speed * energy;
+  float f_speed = speed * g_state.energy;
   float d = dotz::sqrt(h * h + v * v);
   float sx = h * f_speed / d;
   float sy = v * f_speed / d;
   set_walk_animation(ec, s);
-  exercise(ec, energy_lost_per_sec);
+  exercise(energy_lost_per_sec, ms);
 
   ec->collisions.remove(pid);
   update_anims(ec, ms);

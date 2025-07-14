@@ -43,10 +43,10 @@ void add_battery(compos *ec, float y, tile::ui::c icon, pog::eid gg) {
   ec->batteries().add(gg, {});
 }
 export void add_entities(compos *ec) {
-  add_battery(ec, 3, tile::ui::mind_l, ec->player().happyness);
-  add_battery(ec, 2, tile::ui::heart_l, ec->player().health);
-  add_battery(ec, 1, tile::ui::food_l, ec->player().satiation);
-  add_battery(ec, 0, tile::ui::energy_l, ec->player().energy);
+  //add_battery(ec, 3, tile::ui::mind_l, ec->player().happyness);
+  //add_battery(ec, 2, tile::ui::heart_l, ec->player().health);
+  //add_battery(ec, 1, tile::ui::food_l, ec->player().satiation);
+  //add_battery(ec, 0, tile::ui::energy_l, ec->player().energy);
 }
 
 // Looks excessive, but it is precise and it allows per-range adjustment (just
@@ -67,8 +67,8 @@ export void update_batteries(compos *ec) {
                                        tile::ui::bat_y_2, tile::ui::bat_g_3,
                                        tile::ui::bat_g_4};
   for (auto &[id, _] : ec->batteries()) {
-    unsigned val = step(ec->gauges.get(id).value);
-    sprite::set_uv(ec, id, tile::uv(levels[val]));
+    //unsigned val = step(ec->gauges.get(id).value);
+    //sprite::set_uv(ec, id, tile::uv(levels[val]));
   }
 }
 
