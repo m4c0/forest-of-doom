@@ -8,7 +8,6 @@ import hud;
 import gauge;
 import input;
 import jute;
-import movement;
 import player;
 import prefabs;
 import qsu;
@@ -91,7 +90,6 @@ static void on_frame() {
   // TODO: speed of character depends on FPS
   // TODO: move most of these out of the on_frame code 
   player::tick(&g_ec);
-  movement::update_sprites(&g_ec);
   gauge::run_drains(&g_ec);
   hud::update_batteries(&g_ec);
   repaint();

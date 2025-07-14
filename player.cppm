@@ -4,7 +4,6 @@ import collision;
 import dotz;
 import gauge;
 import input;
-import movement;
 import ranged;
 import pog;
 import sprite;
@@ -43,16 +42,18 @@ export struct c {
 };
 
 export class compos : public virtual gauge::compos,
-                      public virtual movement::compos,
+                      public virtual collision::compos,
                       public virtual pog::entity_provider,
                       public virtual sprite::compos,
                       public virtual stopwatch {
   c m_player;
   anim m_animation;
+  dotz::vec2 m_movement;
 
 public:
   c &player() noexcept { return m_player; }
   anim &animation() noexcept { return m_animation; }
+  auto &movement() noexcept { return m_movement; }
 };
 
 export void add_entity(compos *ec) {
@@ -78,7 +79,7 @@ export void add_entity(compos *ec) {
       .satiation = gauge::add_gauge(ec),
   };
   ec->animation() = a;
-  ec->movements().add(pid, {});
+  ec->movement() = {};
   collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
 }
 
@@ -160,7 +161,7 @@ void set_pick_animation(compos *ec) {
   update_animation(ec, get_side(ec), a);
 }
 
-export void update_anims(compos *ec) {
+void update_anims(compos *ec) {
   auto millis = ec->current_millis();
   auto & a = ec->animation();
   a.frame += millis * a.frames_per_sec;
@@ -170,6 +171,25 @@ export void update_anims(compos *ec) {
   auto u = a.start_x + (frame % a.num_frames);
   const auto id = ec->player().eid;
   sprite::set_uv(ec, id, u, a.y);
+}
+void update_sprites(compos *c) {
+  float ms = c->current_millis();
+  auto dx = c->movement().x * ms;
+  auto dy = c->movement().y * ms;
+
+  const auto id = c->player().eid;
+
+  if (collision::move_by(c, id, dx, dy)) {
+  } else if (collision::move_by(c, id, 0, dy)) {
+    dx = 0;
+  } else if (collision::move_by(c, id, dx, 0)) {
+    dy = 0;
+  } else {
+    // TODO: do something
+    return;
+  }
+
+  sprite::move_by(c, id, dx, dy);
 }
 export void tick(compos *ec) {
   constexpr const auto blocks_per_sec = 4.0f;
@@ -184,7 +204,7 @@ export void tick(compos *ec) {
       rest(ec, energy_gain_per_sec);
     }
     set_sit_animation(ec);
-    ec->movements().update(pid, {});
+    ec->movement() = {};
     update_anims(ec);
     return;
   }
@@ -198,7 +218,7 @@ export void tick(compos *ec) {
     s = h > 0 ? p_right : p_left;
   } else {
     set_idle_animation(ec, s);
-    ec->movements().update(pid, {});
+    ec->movement() = {};
     update_anims(ec);
     return;
   }
@@ -211,7 +231,7 @@ export void tick(compos *ec) {
   if (energy == 0) {
     // TODO: use "hurt" animation or something
     set_idle_animation(ec, s);
-    ec->movements().update(pid, {});
+    ec->movement() = {};
     update_anims(ec);
     return;
   }
@@ -224,8 +244,9 @@ export void tick(compos *ec) {
   exercise(ec, energy_lost_per_sec);
 
   ec->collisions.remove(pid);
-  ec->movements().update(pid, {sx, sy});
+  ec->movement() = {sx, sy};
   update_anims(ec);
+  update_sprites(ec);
 }
 
 export dotz::vec2 center(player::compos * ec) {
