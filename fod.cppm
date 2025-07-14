@@ -123,5 +123,6 @@ const int i = [] {
   v::on_resize = on_resize;
   v::on_frame  = on_frame;
   v::on_stop   = on_stop;
+  input::setup();
   return 0;
 }();

@@ -45,11 +45,9 @@ export class compos : public virtual animation::compos,
                       public virtual sprite::compos,
                       public virtual stopwatch {
   c m_player;
-  input::state m_input{};
 
 public:
   c &player() noexcept { return m_player; }
-  input::state &input() noexcept { return m_input; }
 };
 
 export void add_entity(compos *ec) {
@@ -166,7 +164,7 @@ export void tick(compos *ec) {
   const auto energy = ec->gauges.get(ec->player().energy).value;
   const auto satiation = ec->gauges.get(ec->player().satiation).value;
 
-  if (ec->input().rest()) {
+  if (input::state(input::buttons::REST)) {
     if (energy < 1 && satiation > 0) {
       burn_callories(ec, food_lost_per_sec);
       rest(ec, energy_gain_per_sec);
@@ -176,8 +174,8 @@ export void tick(compos *ec) {
     return;
   }
 
-  auto h = ec->input().h_value();
-  auto v = ec->input().v_value();
+  auto h = input::state(input::axis::X);
+  auto v = input::state(input::axis::Y);
   auto s = ec->player().side;
   if (v != 0) {
     s = v > 0 ? p_down : p_up;

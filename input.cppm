@@ -1,52 +1,73 @@
 export module input;
 import casein;
+import hai;
 
-export namespace input {
-template <casein::keys K> class button {
-  bool m_down{};
+namespace input {
+  export enum class axis { X, Y };
+  export enum class buttons { REST };
+  export float state(axis a);
+  export bool state(buttons b);
 
-public:
-  button() {
-    using namespace casein;
-    handle(KEY_DOWN, K, [this] { m_down = true; });
-    handle(KEY_UP,   K, [this] { m_down = false; });
+  export void on_button_down(buttons b, hai::fn<void> fn);
+
+  export void setup();
+}
+
+module :private;
+
+namespace {
+  enum keys {
+    REST,
+    MOVE_LEFT,
+    MOVE_RIGHT,
+    MOVE_DOWN,
+    MOVE_UP,
+    MAX_KEYS,
+  };
+}
+
+static hai::fn<void> g_btn_down_cb[MAX_KEYS] {};
+static bool g_state[MAX_KEYS] {};
+static void setup_btn(casein::keys k, keys i) {
+  using namespace casein;
+  handle(KEY_DOWN, k, [i] {
+    auto old = g_state[i];
+    g_state[i] = true;
+    if (!old && g_btn_down_cb[i]) g_btn_down_cb[i]();
+  });
+  handle(KEY_UP,   k, [i] { g_state[i] = false; });
+}
+
+static int axis_state(keys n, keys p) {
+  if (g_state[n] && !g_state[p]) return -1;
+  if (!g_state[n] && g_state[p]) return 1;
+  return 0;
+}
+
+float input::state(axis a) {
+  switch (a) {
+    case axis::X: return axis_state(MOVE_LEFT, MOVE_RIGHT);
+    case axis::Y: return axis_state(MOVE_UP, MOVE_DOWN);
   }
-
-  [[nodiscard]] constexpr auto value() const noexcept { return m_down; }
-
-};
-
-template <casein::keys N, casein::keys P> class axis {
-  button<N> m_n;
-  button<P> m_p;
-
-public:
-  [[nodiscard]] int value() const noexcept {
-    if (m_n.value() && !m_p.value()) return -1;
-    if (m_p.value() && !m_n.value()) return 1;
-    return 0;
+}
+bool input::state(buttons b) {
+  switch (b) {
+    case buttons::REST: return g_state[REST];
   }
-};
+}
 
-using h_axis = axis<casein::K_LEFT, casein::K_RIGHT>;
-using v_axis = axis<casein::K_UP, casein::K_DOWN>;
+void input::on_button_down(buttons b, hai::fn<void> fn) {
+  switch (b) {
+    case buttons::REST: g_btn_down_cb[REST] = fn; break;
+  }
+}
 
-class dual_axis {
-  h_axis m_h{};
-  v_axis m_v{};
+void input::setup() {
+  using namespace casein;
+  setup_btn(K_LEFT,  MOVE_LEFT);
+  setup_btn(K_RIGHT, MOVE_RIGHT);
+  setup_btn(K_UP,    MOVE_UP);
+  setup_btn(K_DOWN,  MOVE_DOWN);
 
-public:
-  [[nodiscard]] int h_value() const noexcept { return m_h.value(); }
-  [[nodiscard]] int v_value() const noexcept { return m_v.value(); }
-};
-
-class state {
-  dual_axis m_move;
-  button<casein::K_SPACE> m_rest;
-
-public:
-  [[nodiscard]] int h_value() const noexcept { return m_move.h_value(); }
-  [[nodiscard]] int v_value() const noexcept { return m_move.v_value(); }
-  [[nodiscard]] bool rest() const noexcept { return m_rest.value(); }
-};
-} // namespace input
+  setup_btn(K_SPACE, REST);
+}
