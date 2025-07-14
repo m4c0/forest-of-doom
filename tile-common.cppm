@@ -1,6 +1,4 @@
 export module tile:common;
-export import area;
-export import collision;
 export import pog;
 export import rect;
 export import sprite;
@@ -16,7 +14,7 @@ constexpr rect uv(c_t t) {
       .h = static_cast<float>((t >> 0) & 0xFFU),
   };
 }
-struct compos : virtual collision::compos, virtual sprite::compos {};
+struct compos : virtual sprite::compos {};
 
 auto add_tile(compos *ec, c_t t, rect uv, sprite::layers l, float x, float y) {
   sprite::c s{

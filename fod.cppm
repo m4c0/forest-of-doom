@@ -2,6 +2,7 @@
 export module fod;
 
 import backpack;
+import collision;
 import dotz;
 import fox;
 import hud;
