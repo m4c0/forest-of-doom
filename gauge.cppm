@@ -1,28 +1,11 @@
 export module gauge;
+import dotz;
 import pog;
 
 namespace gauge {
-class ranged {
-  float m_value{1.0f};
-
-public:
-  constexpr operator float() const noexcept { return m_value; }
-
-  constexpr auto &operator+=(float delta) noexcept {
-    auto n = m_value + delta;
-    m_value = n > 1 ? 1 : n;
-    return *this;
-  }
-  constexpr auto &operator-=(float delta) noexcept {
-    auto n = m_value - delta;
-    m_value = n < 0 ? 0 : n;
-    return *this;
-  }
-};
-
 export struct c {
-  ranged value;
-  float drain;
+  float value = 1;
+  float drain = 0;
 };
 export struct compos : virtual pog::entity_provider {
   pog::sparse_set<c> gauges{};
@@ -42,7 +25,8 @@ export void add_drain(compos *ec, pog::eid id, float val_per_sec) {
 
 export void run_drains(compos *ec, float ms) {
   for (auto [id, g] : ec->gauges) {
-    g.value -= g.drain * ms / 1000.0f;
+    g.value = dotz::clamp(g.value - g.drain * ms / 1000.0f, 0.f, 1.f);
+
     g.drain = 0;
     ec->gauges.update(id, g);
   }
