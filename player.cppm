@@ -11,8 +11,6 @@ import pog;
 import sprite;
 import stopwatch;
 
-extern "C" float sqrtf(float);
-
 namespace player {
 constexpr const auto energy_lost_per_sec = 0.025f;
 constexpr const auto food_lost_per_sec = 0.1f;
@@ -200,7 +198,7 @@ export void tick(compos *ec) {
   }
 
   float f_speed = speed * energy;
-  float d = sqrtf(h * h + v * v);
+  float d = dotz::sqrt(h * h + v * v);
   float sx = h * f_speed / d;
   float sy = v * f_speed / d;
   set_walk_animation(ec, s);
