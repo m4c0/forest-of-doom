@@ -14,18 +14,24 @@ dotz::ivec2 g_cursor;
 static void load() {
   g_fox->load(fox::layers::floor, [](auto * m) {
     *m += {
-      .pos = g_cursor,
-      .uv = g_cursor,
-      .size { 1, 1 },
-      .texid = 1,
-    };
-    *m += {
       .pos { 0, 0 },
       .uv { 0, 0 },
       .size { 64, 64 },
-      .alpha = 0.7,
       .texid = 1,
     };
+  });
+  g_fox->load(fox::layers::entities, [](auto * m) {
+    for (dotz::ivec2 p = -1; p.y <= 1; p.y++) {
+      for (p.x = -1; p.x <= 1; p.x++) {
+        if (p.x == 0 && p.y == 0) continue;
+        *m += {
+          .pos = g_cursor + p,
+          .uv = p + 1,
+          .size { 1, 1 },
+          .texid = 3,
+        };
+      }
+    }
   });
 }
 static constexpr const auto cursor(int dx, int dy) {
