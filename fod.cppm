@@ -68,7 +68,7 @@ static void on_start() {
   g_q = new qsu::main {};
   g_fox = new fox::main {};
   
-  g_fox->load([](auto * m) {
+  g_fox->load(fox::layers::floor, [](auto * m) {
     load_prefab(m, "prefabs-ocean-0.txt", -16, -16);
     load_prefab(m, "prefabs-ocean-0.txt",   0, -16);
     load_prefab(m, "prefabs-ocean-0.txt",  16, -16);
@@ -79,7 +79,8 @@ static void on_start() {
     load_prefab(m, "prefabs-ocean-0.txt",  16,  16);
   
     load_prefab(m, "prefabs-island-0.txt", 0, 0);
-
+  });
+  g_fox->load(fox::layers::entities, [](auto * m) {
     backpack::load(m);
   });
 

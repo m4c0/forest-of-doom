@@ -11,7 +11,15 @@ import voo;
 import wagen;
 
 namespace fox {
+  export enum class layers : unsigned {
+    floor = 0,
+    entities,
+    player,
+    max,
+  };
+
   constexpr const auto max_sprites = 256 * 9 * 4;
+  constexpr const auto max_layers = static_cast<unsigned>(layers::max);
   constexpr const auto uber_dset_smps = 2;
 
   export struct sprite {
@@ -60,7 +68,7 @@ namespace fox {
   };
 
   export class main {
-    sprite_buffer m_buf {};
+    sprite_buffer m_buf[max_layers] {};
 
     voo::one_quad m_quad { v::dq()->physical_device() };
 
@@ -90,7 +98,7 @@ namespace fox {
     });
 
   public:
-    void load(auto && fn) { m_buf.load(fn); }
+    void load(layers l, auto && fn) { m_buf[static_cast<unsigned>(l)].load(fn); }
 
     void on_frame(float grid_size, dotz::vec2 center) {
       upc pc {
@@ -102,7 +110,7 @@ namespace fox {
       vee::cmd_bind_gr_pipeline(cb, *m_ppl);
       vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
       vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset.descriptor_set());
-      m_quad.run(cb, 0, m_buf.bind(cb));
+      for (auto & l : m_buf) m_quad.run(cb, 0, l.bind(cb));
     }
   };
 }

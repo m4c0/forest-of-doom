@@ -12,7 +12,7 @@ fox::main * g_fox;
 dotz::ivec2 g_cursor;
 
 static void load() {
-  g_fox->load([](auto * m) {
+  g_fox->load(fox::layers::floor, [](auto * m) {
     *m += {
       .pos = g_cursor,
       .uv = g_cursor,
