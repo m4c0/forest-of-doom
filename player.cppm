@@ -19,10 +19,10 @@ namespace player {
   static constexpr const auto starvation_health_loss_per_sec = 0.1f;
 
   struct anim {
-    unsigned start_x;
-    unsigned y;
-    unsigned num_frames;
-    unsigned frames_per_sec;
+    unsigned start_x = 0;
+    unsigned y = 0;
+    unsigned num_frames = 1;
+    unsigned frames_per_sec = 0;
     unsigned frame = 0;
   };
 
@@ -39,7 +39,7 @@ namespace player {
       .size { 1, 2 },
       .texid = 2,
     };
-    anim anim;
+    anim anim {};
     side side;
   } g_state;
   
@@ -67,21 +67,7 @@ public:
 };
 
 export void add_entity(compos *ec) {
-  constexpr const auto sx = 8.0f;
-  constexpr const auto sy = 8.0f;
-
-  rect pos{sx, sy, 1, 2};
-  sprite::c spr{
-      .uv = {0, 2, 1, 2},
-      .layer = sprite::layers::scout,
-      .dim = 1,
-  };
-  anim a{
-      .start_x = 0,
-      .y = 0,
-      .num_frames = 1,
-  };
-  auto pid = sprite::add(ec, spr, pos);
+  auto pid = ec->e().alloc();
   ec->player() = c{
       .eid = pid,
       .energy = gauge::add_gauge(ec),
@@ -89,8 +75,7 @@ export void add_entity(compos *ec) {
       .health = gauge::add_gauge(ec),
       .satiation = gauge::add_gauge(ec),
   };
-  g_state.anim = a;
-  collision::add(ec, pid, sx, sy + 0.9f, 1, 1);
+  collision::add(ec, pid, g_state.sprite.pos.x, g_state.sprite.pos.y + 0.9f, 1, 1);
 }
 
 void starve(compos *ec, float val_per_sec) {
