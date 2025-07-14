@@ -31,7 +31,7 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
       };
     });
     o0->for_each([&](float x, float y, const auto & def) {
-      if (dotz::length(def.collision) > 0) {
+      if (dotz::length(def.collision.zw()) > 0) {
         auto id = g_ec.e().alloc();
         collision::add(&g_ec, id,
             dx + x + def.collision.x,
