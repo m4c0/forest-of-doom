@@ -1,5 +1,4 @@
 export module hud;
-import player;
 import pog;
 import sprite;
 import tile;
@@ -10,7 +9,7 @@ struct anchor {
   float dy;
 };
 export class compos : public virtual pog::entity_provider,
-                      public virtual player::compos {
+                      public virtual sprite::compos {
   pog::sparse_set<anchor> m_anchors{};
   pog::sparse_set<pog::marker> m_batteries{};
 

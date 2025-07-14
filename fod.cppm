@@ -16,7 +16,7 @@ import sitime;
 import tile;
 import v;
 
-struct ec : hud::compos {} g_ec;
+struct ec : hud::compos, player::compos {} g_ec;
 
 void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
   try {

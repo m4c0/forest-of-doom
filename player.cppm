@@ -43,30 +43,19 @@ namespace player {
     float happyness = 1;
     float health = 1;
     float satiation = 1;
+
+    pog::eid eid;
   } g_state;
   
   export void load(fox::memiter * m) {
     *m += g_state.sprite;
   }
 
-export struct c {
-  pog::eid eid;
-};
-
 export class compos : public virtual collision::compos,
-                      public virtual pog::entity_provider,
-                      public virtual sprite::compos {
-  c m_player;
-
-public:
-  c &player() noexcept { return m_player; }
-};
+                      public virtual pog::entity_provider {};
 
 export void add_entity(compos *ec) {
-  auto pid = ec->e().alloc();
-  ec->player() = c{
-      .eid = pid,
-  };
+  auto pid = g_state.eid = ec->e().alloc();
   collision::add(ec, pid, g_state.sprite.pos.x, g_state.sprite.pos.y + 0.9f, 1, 1);
 }
 
@@ -144,12 +133,10 @@ void update_sprites(compos *c, float sx, float sy, float ms) {
   auto dx = sx * ms;
   auto dy = sy * ms;
 
-  const auto id = c->player().eid;
-
-  if (collision::move_by(c, id, dx, dy)) {
-  } else if (collision::move_by(c, id, 0, dy)) {
+  if (collision::move_by(c, g_state.eid, dx, dy)) {
+  } else if (collision::move_by(c, g_state.eid, 0, dy)) {
     dx = 0;
-  } else if (collision::move_by(c, id, dx, 0)) {
+  } else if (collision::move_by(c, g_state.eid, dx, 0)) {
     dy = 0;
   } else {
     // TODO: do something
@@ -161,7 +148,6 @@ void update_sprites(compos *c, float sx, float sy, float ms) {
 export void tick(compos *ec, float ms) {
   constexpr const auto blocks_per_sec = 4.0f;
   constexpr const auto speed = blocks_per_sec / 1000.0f;
-  const auto pid = ec->player().eid;
 
   if (input::state(input::buttons::REST)) {
     if (g_state.energy < 1 && g_state.satiation > 0) {
@@ -205,7 +191,7 @@ export void tick(compos *ec, float ms) {
   set_walk_animation(ec, s);
   exercise(energy_lost_per_sec, ms);
 
-  ec->collisions.remove(pid);
+  ec->collisions.remove(g_state.eid);
   update_anims(ec, ms);
   update_sprites(ec, sx, sy, ms);
 }
