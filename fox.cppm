@@ -41,12 +41,26 @@ namespace fox {
     constexpr const auto descriptor_set_layout() const { return m_dset.descriptor_set_layout(); }
   };
 
-  export class main {
+  class sprite_buffer {
     voo::bound_buffer m_buf = voo::bound_buffer::create_from_host(
         v::dq()->physical_device(),
         max_sprites * sizeof(sprite),
         vee::buffer_usage::vertex_buffer);
     unsigned m_count {};
+
+  public:
+    void load(auto && fn) {
+      voo::memiter<sprite> m { *m_buf.memory, &m_count };
+      fn(&m);
+    }
+    auto bind(vee::command_buffer cb) {
+      vee::cmd_bind_vertex_buffers(cb, 1, *m_buf.buffer);
+      return m_count;
+    }
+  };
+
+  export class main {
+    sprite_buffer m_buf {};
 
     voo::one_quad m_quad { v::dq()->physical_device() };
 
@@ -76,10 +90,7 @@ namespace fox {
     });
 
   public:
-    void load(auto && fn) {
-      voo::memiter<sprite> m { *m_buf.memory, &m_count };
-      fn(&m);
-    }
+    void load(auto && fn) { m_buf.load(fn); }
 
     void on_frame(float grid_size, dotz::vec2 center) {
       upc pc {
@@ -89,10 +100,9 @@ namespace fox {
 
       auto cb = v::sw()->command_buffer();
       vee::cmd_bind_gr_pipeline(cb, *m_ppl);
-      vee::cmd_bind_vertex_buffers(cb, 1, *m_buf.buffer);
       vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
       vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset.descriptor_set());
-      m_quad.run(cb, 0, m_count);
+      m_quad.run(cb, 0, m_buf.bind(cb));
     }
   };
 }
