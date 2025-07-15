@@ -128,13 +128,15 @@ export void tick(compos *ec, float ms) {
 
   if (input::state(input::buttons::REST)) return rest(ms);
 
-  auto h = input::state(input::axis::X);
-  auto v = input::state(input::axis::Y);
+  dotz::vec2 in {
+    input::state(input::axis::X),
+    input::state(input::axis::Y),
+  };
   auto s = g_state.side;
-  if (v != 0) {
-    s = v > 0 ? p_down : p_up;
-  } else if (h != 0) {
-    s = h > 0 ? p_right : p_left;
+  if (in.y != 0) {
+    s = in.y > 0 ? p_down : p_up;
+  } else if (in.x != 0) {
+    s = in.x > 0 ? p_right : p_left;
   } else {
     idle_animation(ms, s);
     return;
@@ -151,26 +153,23 @@ export void tick(compos *ec, float ms) {
     return;
   }
 
-  float f_speed = speed * g_state.energy;
-  float d = dotz::sqrt(h * h + v * v);
-  float dx = ms * h * f_speed / d;
-  float dy = ms * v * f_speed / d;
-  walk_animation(ms, s);
   exercise(energy_lost_per_sec, ms);
+  walk_animation(ms, s);
 
   ec->collisions.remove(g_state.eid);
 
-  if (collision::move_by(ec, g_state.eid, dx, dy)) {
-  } else if (collision::move_by(ec, g_state.eid, 0, dy)) {
-    dx = 0;
-  } else if (collision::move_by(ec, g_state.eid, dx, 0)) {
-    dy = 0;
+  auto d = dotz::normalise(in) * ms * speed * g_state.energy;
+  if (collision::move_by(ec, g_state.eid, d.x, d.y)) {
+  } else if (collision::move_by(ec, g_state.eid, 0, d.y)) {
+    d.x = 0;
+  } else if (collision::move_by(ec, g_state.eid, d.x, 0)) {
+    d.y = 0;
   } else {
     // TODO: do something
     return;
   }
 
-  g_state.sprite.pos = g_state.sprite.pos + dotz::vec2 { dx, dy };
+  g_state.sprite.pos = g_state.sprite.pos + d;
 }
 
   export dotz::vec2 center() {
