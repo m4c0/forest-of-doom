@@ -68,43 +68,6 @@ export void add_entity(compos *ec) {
   static void rest(float vps, float ms) { exercise(-vps, ms); }
   static void burn_callories(float vps, float ms) { drain(g_state.satiation, vps, ms); }
 
-  static bool set_animation(unsigned s, anim a) {
-    a.start_x = s * a.num_frames;
-
-    if (a.start_x == g_state.anim.start_x && a.y == g_state.anim.y) {
-      g_state.anim.frames_per_sec = a.frames_per_sec;
-      return false;
-    }
-
-    g_state.anim = a;
-    return true;
-  }
-  static void set_animation(side s, anim a) {
-    if (set_animation(static_cast<unsigned>(s), a)) g_state.side = s;
-  }
-  static void idle_animation(side s) {
-    set_animation(s, {
-      .y = 2,
-      .num_frames = 6,
-      .frames_per_sec = 6,
-    });
-  }
-  static void sit_animation() {
-    // TODO: realign "sitting" because he is actually floating
-    set_animation(g_state.side / 2U, {
-      .y = 8,
-      .num_frames = 6,
-      .frames_per_sec = 6,
-    });
-  }
-  static void walk_animation(side s) {
-    set_animation(s, {
-      .y = 4,
-      .num_frames = 6,
-      .frames_per_sec = static_cast<unsigned>(24 * g_state.energy),
-    });
-  }
-
   static void tick_animation(float ms) {
     g_state.anim.frame += ms * g_state.anim.frames_per_sec;
   
@@ -113,19 +76,57 @@ export void add_entity(compos *ec) {
     auto u = g_state.anim.start_x + (frame % g_state.anim.num_frames);
     g_state.sprite.uv = { u, g_state.anim.y };
   }
-export void tick(compos *ec, float ms) {
-  constexpr const auto blocks_per_sec = 4.0f;
-  constexpr const auto speed = blocks_per_sec / 1000.0f;
 
-  if (input::state(input::buttons::REST)) {
+  static bool set_animation(float ms, unsigned s, anim a) {
+    a.start_x = s * a.num_frames;
+
+    if (a.start_x == g_state.anim.start_x && a.y == g_state.anim.y) {
+      g_state.anim.frames_per_sec = a.frames_per_sec;
+      tick_animation(ms);
+      return false;
+    }
+
+    g_state.anim = a;
+    return true;
+  }
+  static void set_animation(float ms, side s, anim a) {
+    if (set_animation(ms, static_cast<unsigned>(s), a)) g_state.side = s;
+  }
+  static void idle_animation(float ms, side s) {
+    set_animation(ms, s, {
+      .y = 2,
+      .num_frames = 6,
+      .frames_per_sec = 6,
+    });
+  }
+  static void sit_animation(float ms) {
+    // TODO: realign "sitting" because he is actually floating
+    set_animation(ms, g_state.side / 2U, {
+      .y = 8,
+      .num_frames = 6,
+      .frames_per_sec = 6,
+    });
+  }
+  static void walk_animation(float ms, side s) {
+    set_animation(ms, s, {
+      .y = 4,
+      .num_frames = 6,
+      .frames_per_sec = static_cast<unsigned>(24 * g_state.energy),
+    });
+  }
+
+  static void rest(float ms) {
     if (g_state.energy < 1 && g_state.satiation > 0) {
       burn_callories(food_lost_per_sec, ms);
       rest(energy_gain_per_sec, ms);
     }
-    sit_animation();
-    tick_animation(ms);
-    return;
+    sit_animation(ms);
   }
+export void tick(compos *ec, float ms) {
+  constexpr const auto blocks_per_sec = 4.0f;
+  constexpr const auto speed = blocks_per_sec / 1000.0f;
+
+  if (input::state(input::buttons::REST)) return rest(ms);
 
   auto h = input::state(input::axis::X);
   auto v = input::state(input::axis::Y);
@@ -135,8 +136,7 @@ export void tick(compos *ec, float ms) {
   } else if (h != 0) {
     s = h > 0 ? p_right : p_left;
   } else {
-    idle_animation(s);
-    tick_animation(ms);
+    idle_animation(ms, s);
     return;
   }
 
@@ -147,8 +147,7 @@ export void tick(compos *ec, float ms) {
   }
   if (g_state.energy == 0) {
     // TODO: use "hurt" animation or something
-    idle_animation(s);
-    tick_animation(ms);
+    idle_animation(ms, s);
     return;
   }
 
@@ -156,11 +155,10 @@ export void tick(compos *ec, float ms) {
   float d = dotz::sqrt(h * h + v * v);
   float dx = ms * h * f_speed / d;
   float dy = ms * v * f_speed / d;
-  walk_animation(s);
+  walk_animation(ms, s);
   exercise(energy_lost_per_sec, ms);
 
   ec->collisions.remove(g_state.eid);
-  tick_animation(ms);
 
   if (collision::move_by(ec, g_state.eid, dx, dy)) {
   } else if (collision::move_by(ec, g_state.eid, 0, dy)) {
