@@ -1,4 +1,6 @@
 export module hud;
+import dotz;
+import fox;
 import pog;
 import sprite;
 import tile;
@@ -79,4 +81,16 @@ export void update_layout(compos *ec, float gw, float gh) {
     sprite::set_pos(ec, id, x, y);
   }
 }
+
+  export void load(fox::memiter * m, dotz::vec2 grid) {
+    dotz::vec2 p { -grid.x, grid.y - 4 };
+    const auto sp = [&](dotz::vec2 pos, dotz::vec2 uv) {
+      *m += { .pos = pos + p, .uv = uv, .size = 1, .texid = 3 };
+    };
+
+    sp({ 0, 0 }, {  9, 10 });
+    sp({ 0, 1 }, { 11, 10 });
+    sp({ 0, 2 }, { 12, 10 });
+    sp({ 0, 3 }, { 10, 10 });
+  }
 } // namespace hud

@@ -87,7 +87,6 @@ static void on_frame() {
   // TODO: move most of these out of the on_frame code 
   float ms = g_timer.millis();
   player::tick(ms);
-  hud::update_batteries(&g_ec);
   repaint();
   g_timer = {};
 
@@ -98,7 +97,7 @@ static void on_frame() {
   g_fox->load(fox::layers::player, [](auto * m) {
     player::load(m);
   });
-  g_fox->on_frame(16, 32, player::center());
+  g_fox->on_frame(16, 16, player::center());
 
   g_q->on_frame();
 }
@@ -107,11 +106,7 @@ static void on_resize() {
   auto [gw, gh] = g_q->hud_grid_size();
   hud::update_layout(&g_ec, gw, gh);
   g_fox->load_ui([](auto * m) {
-    *m += {
-      .uv { 8, 10 },
-      .size = 1,
-      .texid = 3,
-    };
+    hud::load(m, g_fox->aspect() * 8);
   });
 }
 
