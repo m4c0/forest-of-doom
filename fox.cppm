@@ -69,6 +69,7 @@ namespace fox {
 
   export class main {
     sprite_buffer m_buf[max_layers] {};
+    sprite_buffer m_ui_buf {};
 
     voo::one_quad m_quad { v::dq()->physical_device() };
 
@@ -99,18 +100,25 @@ namespace fox {
 
   public:
     void load(layers l, auto && fn) { m_buf[static_cast<unsigned>(l)].load(fn); }
+    void load_ui(auto && fn) { m_ui_buf.load(fn); }
 
-    void on_frame(float grid_size, dotz::vec2 center) {
+    void on_frame(float grid_size, float ui_size, dotz::vec2 center) {
+      auto cb = v::sw()->command_buffer();
+      vee::cmd_bind_gr_pipeline(cb, *m_ppl);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset.descriptor_set());
+
       upc pc {
         .grid_pos = center,
         .grid_size = dotz::vec2 { v::sw()->aspect(), 1.0f } * grid_size / 2,
       };
-
-      auto cb = v::sw()->command_buffer();
-      vee::cmd_bind_gr_pipeline(cb, *m_ppl);
       vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
-      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset.descriptor_set());
       for (auto & l : m_buf) m_quad.run(cb, 0, l.bind(cb));
+
+      pc = {
+        .grid_size = dotz::vec2 { v::sw()->aspect(), 1.0f } * ui_size / 2,
+      };
+      vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
+      m_quad.run(cb, 0, m_ui_buf.bind(cb));
     }
   };
 }

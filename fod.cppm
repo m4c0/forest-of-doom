@@ -98,7 +98,7 @@ static void on_frame() {
   g_fox->load(fox::layers::player, [](auto * m) {
     player::load(m);
   });
-  g_fox->on_frame(16, player::center());
+  g_fox->on_frame(16, 32, player::center());
 
   g_q->on_frame();
 }
@@ -106,6 +106,13 @@ static void on_frame() {
 static void on_resize() {
   auto [gw, gh] = g_q->hud_grid_size();
   hud::update_layout(&g_ec, gw, gh);
+  g_fox->load_ui([](auto * m) {
+    *m += {
+      .uv { 8, 10 },
+      .size = 1,
+      .texid = 3,
+    };
+  });
 }
 
 static void on_stop() {

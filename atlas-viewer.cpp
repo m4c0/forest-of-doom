@@ -49,7 +49,7 @@ const int i = [] {
     load();
   };
   v::on_frame = [] {
-    g_fox->on_frame(16, g_cursor);
+    g_fox->on_frame(16, 32, g_cursor);
   };
   v::on_resize = [] {};
   v::on_stop = [] {
