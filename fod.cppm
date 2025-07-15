@@ -80,7 +80,7 @@ static void on_frame() {
     player::load(m);
   });
   g_fox->load_ui([](auto * m) {
-    hud::load(m, g_fox->aspect() * 8);
+    hud::load_ui(m, g_fox->aspect() * 8);
   });
   g_fox->on_frame(16, 16, player::center());
 }

@@ -12,7 +12,7 @@ namespace hud {
     return 4;
   }
 
-  export void load(fox::memiter * m, dotz::vec2 grid) {
+  export void load_ui(fox::memiter * m, dotz::vec2 grid) {
     constexpr const dotz::vec2 levels[] {
       { 16, 8 },
       { 18, 14 },
