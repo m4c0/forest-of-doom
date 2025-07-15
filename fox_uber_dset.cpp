@@ -1,3 +1,4 @@
+#pragma leco add_resource_dir res
 module fox;
 import jute;
 import silog;
