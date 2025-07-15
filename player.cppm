@@ -1,11 +1,8 @@
 export module player;
-import area;
 import collision;
 import dotz;
 import fox;
 import input;
-import pog;
-import sprite;
 
 namespace player {
   static constexpr const auto energy_lost_per_sec = 0.025f;
