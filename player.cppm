@@ -28,7 +28,14 @@ namespace player {
     p_down,
   };
 
-  struct state {
+  struct gauges {
+    float energy = 1;
+    float happyness = 1;
+    float health = 1;
+    float satiation = 1;
+  };
+
+  struct state : gauges {
     fox::sprite sprite {
       .pos { 8, 8 },
       .size { 1, 2 },
@@ -36,11 +43,9 @@ namespace player {
     };
     anim anim {};
     side side;
-    float energy = 1;
-    float happyness = 1;
-    float health = 1;
-    float satiation = 1;
   } g_state;
+
+  export gauges status() { return g_state; }
   
   export void load(fox::memiter * m) {
     *m += g_state.sprite;

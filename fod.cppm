@@ -10,13 +10,9 @@ import input;
 import jute;
 import player;
 import prefabs;
-import qsu;
 import silog;
 import sitime;
-import tile;
 import v;
-
-struct ec : hud::compos {} g_ec;
 
 void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
   try {
@@ -49,17 +45,10 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
 }
 
 fox::main * g_fox {};
-qsu::main * g_q {};
 sitime::stopwatch g_timer {};
 
-static void repaint() {
-  auto [x, y] = player::center();
-  g_q->center_at(x, y);
-  g_q->fill(&g_ec);
-}
-
 static void on_start() {
-  g_q = new qsu::main {};
+  g_timer = {};
   g_fox = new fox::main {};
   
   g_fox->load(fox::layers::floor, [](auto * m) {
@@ -74,12 +63,6 @@ static void on_start() {
   
     load_prefab(m, "prefabs-island-0.txt", 0, 0);
   });
-
-  hud::add_entities(&g_ec);
-
-  g_q->set_grid(32, 32);
-  repaint();
-  g_timer = {};
 }
 
 static void on_frame() {
@@ -87,7 +70,6 @@ static void on_frame() {
   // TODO: move most of these out of the on_frame code 
   float ms = g_timer.millis();
   player::tick(ms);
-  repaint();
   g_timer = {};
 
   g_fox->load(fox::layers::entities, [](auto * m) {
@@ -97,21 +79,16 @@ static void on_frame() {
   g_fox->load(fox::layers::player, [](auto * m) {
     player::load(m);
   });
-  g_fox->on_frame(16, 16, player::center());
-
-  g_q->on_frame();
-}
-
-static void on_resize() {
-  auto [gw, gh] = g_q->hud_grid_size();
-  hud::update_layout(&g_ec, gw, gh);
   g_fox->load_ui([](auto * m) {
     hud::load(m, g_fox->aspect() * 8);
   });
+  g_fox->on_frame(16, 16, player::center());
+}
+
+static void on_resize() {
 }
 
 static void on_stop() {
-  delete g_q;
   delete g_fox;
 }
 
