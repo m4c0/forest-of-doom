@@ -112,64 +112,64 @@ namespace player {
     }
     sit_animation(ms);
   }
-export void tick(float ms) {
-  constexpr const auto blocks_per_sec = 4.0f;
-  constexpr const auto speed = blocks_per_sec / 1000.0f;
-
-  if (input::state(input::buttons::REST)) return rest(ms);
-
-  dotz::vec2 in {
-    input::state(input::axis::X),
-    input::state(input::axis::Y),
-  };
-  auto s = g_state.side;
-  if (in.y != 0) {
-    s = in.y > 0 ? p_down : p_up;
-  } else if (in.x != 0) {
-    s = in.x > 0 ? p_right : p_left;
-  } else {
-    idle_animation(ms, s);
-    return;
+  export void tick(float ms) {
+    constexpr const auto blocks_per_sec = 4.0f;
+    constexpr const auto speed = blocks_per_sec / 1000.0f;
+  
+    if (input::state(input::buttons::REST)) return rest(ms);
+  
+    dotz::vec2 in {
+      input::state(input::axis::X),
+      input::state(input::axis::Y),
+    };
+    auto s = g_state.side;
+    if (in.y != 0) {
+      s = in.y > 0 ? p_down : p_up;
+    } else if (in.x != 0) {
+      s = in.x > 0 ? p_right : p_left;
+    } else {
+      idle_animation(ms, s);
+      return;
+    }
+  
+    if (g_state.energy == 0 && g_state.satiation < starvation_limit) {
+      auto adj_food = 1.0f - (g_state.satiation - starvation_limit) / starvation_limit;
+      depress(adj_food * starvation_mental_loss_per_sec, ms);
+      starve(adj_food * starvation_health_loss_per_sec, ms);
+    }
+    if (g_state.energy == 0) {
+      // TODO: use "hurt" animation or something
+      idle_animation(ms, s);
+      return;
+    }
+  
+    exercise(energy_lost_per_sec, ms);
+    walk_animation(ms, s);
+  
+    const auto collides = [&](float dx, float dy) {
+      auto aa = g_state.sprite.pos + dotz::vec2 { dx, dy + 0.9f };
+      auto bb = aa + 1;
+      bool result = false;
+      collision::bodies().collides_aabb(aa, bb, [&](auto owner, auto id) {
+        result = true;
+        return false;
+      });
+      return result;
+    };
+  
+    auto d = dotz::normalise(in) * ms * speed * g_state.energy;
+    if (!collides(d.x, d.y)) {
+    } else if (!collides(0, d.y)) {
+      d.x = 0;
+    } else if (!collides(d.x, 0)) {
+      d.y = 0;
+    } else {
+      // TODO: do something
+      return;
+    }
+  
+    g_state.sprite.pos = g_state.sprite.pos + d;
   }
-
-  if (g_state.energy == 0 && g_state.satiation < starvation_limit) {
-    auto adj_food = 1.0f - (g_state.satiation - starvation_limit) / starvation_limit;
-    depress(adj_food * starvation_mental_loss_per_sec, ms);
-    starve(adj_food * starvation_health_loss_per_sec, ms);
-  }
-  if (g_state.energy == 0) {
-    // TODO: use "hurt" animation or something
-    idle_animation(ms, s);
-    return;
-  }
-
-  exercise(energy_lost_per_sec, ms);
-  walk_animation(ms, s);
-
-  const auto collides = [&](float dx, float dy) {
-    auto aa = g_state.sprite.pos + dotz::vec2 { dx, dy + 0.9f };
-    auto bb = aa + 1;
-    bool result = false;
-    collision::bodies().collides_aabb(aa, bb, [&](auto owner, auto id) {
-      result = true;
-      return false;
-    });
-    return result;
-  };
-
-  auto d = dotz::normalise(in) * ms * speed * g_state.energy;
-  if (!collides(d.x, d.y)) {
-  } else if (!collides(0, d.y)) {
-    d.x = 0;
-  } else if (!collides(d.x, 0)) {
-    d.y = 0;
-  } else {
-    // TODO: do something
-    return;
-  }
-
-  g_state.sprite.pos = g_state.sprite.pos + d;
-}
 
   export dotz::vec2 center() {
     return g_state.sprite.pos + g_state.sprite.size / 2.0;
