@@ -24,7 +24,7 @@ namespace player {
     unsigned frame = 0;
   };
 
-  enum side {
+  enum side : unsigned {
     p_right = 0,
     p_up,
     p_left,
@@ -68,83 +68,51 @@ export void add_entity(compos *ec) {
   static void rest(float vps, float ms) { exercise(-vps, ms); }
   static void burn_callories(float vps, float ms) { drain(g_state.satiation, vps, ms); }
 
-bool update_animation(compos *ec, unsigned s, anim a) {
-  a.start_x = s * a.num_frames;
+  static bool set_animation(unsigned s, anim a) {
+    a.start_x = s * a.num_frames;
 
-  if (a.start_x == g_state.anim.start_x && a.y == g_state.anim.y) {
-    g_state.anim.frames_per_sec = a.frames_per_sec;
-    return false;
+    if (a.start_x == g_state.anim.start_x && a.y == g_state.anim.y) {
+      g_state.anim.frames_per_sec = a.frames_per_sec;
+      return false;
+    }
+
+    g_state.anim = a;
+    return true;
   }
-
-  g_state.anim = a;
-  return true;
-}
-void update_animation(compos *ec, side s, anim a) {
-  if (update_animation(ec, static_cast<unsigned>(s), a))
-    g_state.side = s;
-}
-
-void set_idle_animation(compos *ec, side s) {
-  constexpr const anim a{
+  static void set_animation(side s, anim a) {
+    if (set_animation(static_cast<unsigned>(s), a)) g_state.side = s;
+  }
+  static void idle_animation(side s) {
+    set_animation(s, {
       .y = 2,
       .num_frames = 6,
       .frames_per_sec = 6,
-  };
-  update_animation(ec, s, a);
-}
-void set_sit_animation(compos *ec) {
-  // TODO: realign "sitting" because he is actually floating
-  constexpr const anim a{
+    });
+  }
+  static void sit_animation() {
+    // TODO: realign "sitting" because he is actually floating
+    set_animation(g_state.side / 2U, {
       .y = 8,
       .num_frames = 6,
       .frames_per_sec = 6,
-  };
-  update_animation(ec, g_state.side / 2U, a);
-}
-void set_walk_animation(compos *ec, side s) {
-  constexpr const anim a{
+    });
+  }
+  static void walk_animation(side s) {
+    set_animation(s, {
       .y = 4,
       .num_frames = 6,
-      .frames_per_sec = 24,
-  };
-
-  auto aa = a;
-  aa.frames_per_sec = static_cast<unsigned>(a.frames_per_sec * g_state.energy);
-  update_animation(ec, s, aa);
-}
-void set_pick_animation(compos *ec) {
-  constexpr const anim a{
-      .y = 18,
-      .num_frames = 12,
-      .frames_per_sec = 12,
-  };
-  update_animation(ec, g_state.side, a);
-}
-
-void update_anims(compos *ec, float ms) {
-  g_state.anim.frame += ms * g_state.anim.frames_per_sec;
-
-  auto frame = g_state.anim.frame / 1000;
-
-  auto u = g_state.anim.start_x + (frame % g_state.anim.num_frames);
-  g_state.sprite.uv = { u, g_state.anim.y };
-}
-void update_sprites(compos *c, float sx, float sy, float ms) {
-  auto dx = sx * ms;
-  auto dy = sy * ms;
-
-  if (collision::move_by(c, g_state.eid, dx, dy)) {
-  } else if (collision::move_by(c, g_state.eid, 0, dy)) {
-    dx = 0;
-  } else if (collision::move_by(c, g_state.eid, dx, 0)) {
-    dy = 0;
-  } else {
-    // TODO: do something
-    return;
+      .frames_per_sec = static_cast<unsigned>(24 * g_state.energy),
+    });
   }
 
-  g_state.sprite.pos = g_state.sprite.pos + dotz::vec2 { dx, dy };
-}
+  static void tick_animation(float ms) {
+    g_state.anim.frame += ms * g_state.anim.frames_per_sec;
+  
+    auto frame = g_state.anim.frame / 1000;
+  
+    auto u = g_state.anim.start_x + (frame % g_state.anim.num_frames);
+    g_state.sprite.uv = { u, g_state.anim.y };
+  }
 export void tick(compos *ec, float ms) {
   constexpr const auto blocks_per_sec = 4.0f;
   constexpr const auto speed = blocks_per_sec / 1000.0f;
@@ -154,8 +122,8 @@ export void tick(compos *ec, float ms) {
       burn_callories(food_lost_per_sec, ms);
       rest(energy_gain_per_sec, ms);
     }
-    set_sit_animation(ec);
-    update_anims(ec, ms);
+    sit_animation();
+    tick_animation(ms);
     return;
   }
 
@@ -167,8 +135,8 @@ export void tick(compos *ec, float ms) {
   } else if (h != 0) {
     s = h > 0 ? p_right : p_left;
   } else {
-    set_idle_animation(ec, s);
-    update_anims(ec, ms);
+    idle_animation(s);
+    tick_animation(ms);
     return;
   }
 
@@ -179,21 +147,32 @@ export void tick(compos *ec, float ms) {
   }
   if (g_state.energy == 0) {
     // TODO: use "hurt" animation or something
-    set_idle_animation(ec, s);
-    update_anims(ec, ms);
+    idle_animation(s);
+    tick_animation(ms);
     return;
   }
 
   float f_speed = speed * g_state.energy;
   float d = dotz::sqrt(h * h + v * v);
-  float sx = h * f_speed / d;
-  float sy = v * f_speed / d;
-  set_walk_animation(ec, s);
+  float dx = ms * h * f_speed / d;
+  float dy = ms * v * f_speed / d;
+  walk_animation(s);
   exercise(energy_lost_per_sec, ms);
 
   ec->collisions.remove(g_state.eid);
-  update_anims(ec, ms);
-  update_sprites(ec, sx, sy, ms);
+  tick_animation(ms);
+
+  if (collision::move_by(ec, g_state.eid, dx, dy)) {
+  } else if (collision::move_by(ec, g_state.eid, 0, dy)) {
+    dx = 0;
+  } else if (collision::move_by(ec, g_state.eid, dx, 0)) {
+    dy = 0;
+  } else {
+    // TODO: do something
+    return;
+  }
+
+  g_state.sprite.pos = g_state.sprite.pos + dotz::vec2 { dx, dy };
 }
 
   export dotz::vec2 center() {
