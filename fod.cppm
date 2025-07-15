@@ -16,7 +16,7 @@ import sitime;
 import tile;
 import v;
 
-struct ec : hud::compos, player::compos {} g_ec;
+struct ec : hud::compos {} g_ec;
 
 void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
   try {
@@ -31,13 +31,9 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
     });
     o0->for_each([&](float x, float y, const auto & def) {
       if (dotz::length(def.collision.zw()) > 0) {
-        auto id = g_ec.e().alloc();
-        collision::add(&g_ec, id,
-            dx + x + def.collision.x,
-            dy + y + def.collision.y,
-            def.collision.z,
-            def.collision.w);
-
+        auto aa = def.collision.xy() + dotz::vec2 { dx + x, dy + y };
+        auto bb = aa + def.collision.zw();
+        collision::bodies().add_aabb(aa, bb, 'body', 1);
       }
 
       if (*def.behaviour == "backpack") backpack::add(fox::sprite {
@@ -79,7 +75,6 @@ static void on_start() {
     load_prefab(m, "prefabs-island-0.txt", 0, 0);
   });
 
-  player::add_entity(&g_ec);
   hud::add_entities(&g_ec);
 
   g_q->set_grid(32, 32);
@@ -91,7 +86,7 @@ static void on_frame() {
   // TODO: speed of character depends on FPS
   // TODO: move most of these out of the on_frame code 
   float ms = g_timer.millis();
-  player::tick(&g_ec, ms);
+  player::tick(ms);
   hud::update_batteries(&g_ec);
   repaint();
   g_timer = {};

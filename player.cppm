@@ -43,21 +43,11 @@ namespace player {
     float happyness = 1;
     float health = 1;
     float satiation = 1;
-
-    pog::eid eid;
   } g_state;
   
   export void load(fox::memiter * m) {
     *m += g_state.sprite;
   }
-
-export class compos : public virtual collision::compos,
-                      public virtual pog::entity_provider {};
-
-export void add_entity(compos *ec) {
-  auto pid = g_state.eid = ec->e().alloc();
-  collision::add(ec, pid, g_state.sprite.pos.x, g_state.sprite.pos.y + 0.9f, 1, 1);
-}
 
   static void drain(float & f, float vps, float ms) {
     f = dotz::clamp(f - vps * ms / 1000.0f, 0.f, 1.f);
@@ -122,7 +112,7 @@ export void add_entity(compos *ec) {
     }
     sit_animation(ms);
   }
-export void tick(compos *ec, float ms) {
+export void tick(float ms) {
   constexpr const auto blocks_per_sec = 4.0f;
   constexpr const auto speed = blocks_per_sec / 1000.0f;
 
@@ -156,13 +146,22 @@ export void tick(compos *ec, float ms) {
   exercise(energy_lost_per_sec, ms);
   walk_animation(ms, s);
 
-  ec->collisions.remove(g_state.eid);
+  const auto collides = [&](float dx, float dy) {
+    auto aa = g_state.sprite.pos + dotz::vec2 { dx, dy + 0.9f };
+    auto bb = aa + 1;
+    bool result = false;
+    collision::bodies().collides_aabb(aa, bb, [&](auto owner, auto id) {
+      result = true;
+      return false;
+    });
+    return result;
+  };
 
   auto d = dotz::normalise(in) * ms * speed * g_state.energy;
-  if (collision::move_by(ec, g_state.eid, d.x, d.y)) {
-  } else if (collision::move_by(ec, g_state.eid, 0, d.y)) {
+  if (!collides(d.x, d.y)) {
+  } else if (!collides(0, d.y)) {
     d.x = 0;
-  } else if (collision::move_by(ec, g_state.eid, d.x, 0)) {
+  } else if (!collides(d.x, 0)) {
     d.y = 0;
   } else {
     // TODO: do something

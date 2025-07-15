@@ -4,7 +4,6 @@ export module qsu;
 import :layer;
 import area;
 import casein;
-import collision;
 import dotz;
 import hai;
 import pog;
