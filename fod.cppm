@@ -14,6 +14,9 @@ import silog;
 import sitime;
 import v;
 
+fox::main * g_fox {};
+sitime::stopwatch g_timer {};
+
 void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
   try {
     auto o0 = prefabs::load(name);
@@ -43,9 +46,6 @@ void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
     silog::log(silog::error, "%s:%d: %s", name.cstr().begin(), e.line_number, e.msg.begin());
   }
 }
-
-fox::main * g_fox {};
-sitime::stopwatch g_timer {};
 
 static void on_start() {
   g_timer = {};
