@@ -101,6 +101,9 @@ static void on_action() {
     silog::log(silog::info, "open sesame");
   }
 }
+static void on_rest() {
+  player::rest();
+}
 
 const int i = [] {
   v::on_start  = on_start;
@@ -110,5 +113,6 @@ const int i = [] {
 
   input::setup();
   input::on_button_down(input::buttons::ACTION, on_action);
+  input::on_button_down(input::buttons::REST, on_rest);
   return 0;
 }();

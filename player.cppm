@@ -121,17 +121,17 @@ namespace player {
     constexpr const auto blocks_per_sec = 4.0f;
     constexpr const auto speed = blocks_per_sec / 1000.0f;
   
-    if (g_state.resting) rest(ms);
-  
     auto s = g_state.side;
     if (in.y != 0) {
       s = in.y > 0 ? p_down : p_up;
     } else if (in.x != 0) {
       s = in.x > 0 ? p_right : p_left;
+    } else if (g_state.resting) {
+      return rest(ms);
     } else {
-      idle_animation(ms, s);
-      return;
+      return idle_animation(ms, s);
     }
+    g_state.resting = false;
   
     if (g_state.energy == 0 && g_state.satiation < starvation_limit) {
       auto adj_food = 1.0f - (g_state.satiation - starvation_limit) / starvation_limit;
