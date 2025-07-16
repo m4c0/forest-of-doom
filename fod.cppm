@@ -70,7 +70,6 @@ static void on_frame() {
   // TODO: move most of these out of the on_frame code 
   float ms = g_timer.millis();
   player::tick(ms);
-  g_timer = {};
 
   g_fox->load(fox::layers::entities, [](auto * m) {
     auto p = player::center();
@@ -83,6 +82,8 @@ static void on_frame() {
     hud::load_ui(m, g_fox->aspect() * 8);
   });
   g_fox->on_frame(16, 16, player::center());
+
+  g_timer = {};
 }
 
 static void on_resize() {
@@ -92,11 +93,20 @@ static void on_stop() {
   delete g_fox;
 }
 
+static void on_action() {
+  if (backpack::open(player::center())) {
+    // TODO: open UI, reset input, etc
+    silog::log(silog::info, "open sesame");
+  }
+}
+
 const int i = [] {
   v::on_start  = on_start;
   v::on_resize = on_resize;
   v::on_frame  = on_frame;
   v::on_stop   = on_stop;
+
   input::setup();
+  input::on_button_down(input::buttons::ACTION, on_action);
   return 0;
 }();
