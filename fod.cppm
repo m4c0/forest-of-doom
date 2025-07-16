@@ -66,10 +66,12 @@ static void on_start() {
 }
 
 static void on_frame() {
-  // TODO: speed of character depends on FPS
-  // TODO: move most of these out of the on_frame code 
   float ms = g_timer.millis();
-  player::tick(ms);
+  dotz::vec2 in {
+    input::state(input::axis::X),
+    input::state(input::axis::Y),
+  };
+  player::tick(in, ms);
 
   g_fox->load(fox::layers::entities, [](auto * m) {
     auto p = player::center();

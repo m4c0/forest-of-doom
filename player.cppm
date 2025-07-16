@@ -2,7 +2,6 @@ export module player;
 import collision;
 import dotz;
 import fox;
-import input;
 
 namespace player {
   static constexpr const auto energy_lost_per_sec = 0.025f;
@@ -43,6 +42,7 @@ namespace player {
     };
     anim anim {};
     side side;
+    bool resting;
   } g_state;
 
   export gauges status() { return g_state; }
@@ -114,16 +114,15 @@ namespace player {
     }
     sit_animation(ms);
   }
-  export void tick(float ms) {
+
+  export void rest() { g_state.resting = true; }
+
+  export void tick(dotz::vec2 in, float ms) {
     constexpr const auto blocks_per_sec = 4.0f;
     constexpr const auto speed = blocks_per_sec / 1000.0f;
   
-    if (input::state(input::buttons::REST)) return rest(ms);
+    if (g_state.resting) rest(ms);
   
-    dotz::vec2 in {
-      input::state(input::axis::X),
-      input::state(input::axis::Y),
-    };
     auto s = g_state.side;
     if (in.y != 0) {
       s = in.y > 0 ? p_down : p_up;
