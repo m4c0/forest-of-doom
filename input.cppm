@@ -4,7 +4,7 @@ import hai;
 
 namespace input {
   export enum class axis { X, Y };
-  export enum class buttons { ACTION, REST };
+  export enum class buttons { ACTION, CANCEL, REST };
   export float state(axis a);
   export bool state(buttons b);
 
@@ -18,6 +18,7 @@ module :private;
 namespace {
   enum keys {
     ACTION,
+    CANCEL,
     REST,
     MOVE_LEFT,
     MOVE_RIGHT,
@@ -54,6 +55,7 @@ float input::state(axis a) {
 bool input::state(buttons b) {
   switch (b) {
     case buttons::ACTION: return g_state[ACTION];
+    case buttons::CANCEL: return g_state[CANCEL];
     case buttons::REST: return g_state[REST];
   }
 }
@@ -61,6 +63,7 @@ bool input::state(buttons b) {
 void input::on_button_down(buttons b, hai::fn<void> fn) {
   switch (b) {
     case buttons::ACTION: g_btn_down_cb[ACTION] = fn; break;
+    case buttons::CANCEL: g_btn_down_cb[CANCEL] = fn; break;
     case buttons::REST: g_btn_down_cb[REST] = fn; break;
   }
 }
@@ -72,6 +75,7 @@ void input::setup() {
   setup_btn(K_UP,    MOVE_UP);
   setup_btn(K_DOWN,  MOVE_DOWN);
 
-  setup_btn(K_ENTER, ACTION);
-  setup_btn(K_SPACE, REST);
+  setup_btn(K_ENTER,  ACTION);
+  setup_btn(K_ESCAPE, CANCEL);
+  setup_btn(K_SPACE,  REST);
 }
