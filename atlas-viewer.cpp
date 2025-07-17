@@ -10,6 +10,7 @@ import v;
 
 fox::main * g_fox;
 dotz::ivec2 g_cursor;
+unsigned g_texid {};
 
 static void load() {
   g_fox->load(fox::layers::floor, [](auto * m) {
@@ -17,7 +18,7 @@ static void load() {
       .pos { 0, 0 },
       .uv { 0, 0 },
       .size { 64, 64 },
-      .texid = fox::texids::eleven_camping,
+      .texid = static_cast<fox::texids>(g_texid),
     };
   });
   g_fox->load(fox::layers::entities, [](auto * m) {
@@ -61,6 +62,12 @@ const int i = [] {
   handle(KEY_DOWN, K_RIGHT, cursor(+1, 0));
   handle(KEY_DOWN, K_UP,    cursor(0, -1));
   handle(KEY_DOWN, K_DOWN,  cursor(0, +1));
+
+  handle(KEY_DOWN, K_SPACE, [] {
+    g_texid++;
+    if (g_texid == static_cast<unsigned>(fox::texids::max)) g_texid = 0;
+    load();
+  });
 
   handle(KEY_DOWN, K_ENTER, [] {
     silog::log(silog::info, "> tile %d %d 1 1", g_cursor.x, g_cursor.y);
