@@ -17,17 +17,24 @@ namespace fox {
     player,
     max,
   };
+  export enum class texids : unsigned {
+    one_terrains_and_fences = 0,
+    eleven_camping,
+    char_scout,
+    ui_style,
+    max,
+  };
 
   constexpr const auto max_sprites = 256 * 9 * 4;
   constexpr const auto max_layers = static_cast<unsigned>(layers::max);
-  constexpr const auto uber_dset_smps = 4;
+  constexpr const auto uber_dset_smps = static_cast<unsigned>(texids::max);
 
   export struct sprite {
     dotz::vec2 pos;
     dotz::vec2 uv;
     dotz::vec2 size;
     float alpha = 1;
-    unsigned texid = 0;
+    texids texid;
   };
 
   export using memiter = voo::memiter<sprite>;

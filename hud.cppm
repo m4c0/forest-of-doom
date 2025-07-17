@@ -23,7 +23,7 @@ namespace hud {
 
     dotz::vec2 p { -grid.x, grid.y - 4 };
     const auto sp = [&](dotz::vec2 pos, dotz::vec2 uv) {
-      *m += { .pos = pos + p, .uv = uv, .size = 1, .texid = 3 };
+      *m += { .pos = pos + p, .uv = uv, .size = 1, .texid = fox::texids::ui_style };
     };
     const auto gauge = [&](float y, dotz::vec2 icon_uv, float level) {
       sp({ 0.0f, y }, icon_uv);

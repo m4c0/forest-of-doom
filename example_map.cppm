@@ -16,7 +16,7 @@ namespace example_map {
           .pos   { dx + x, dy + y },
           .uv    = def.tile.uv,
           .size  = def.tile.size,
-          .texid = def.tile.texid,
+          .texid = static_cast<fox::texids>(def.tile.texid),
         };
       });
       o0->for_each([&](float x, float y, const auto & def) {
@@ -30,7 +30,7 @@ namespace example_map {
           .pos   { dx + x, dy + y },
           .uv    = def.entity.uv,
           .size  = def.entity.size,
-          .texid = def.entity.texid,
+          .texid = static_cast<fox::texids>(def.entity.texid),
         });
       });
     } catch (const prefabs::error & e) {

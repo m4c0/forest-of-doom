@@ -38,7 +38,7 @@ namespace player {
     fox::sprite sprite {
       .pos { 8, 8 },
       .size { 1, 2 },
-      .texid = 2,
+      .texid = fox::texids::char_scout,
     };
     anim anim {};
     side side;

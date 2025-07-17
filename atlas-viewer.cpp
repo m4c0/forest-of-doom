@@ -17,7 +17,7 @@ static void load() {
       .pos { 0, 0 },
       .uv { 0, 0 },
       .size { 64, 64 },
-      .texid = 1,
+      .texid = fox::texids::eleven_camping,
     };
   });
   g_fox->load(fox::layers::entities, [](auto * m) {
@@ -28,7 +28,7 @@ static void load() {
           .pos = g_cursor + p,
           .uv = p + 1,
           .size { 1, 1 },
-          .texid = 3,
+          .texid = fox::texids::ui_style,
         };
       }
     }
