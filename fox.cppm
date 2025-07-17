@@ -122,5 +122,5 @@ namespace fox {
       vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
       m_quad.run(cb, 0, m_ui_buf.bind(cb));
     }
-  };
+  } * g;
 }
