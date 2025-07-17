@@ -31,12 +31,13 @@ static void on_frame(float ms) {
 
     box();
 
-    for (auto y = 0; y < 5; y++) {
-      for (auto x = 0; x < 5; x++) {
-        sp({ x * 2 + 0.5f, y * 2.0f }, { 3, 18 }, 3);
+    for (auto y = 0; y < 8; y++) {
+      for (auto x = 0; x < 8; x++) {
+        sp({ x * 1.2f + 0.3f, y * 1.2f - 0.2f }, { 0, 6 }, 3);
       }
     }
 
+    sp({ 1.0f + 0.3f, 1.0f - 0.2f }, { 8, 0 });
   });
   fox::g->on_frame(16, 16, player::center());
 }
