@@ -1,4 +1,5 @@
 #pragma leco app
+#pragma leco add_impl fod_open_backpack.cpp
 #pragma leco add_impl fod_poc.cpp
 #pragma leco add_impl fod_start.cpp
 export module fod;

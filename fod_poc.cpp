@@ -9,8 +9,7 @@ import silog;
 
 static void on_action() {
   if (backpack::open(player::center())) {
-    // TODO: open UI, reset input, etc
-    silog::log(silog::info, "open sesame");
+    fod::open_backpack();
   }
 }
 static void on_rest() {
