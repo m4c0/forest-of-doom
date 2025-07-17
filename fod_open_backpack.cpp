@@ -7,10 +7,13 @@ import player;
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
+    const dotz::vec2 size { 8, 5 };
+    const dotz::vec2 tl = -(size + 3) / 2.0;
+
     const auto sp = [&](dotz::vec2 pos, dotz::vec2 uv) {
-      *m += { .pos = pos, .uv = uv, .size  = 1, .texid = fox::texids::ui_style };
+      *m += { .pos = tl + pos, .uv = uv, .size  = 1, .texid = fox::texids::ui_style };
     };
-    const auto box = [&](dotz::vec2 pos, dotz::vec2 size) {
+    const auto box = [&] {
       sp({ 0, 0 }, { 3, 8 });
       for (auto x = 0; x < size.x; x++) sp({ x + 1, 0 }, { 4, 8 });
       sp({ size.x + 1, 0.f }, { 5, 8 });
@@ -25,7 +28,8 @@ static void on_frame(float ms) {
       for (auto x = 0; x < size.x; x++) sp({ x + 1.f, size.y + 1 }, { 4, 9 });
       sp({ size.x + 1, size.y + 1 }, { 5, 9 });
     };
-    box({ 0, 0 }, { 5, 3 });
+
+    box();
   });
   fox::g->on_frame(16, 16, player::center());
 }
