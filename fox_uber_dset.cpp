@@ -9,6 +9,7 @@ static constexpr const jute::view images[fox::uber_dset_smps] {
   "11_Camping_16x16.png",
   "Modern_Exteriors_Characters_Scout_16x16_1.png",
   "Modern_UI_Style_1.png",
+  "UI_Paper.png",
 };
 static_assert(images[fox::uber_dset_smps - 1] != "");
 

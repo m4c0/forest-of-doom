@@ -22,6 +22,7 @@ namespace fox {
     eleven_camping,
     char_scout,
     ui_style,
+    ui_paper,
     max,
   };
 
