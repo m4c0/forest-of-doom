@@ -46,9 +46,21 @@ static void on_frame(float ms) {
   fox::g->on_frame(16, 16, player::center());
 }
 
+static constexpr auto cursor(int dx, int dy) {
+  return [=] {
+    g_cursor = dotz::clamp(g_cursor + dotz::ivec2 { dx, dy }, {0}, {7});
+  };
+}
+
 void fod::open_backpack() {
-  input::reset();
-  input::on_key_down(input::keys::CANCEL, fod::poc);
   fod::on_frame = ::on_frame;
   g_cursor = {};
+
+  using namespace input;
+  reset();
+  on_key_down(keys::CANCEL, fod::poc);
+  on_key_down(keys::MOVE_DOWN,  cursor( 0,  1));
+  on_key_down(keys::MOVE_UP,    cursor( 0, -1));
+  on_key_down(keys::MOVE_LEFT,  cursor(-1,  0));
+  on_key_down(keys::MOVE_RIGHT, cursor( 1,  0));
 }
