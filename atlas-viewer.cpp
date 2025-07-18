@@ -1,4 +1,3 @@
-#pragma leco add_resource_dir res
 #pragma leco app
 
 import casein;
