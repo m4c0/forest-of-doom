@@ -6,6 +6,7 @@ import input;
 import player;
 
 static dotz::ivec2 g_cursor {};
+static dotz::ivec2 g_sel {-1};
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
@@ -37,13 +38,29 @@ static void on_frame(float ms) {
 
     for (dotz::ivec2 p = 0; p.y < 8; p.y++) {
       for (p.x = 0; p.x < 8; p.x++) {
-        sp(p * csz + gtl, { 5, 5 });
+        auto uv = 
+          (p.y > 3) ?
+          dotz::vec2 { 5, 9 } :
+          (p == g_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
+        sp(p * csz + gtl, uv);
       }
     }
 
     sp(g_cursor * csz + gtl, { 15, 4 });
   });
   fox::g->on_frame(16, 16, player::center());
+}
+
+static void on_action() {
+  if (g_cursor.y > 3) return;
+
+  if (g_sel == -1) {
+    g_sel = g_cursor;
+    return;
+  }
+
+  // TODO: act on item?
+  g_sel = -1;
 }
 
 static constexpr auto cursor(int dx, int dy) {
@@ -55,9 +72,11 @@ static constexpr auto cursor(int dx, int dy) {
 void fod::open_backpack() {
   fod::on_frame = ::on_frame;
   g_cursor = {};
+  g_sel = -1;
 
   using namespace input;
   reset();
+  on_key_down(keys::ACTION, on_action);
   on_key_down(keys::CANCEL, fod::poc);
   on_key_down(keys::MOVE_DOWN,  cursor( 0,  1));
   on_key_down(keys::MOVE_UP,    cursor( 0, -1));
