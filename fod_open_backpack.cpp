@@ -47,9 +47,9 @@ static void on_frame(float ms) {
 }
 
 void fod::open_backpack() {
-  input::on_button_down(input::buttons::ACTION, [] {});
-  input::on_button_down(input::buttons::CANCEL, fod::poc);
-  input::on_button_down(input::buttons::REST, [] {});
+  input::on_key_down(input::keys::ACTION, [] {});
+  input::on_key_down(input::keys::CANCEL, fod::poc);
+  input::on_key_down(input::keys::REST, [] {});
   fod::on_frame = ::on_frame;
   g_cursor = {};
 }
