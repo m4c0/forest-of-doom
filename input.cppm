@@ -18,6 +18,7 @@ namespace input {
   export float state(axis a);
 
   export void on_key_down(keys b, hai::fn<void> fn);
+  export void reset();
 
   export void setup();
 }
@@ -52,6 +53,13 @@ float input::state(axis a) {
 }
 
 void input::on_key_down(keys k, hai::fn<void> fn) { g_btn_down_cb[ik(k)] = fn; }
+
+void input::reset() {
+  for (auto i = 0; i < ik(keys::MAX_KEYS); i++) {
+    g_state[i] = false;
+    g_btn_down_cb[i] = {};
+  }
+}
 
 void input::setup() {
   using namespace casein;
