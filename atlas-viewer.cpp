@@ -16,7 +16,7 @@ static void load() {
     *m += {
       .pos { 0, 0 },
       .uv { 0, 0 },
-      .size { 64, 64 },
+      .size { 512, 512 },
       .texid = static_cast<fox::texids>(g_texid),
     };
   });
