@@ -83,6 +83,8 @@ static void on_frame(float ms) {
 
 static void on_action() {
   if (g_sel == -1) {
+    auto i = inv(g_cursor);
+    if (!i.x && !i.y) return;
     g_sel = g_cursor;
     return;
   }
