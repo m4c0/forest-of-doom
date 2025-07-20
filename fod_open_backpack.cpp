@@ -46,6 +46,19 @@ static void on_frame(float ms) {
       }
     }
 
+    const auto inv = [&](dotz::vec2 pos, dotz::vec2 uv) {
+      *m += {
+        .pos   = tl + pos * csz + gtl,
+        .uv    = uv,
+        .size  = 1,
+        .texid = fox::texids::ui_style,
+      };
+    };
+    inv({ 0, 0 }, {  8, 0 });
+    inv({ 1, 0 }, { 11, 3 });
+    inv({ 2, 0 }, { 12, 3 });
+    inv({ 3, 0 }, { 12, 2 });
+
     sp(g_cursor * csz + gtl, { 15, 4 });
   });
   fox::g->on_frame(16, 16, player::center());
