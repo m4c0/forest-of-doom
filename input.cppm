@@ -71,4 +71,9 @@ void input::setup() {
   setup_btn(K_ENTER,  keys::ACTION);
   setup_btn(K_ESCAPE, keys::CANCEL);
   setup_btn(K_SPACE,  keys::REST);
+
+  handle(KEY_DOWN, K_F12, [] {
+    fullscreen = !fullscreen;
+    interrupt(IRQ_FULLSCREEN);
+  });
 }
