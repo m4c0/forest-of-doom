@@ -5,12 +5,21 @@ import fox;
 import input;
 import player;
 
+static constexpr const auto inv_w = 8U;
+static constexpr const auto inv_h = 8U;
+
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {-1};
+static dotz::vec2 g_inventory[inv_w * inv_h] {
+  {  8, 0 },
+  { 11, 3 },
+  { 12, 3 },
+  { 12, 2 },
+};
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
-    const dotz::vec2 size { 8 };
+    const dotz::vec2 size { inv_w, inv_h };
     const dotz::vec2 tl = -(size + 3) / 2.0;
     const dotz::vec2 gtl = 0.3f;
     const dotz::vec2 csz = 1.2f;
@@ -36,8 +45,8 @@ static void on_frame(float ms) {
 
     box();
 
-    for (dotz::ivec2 p = 0; p.y < 8; p.y++) {
-      for (p.x = 0; p.x < 8; p.x++) {
+    for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
+      for (p.x = 0; p.x < inv_w; p.x++) {
         auto uv = 
           (p.y > 3) ?
           dotz::vec2 { 5, 9 } :
@@ -54,10 +63,13 @@ static void on_frame(float ms) {
         .texid = fox::texids::ui_style,
       };
     };
-    inv({ 0, 0 }, {  8, 0 });
-    inv({ 1, 0 }, { 11, 3 });
-    inv({ 2, 0 }, { 12, 3 });
-    inv({ 3, 0 }, { 12, 2 });
+    for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
+      for (p.x = 0; p.x < inv_w; p.x++) {
+        auto i = g_inventory[p.y * inv_w + p.x];
+        if (!i.x && !i.y) continue;
+        inv(p, i);
+      }
+    }
 
     sp(g_cursor * csz + gtl, { 15, 4 });
   });
