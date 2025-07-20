@@ -17,6 +17,10 @@ static dotz::vec2 g_inventory[inv_w * inv_h] {
   { 12, 2 },
 };
 
+static auto & inv(dotz::ivec2 p) {
+  return g_inventory[p.y * inv_w + p.x];
+}
+
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
     const dotz::vec2 size { inv_w, inv_h };
@@ -47,27 +51,28 @@ static void on_frame(float ms) {
 
     for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
       for (p.x = 0; p.x < inv_w; p.x++) {
-        auto uv = 
-          (p.y > 3) ?
-          dotz::vec2 { 5, 9 } :
-          (p == g_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
+        auto i = inv(p);
+
+        dotz::vec2 uv {};
+        if (g_sel.x < 0) {
+          uv = i.x || i.y ? dotz::vec2 { 5, 7 } : dotz::vec2 { 5, 9 };
+        } else {
+          uv = (p == g_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
+        }
         sp(p * csz + gtl, uv);
       }
     }
 
-    const auto inv = [&](dotz::vec2 pos, dotz::vec2 uv) {
-      *m += {
-        .pos   = tl + pos * csz + gtl,
-        .uv    = uv,
-        .size  = 1,
-        .texid = fox::texids::ui_style,
-      };
-    };
     for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
       for (p.x = 0; p.x < inv_w; p.x++) {
-        auto i = g_inventory[p.y * inv_w + p.x];
+        auto i = inv(p);
         if (!i.x && !i.y) continue;
-        inv(p, i);
+        *m += {
+          .pos   = tl + p * csz + gtl,
+          .uv    = i,
+          .size  = 1,
+          .texid = fox::texids::ui_style,
+        };
       }
     }
 
@@ -77,14 +82,15 @@ static void on_frame(float ms) {
 }
 
 static void on_action() {
-  if (g_cursor.y > 3) return;
-
   if (g_sel == -1) {
     g_sel = g_cursor;
     return;
   }
 
-  // TODO: act on item?
+  auto tmp = inv(g_sel);
+  inv(g_sel) = inv(g_cursor);
+  inv(g_cursor) = tmp;
+
   g_sel = -1;
 }
 
