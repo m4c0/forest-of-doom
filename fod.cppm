@@ -7,7 +7,7 @@ import hai;
 
 namespace fod {
   void poc();
-  void open_backpack();
+  void open_backpack(unsigned id);
 
   hai::fn<void, float> on_frame {};
 };

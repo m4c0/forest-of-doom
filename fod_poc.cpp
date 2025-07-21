@@ -8,9 +8,8 @@ import player;
 import silog;
 
 static void on_action() {
-  if (backpack::open(player::center())) {
-    fod::open_backpack();
-  }
+  auto i = backpack::open(player::center());
+  if (i >= 0) fod::open_backpack(i);
 }
 static void on_rest() {
   player::rest();

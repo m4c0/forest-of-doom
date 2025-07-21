@@ -10,12 +10,7 @@ static constexpr const auto inv_h = 8U;
 
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {-1};
-static dotz::vec2 g_inventory[inv_w * inv_h] {
-  {  8, 0 },
-  { 11, 3 },
-  { 12, 3 },
-  { 12, 2 },
-};
+static dotz::vec2 g_inventory[inv_w * inv_h] {};
 
 static auto & inv(dotz::ivec2 p) {
   return g_inventory[p.y * inv_w + p.x];
@@ -102,7 +97,13 @@ static constexpr auto cursor(int dx, int dy) {
   };
 }
 
-void fod::open_backpack() {
+void fod::open_backpack(unsigned id) {
+  for (auto & n: g_inventory) n = {};
+  g_inventory[0] = { 8, 0 };
+  if (id > 0) g_inventory[1] = { 11, 3 };
+  if (id > 1) g_inventory[2] = { 12, 3 };
+  g_inventory[3] = { 12, 2 };
+
   fod::on_frame = ::on_frame;
   g_cursor = {};
   g_sel = -1;

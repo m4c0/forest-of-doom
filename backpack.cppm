@@ -19,11 +19,11 @@ namespace backpack {
     }
   }
   
-  export bool open(dotz::vec2 player) {
-    for (auto i : list) {
-      auto c = i.pos + i.size / 2.0;
-      if (dotz::length(player - c) < 0.5) return true;
+  export int open(dotz::vec2 player) {
+    for (auto i = 0; i < list.size(); i++) {
+      auto c = list[i].pos + list[i].size / 2.0;
+      if (dotz::length(player - c) < 0.5) return i;
     }
-    return false;
+    return -1;
   }
 }
