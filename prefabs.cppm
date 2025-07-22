@@ -1,4 +1,5 @@
 #pragma leco add_impl prefabs_impl.cpp
+#pragma leco add_resource_dir prefabs
 export module prefabs;
 import dotz;
 import jute;
