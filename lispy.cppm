@@ -86,6 +86,8 @@ struct node {
   jute::view atom {};
   hai::varray<node> list {};
   prefabs::tiledef tdef {};
+  bool has_tile     : 1;
+  bool has_collider : 1;
 };
 
 static node next_list(reader & r) {
@@ -141,6 +143,18 @@ static void eval(node & n) {
   if (!is_atom(fn)) throw error { "trying to eval a list as a function"_hs };
 
   if (fn.atom == "tiledef") {
+    if (n.list.size() < 2) throw error { "tiledef must have at least name"_hs };
+
+    for (auto & c : n.list) {
+      if (c.has_tile) {
+        n.tdef.tile = c.tdef.tile;
+        n.has_tile = true;
+      }
+      if (c.has_collider) {
+        n.tdef.collision = c.tdef.collision;
+        n.has_collider = true;
+      }
+    }
   } else if (fn.atom == "tile") {
     if (n.list.size() != 6) throw error { "tile should have uv, size and texid"_hs };
 
@@ -150,6 +164,7 @@ static void eval(node & n) {
     t.size.x = to_i(n.list[3]);
     t.size.y = to_i(n.list[4]);
     t.texid = texid(n.list[5]);
+    n.has_tile = true;
   } else if (fn.atom == "collision") {
     if (n.list.size() != 5) throw error { "collision should have pos and size"_hs };
 
@@ -158,6 +173,7 @@ static void eval(node & n) {
     c.y = to_f(n.list[2]);
     c.z = to_f(n.list[3]);
     c.w = to_f(n.list[4]);
+    n.has_collider = true;
   } else if (fn.atom == "prefab") {
   } else {
     throw error { "invalid function name: "_hs + fn.atom };
