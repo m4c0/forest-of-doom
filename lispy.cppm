@@ -4,6 +4,7 @@ import jojo;
 import jute;
 import hai;
 import no;
+import prefabs;
 import print;
 
 using namespace jute::literals;
@@ -84,6 +85,7 @@ static jute::view next_token(reader & r) {
 struct node {
   jute::view atom {};
   hai::varray<node> list {};
+  prefabs::tiledef tdef {};
 };
 
 static node next_list(reader & r) {
@@ -115,6 +117,10 @@ static node next_node(reader & r) {
   }
 }
 
+static float to_f(const node & n) {
+  return jute::to_f(n.atom);
+}
+
 static bool is_atom(node & n) { return n.list.size() == 0; }
 static void eval(node & n) {
   if (is_atom(n)) return;
@@ -124,7 +130,20 @@ static void eval(node & n) {
   auto & fn = n.list[0];
   if (!is_atom(fn)) throw error { "trying to eval a list as a function"_hs };
 
-  putln(fn.atom);
+  if (fn.atom == "tiledef") {
+  } else if (fn.atom == "tile") {
+    if (n.list.size() != 6) throw error { "tile should have uv, size and texid"_hs };
+
+    auto & t = n.tdef.tile;
+    t.uv.x = to_f(n.list[1]);
+    t.uv.y = to_f(n.list[2]);
+    t.size.x = to_f(n.list[3]);
+    t.size.y = to_f(n.list[4]);
+  } else if (fn.atom == "collision") {
+  } else if (fn.atom == "prefab") {
+  } else {
+    throw error { "invalid function name: "_hs + fn.atom };
+  }
 }
 
 int main() try {
