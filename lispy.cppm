@@ -117,11 +117,21 @@ static node next_node(reader & r) {
   }
 }
 
-static float to_f(const node & n) {
+static bool is_atom(const node & n) { return n.list.size() == 0; }
+
+static int to_f(const node & n) {
+  if (!is_atom(n)) throw error { "non-numerical coordinate"_hs };
   return jute::to_f(n.atom);
 }
+static int to_i(const node & n) {
+  if (!is_atom(n)) throw error { "non-numerical coordinate"_hs };
+  return jute::to_u32(n.atom);
+}
+static int texid(const node & n) {
+  if (n.atom == "one_terrains_and_fences") return 0;
+  throw error { "invalid texture"_hs };
+}
 
-static bool is_atom(node & n) { return n.list.size() == 0; }
 static void eval(node & n) {
   if (is_atom(n)) return;
 
@@ -135,11 +145,19 @@ static void eval(node & n) {
     if (n.list.size() != 6) throw error { "tile should have uv, size and texid"_hs };
 
     auto & t = n.tdef.tile;
-    t.uv.x = to_f(n.list[1]);
-    t.uv.y = to_f(n.list[2]);
-    t.size.x = to_f(n.list[3]);
-    t.size.y = to_f(n.list[4]);
+    t.uv.x = to_i(n.list[1]);
+    t.uv.y = to_i(n.list[2]);
+    t.size.x = to_i(n.list[3]);
+    t.size.y = to_i(n.list[4]);
+    t.texid = texid(n.list[5]);
   } else if (fn.atom == "collision") {
+    if (n.list.size() != 5) throw error { "collision should have pos and size"_hs };
+
+    auto & c = n.tdef.collision;
+    c.x = to_f(n.list[1]);
+    c.y = to_f(n.list[2]);
+    c.z = to_f(n.list[3]);
+    c.w = to_f(n.list[4]);
   } else if (fn.atom == "prefab") {
   } else {
     throw error { "invalid function name: "_hs + fn.atom };
