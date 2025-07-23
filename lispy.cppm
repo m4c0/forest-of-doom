@@ -26,6 +26,7 @@ public:
     return m_pos < m_data.size();
   }
 
+  unsigned loc() const { return m_pos; }
   const char * mark() const { return m_data.begin() + m_pos; }
 
   char peek() {
@@ -37,19 +38,22 @@ public:
     return m_data[m_pos++];
   }
 
-  [[noreturn]] void err(jute::view msg) {
+  [[noreturn]] void err(jute::view msg, unsigned loc) const {
     unsigned l = 1;
     unsigned last = 0;
-    for (auto i = 0; i < m_pos; i++) {
+    for (auto i = 0; i < loc; i++) {
       if (m_data[i] == '\n') {
         last = i;
         l++;
       }
     }
-    throw error { msg, l, m_pos - last };
+    throw error { msg, l, loc - last };
+  }
+  [[noreturn]] void err(jute::view msg) const {
+    err(msg, m_pos);
   }
 
-  jute::view token(const char * start) {
+  jute::view token(const char * start) const {
     return { start, static_cast<unsigned>(mark() - start) };
   }
 };
@@ -86,12 +90,14 @@ struct node {
   jute::view atom {};
   hai::varray<node> list {};
   prefabs::tiledef tdef {};
+  const reader * r {};
+  unsigned loc {};
   bool has_tile     : 1;
   bool has_collider : 1;
 };
 
 static node next_list(reader & r) {
-  node res { .list { 16 } };
+  node res { .list { 16 }, .r = &r, .loc = r.loc() };
   while (r) {
     auto token = next_token(r);
     if (token == ")") return res;
@@ -101,7 +107,7 @@ static node next_list(reader & r) {
     } else if (token == "") {
       break;
     } else {
-      res.list.push_back_doubling(node { token });
+      res.list.push_back_doubling(node { .atom = token, .r = &r, .loc = r.loc() });
     }
   }
   r.err("unbalanced open parenthesis");
@@ -115,23 +121,23 @@ static node next_node(reader & r) {
   } else if (token == ")") {
     r.err("unbalanced close parenthesis");
   } else {
-    return { token };
+    return { .atom = token, .r = &r, .loc = r.loc() };
   }
 }
 
 static bool is_atom(const node & n) { return n.list.size() == 0; }
 
 static int to_f(const node & n) {
-  if (!is_atom(n)) throw error { "non-numerical coordinate"_hs };
+  if (!is_atom(n)) n.r->err("non-numerical coordinate", n.loc);
   return jute::to_f(n.atom);
 }
 static int to_i(const node & n) {
-  if (!is_atom(n)) throw error { "non-numerical coordinate"_hs };
+  if (!is_atom(n)) n.r->err("non-numerical coordinate", n.loc);
   return jute::to_u32(n.atom);
 }
 static int texid(const node & n) {
   if (n.atom == "one_terrains_and_fences") return 0;
-  throw error { "invalid texture"_hs };
+  n.r->err("invalid texture", n.loc);
 }
 
 static void eval(node & n) {
@@ -140,10 +146,10 @@ static void eval(node & n) {
   for (auto & child : n.list) eval(child);
   
   auto & fn = n.list[0];
-  if (!is_atom(fn)) throw error { "trying to eval a list as a function"_hs };
+  if (!is_atom(fn)) n.r->err("trying to eval a list as a function", n.loc);
 
   if (fn.atom == "tiledef") {
-    if (n.list.size() < 2) throw error { "tiledef must have at least name"_hs };
+    if (n.list.size() < 2) n.r->err("tiledef must have at least name", n.loc);
 
     for (auto & c : n.list) {
       bool valid = false;
@@ -161,10 +167,10 @@ static void eval(node & n) {
         n.has_collider = true;
         valid = true;
       }
-      if (!valid) throw error { "invalid element in tiledef"_hs };
+      if (!valid) n.r->err("invalid element in tiledef", n.loc);
     }
   } else if (fn.atom == "tile") {
-    if (n.list.size() != 6) throw error { "tile should have uv, size and texid"_hs };
+    if (n.list.size() != 6) n.r->err("tile should have uv, size and texid", n.loc);
 
     auto & t = n.tdef.tile;
     t.uv.x = to_i(n.list[1]);
@@ -174,7 +180,7 @@ static void eval(node & n) {
     t.texid = texid(n.list[5]);
     n.has_tile = true;
   } else if (fn.atom == "collision") {
-    if (n.list.size() != 5) throw error { "collision should have pos and size"_hs };
+    if (n.list.size() != 5) n.r->err("collision should have pos and size", n.loc);
 
     auto & c = n.tdef.collision;
     c.x = to_f(n.list[1]);
@@ -183,12 +189,12 @@ static void eval(node & n) {
     c.w = to_f(n.list[4]);
     n.has_collider = true;
   } else if (fn.atom == "id") {
-    if (n.list.size() != 2) throw error { "id requires a value"_hs };
-    if (!is_atom(n.list[1])) throw error { "id must be an atom"_hs };
+    if (n.list.size() != 2) n.r->err("id requires a value", n.loc);
+    if (!is_atom(n.list[1])) n.r->err("id must be an atom", n.loc);
     n.tdef.id = n.list[1].atom;
   } else if (fn.atom == "prefab") {
   } else {
-    throw error { "invalid function name: "_hs + fn.atom };
+    n.r->err("invalid function name", n.loc);
   }
 }
 
