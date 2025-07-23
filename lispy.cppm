@@ -146,14 +146,22 @@ static void eval(node & n) {
     if (n.list.size() < 2) throw error { "tiledef must have at least name"_hs };
 
     for (auto & c : n.list) {
+      bool valid = false;
+      if (c.tdef.id.size()) {
+        n.tdef.id = c.tdef.id;
+        valid = true;
+      }
       if (c.has_tile) {
         n.tdef.tile = c.tdef.tile;
         n.has_tile = true;
+        valid = true;
       }
       if (c.has_collider) {
         n.tdef.collision = c.tdef.collision;
         n.has_collider = true;
+        valid = true;
       }
+      if (!valid) throw error { "invalid element in tiledef"_hs };
     }
   } else if (fn.atom == "tile") {
     if (n.list.size() != 6) throw error { "tile should have uv, size and texid"_hs };
@@ -174,6 +182,10 @@ static void eval(node & n) {
     c.z = to_f(n.list[3]);
     c.w = to_f(n.list[4]);
     n.has_collider = true;
+  } else if (fn.atom == "id") {
+    if (n.list.size() != 2) throw error { "id requires a value"_hs };
+    if (!is_atom(n.list[1])) throw error { "id must be an atom"_hs };
+    n.tdef.id = n.list[1].atom;
   } else if (fn.atom == "prefab") {
   } else {
     throw error { "invalid function name: "_hs + fn.atom };
