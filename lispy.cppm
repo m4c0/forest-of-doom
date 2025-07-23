@@ -6,6 +6,8 @@ import hai;
 import no;
 import print;
 
+using namespace jute::literals;
+
 struct error {
   jute::heap msg;
   unsigned line;
@@ -113,14 +115,16 @@ static node next_node(reader & r) {
   }
 }
 
-static void dump(const node & n) {
-  if (n.list.size()) {
-    put("(");
-    for (auto & nn : n.list) dump(nn);
-    put(")");
-  } else {
-    put(n.atom, " ");
-  }
+static bool is_atom(node & n) { return n.list.size() == 0; }
+static void eval(node & n) {
+  if (is_atom(n)) return;
+
+  for (auto & child : n.list) eval(child);
+  
+  auto & fn = n.list[0];
+  if (!is_atom(fn)) throw error { "trying to eval a list as a function"_hs };
+
+  putln(fn.atom);
 }
 
 int main() try {
@@ -131,7 +135,7 @@ int main() try {
   try {
     while (r) {
       auto n = next_node(r);
-      dump(n);
+      eval(n);
     }
   } catch (const error & e) {
     die(file, ":", e.line, ":", e.col, ": ", e.msg);
