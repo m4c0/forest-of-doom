@@ -151,7 +151,8 @@ static void eval(node & n) {
   if (fn.atom == "tiledef") {
     if (n.list.size() < 2) n.r->err("tiledef must have at least name", n.loc);
 
-    for (auto & c : n.list) {
+    for (auto i = 1; i < n.list.size(); i++) {
+      auto & c = n.list[i];
       bool valid = false;
       if (c.tdef.id.size()) {
         n.tdef.id = c.tdef.id;
@@ -167,7 +168,7 @@ static void eval(node & n) {
         n.has_collider = true;
         valid = true;
       }
-      if (!valid) n.r->err("invalid element in tiledef", n.loc);
+      if (!valid) n.r->err("invalid element in tiledef", c.loc);
     }
   } else if (fn.atom == "tile") {
     if (n.list.size() != 6) n.r->err("tile should have uv, size and texid", n.loc);
