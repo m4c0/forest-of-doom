@@ -108,7 +108,7 @@ static node next_list(reader & r) {
     } else if (token == "") {
       break;
     } else {
-      res.list.push_back_doubling(node { .atom = token, .r = &r, .loc = r.loc() });
+      res.list.push_back_doubling(node { .atom = token, .r = &r, .loc = static_cast<unsigned>(r.loc() - token.size()) });
     }
   }
   r.err("unbalanced open parenthesis");
@@ -122,7 +122,7 @@ static node next_node(reader & r) {
   } else if (token == ")") {
     r.err("unbalanced close parenthesis");
   } else {
-    return { .atom = token, .r = &r, .loc = r.loc() };
+    return { .atom = token, .r = &r, .loc = static_cast<unsigned>(r.loc() - token.size()) };
   }
 }
 
