@@ -90,6 +90,7 @@ struct node {
   jute::view atom {};
   hai::varray<node> list {};
   prefabs::tiledef tdef {};
+  hai::uptr<prefabs::tilemap> tmap {};
   const reader * r {};
   unsigned loc {};
   bool has_tile     : 1;
@@ -194,6 +195,18 @@ static void eval(node & n) {
     if (!is_atom(n.list[1])) n.r->err("id must be an atom", n.loc);
     n.tdef.id = n.list[1].atom;
   } else if (fn.atom == "prefab") {
+    if (n.list.size() != prefabs::height + 1) n.r->err("incorrect number of rows in prefab", n.loc);
+
+    n.tmap.reset(new prefabs::tilemap {});
+    auto & map = *n.tmap;
+    for (auto i = 1; i < n.list.size(); i++) {
+      auto & c = n.list[i];
+      if (!is_atom(c)) n.r->err("rows in prefabs must be atoms", c.loc);
+      if (c.atom.size() != prefabs::width) n.r->err("incorrect number of symbols in prefab", c.loc);
+      for (auto x = 0; x < c.atom.size(); x++) {
+        map(i - 1, x) = {};
+      }
+    }
   } else {
     n.r->err("invalid function name", n.loc);
   }
