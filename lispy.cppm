@@ -228,14 +228,17 @@ int main() try {
 
   context ctx {};
   reader r { code };
+  hai::uptr<prefabs::tilemap> prefab {};
   try {
     while (r) {
       auto n = next_node(r);
       eval(ctx, n);
+      if (n.tmap) prefab = traits::move(n.tmap);
     }
   } catch (const error & e) {
     die(file, ":", e.line, ":", e.col, ": ", e.msg);
   }
+  if (!prefab) die("missing prefab definition");
 } catch (...) {
   return 1;
 }
