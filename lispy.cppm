@@ -3,6 +3,7 @@ export module lispy;
 import jojo;
 import jute;
 import hai;
+import hashley;
 import no;
 import prefabs;
 import print;
@@ -141,10 +142,13 @@ static int texid(const node & n) {
   n.r->err("invalid texture", n.loc);
 }
 
-static void eval(node & n) {
+struct context {
+  hashley::fin<prefabs::tiledef> tiledefs { 127 };
+};
+static void eval(context & ctx, node & n) {
   if (is_atom(n)) return;
 
-  for (auto & child : n.list) eval(child);
+  for (auto & child : n.list) eval(ctx, child);
   
   auto & fn = n.list[0];
   if (!is_atom(fn)) n.r->err("trying to eval a list as a function", n.loc);
@@ -170,6 +174,10 @@ static void eval(node & n) {
         valid = true;
       }
       if (!valid) n.r->err("invalid element in tiledef", c.loc);
+    }
+
+    if (n.tdef.id.size()) {
+      ctx.tiledefs[*n.tdef.id] = n.tdef;
     }
   } else if (fn.atom == "tile") {
     if (n.list.size() != 6) n.r->err("tile should have uv, size and texid", n.loc);
@@ -204,7 +212,9 @@ static void eval(node & n) {
       if (!is_atom(c)) n.r->err("rows in prefabs must be atoms", c.loc);
       if (c.atom.size() != prefabs::width) n.r->err("incorrect number of symbols in prefab", c.loc);
       for (auto x = 0; x < c.atom.size(); x++) {
-        map(i - 1, x) = {};
+        auto id = c.atom.subview(x, 1).middle;
+        if (!ctx.tiledefs.has(id)) n.r->err("unknown tiledef", c.loc + x);
+        map(i - 1, x) = ctx.tiledefs[id];
       }
     }
   } else {
@@ -216,11 +226,12 @@ int main() try {
   jute::view file = "prefabs/prefabs-ocean-0.lsp";
   auto code = jojo::read_cstr(file);
 
+  context ctx {};
   reader r { code };
   try {
     while (r) {
       auto n = next_node(r);
-      eval(n);
+      eval(ctx, n);
     }
   } catch (const error & e) {
     die(file, ":", e.line, ":", e.col, ": ", e.msg);
