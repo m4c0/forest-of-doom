@@ -9,12 +9,6 @@ import sires;
 
 using namespace jute::literals;
 
-struct error {
-  jute::heap msg;
-  unsigned line;
-  unsigned col;
-};
-
 class reader : no::no {
   jute::view m_data;
   unsigned m_pos {};
@@ -47,7 +41,7 @@ public:
         l++;
       }
     }
-    throw error { msg, l, loc - last };
+    throw prefabs::parser_error { msg, l, loc - last };
   }
   [[noreturn]] void err(jute::view msg) const {
     err(msg, m_pos);
@@ -224,28 +218,31 @@ static void eval(context & ctx, node & n) {
 // TODO: eviction rules
 hashley::fin<prefabs::tilemap> g_cache { 127 };
 
-const prefabs::tilemap * prefabs::load(jute::view filename) {
+const prefabs::tilemap * prefabs::parse(jute::view filename) {
   if (g_cache.has(filename)) return &g_cache[filename];
 
-  auto code = jojo::read_cstr(sires::real_path_name(filename));
+  auto code = jojo::read_cstr(filename);
 
   context ctx {};
   reader r { code };
   hai::uptr<prefabs::tilemap> prefab {};
 
-  try {
-    while (r) {
-      auto n = next_node(r);
-      eval(ctx, n);
-      if (n.tmap) prefab = traits::move(n.tmap);
-    }
-  } catch (const error & e) {
-    silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
-    throw;
+  while (r) {
+    auto n = next_node(r);
+    eval(ctx, n);
+    if (n.tmap) prefab = traits::move(n.tmap);
   }
-
-  if (!prefab) silog::die("missing prefab definition");
 
   g_cache[filename] = traits::move(*prefab.release());
   return &g_cache[filename];
+}
+const prefabs::tilemap * prefabs::load(jute::view filename) {
+  try {
+    auto prefab = parse(sires::real_path_name(filename)); 
+    if (!prefab) silog::die("missing prefab definition");
+    return prefab;
+  } catch (const prefabs::parser_error & e) {
+    silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
+    throw;
+  }
 }

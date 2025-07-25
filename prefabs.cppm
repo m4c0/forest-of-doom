@@ -13,6 +13,11 @@ namespace prefabs {
 
     explicit assert_error(jute::heap h) : msg { (*h).cstr() } {}
   };
+  export struct parser_error {
+    jute::heap msg;
+    unsigned line;
+    unsigned col;
+  };
 
   export struct sprite {
     dotz::vec2 uv {};
@@ -52,5 +57,6 @@ namespace prefabs {
     }
   };
 
+  export const tilemap * parse(jute::view filename);
   export [[nodiscard]] const tilemap * load(jute::view filename);
 }
