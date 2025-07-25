@@ -36,6 +36,17 @@ const int i = [] {
           };
       });
     });
+    g_fox->load(fox::layers::player, [&](auto * m) {
+      o0->for_each([&](float x, float y, const auto & def) {
+        if (dotz::length(def.collision))
+          *m += fox::sprite {
+            .pos   { x + def.collision.x, y + def.collision.y },
+            .uv    { 2, 2 },
+            .size  = def.collision.zw(),
+            .texid = fox::texids::ui_paper,
+          };
+      });
+    });
   };
   v::on_frame = [] {
     g_fox->on_frame(16, 32, 8);
