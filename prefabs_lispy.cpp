@@ -53,12 +53,14 @@ public:
 };
 
 static bool is_atom_char(char c) {
-  auto upc = c | 0x20;
-  return (upc >= 'a' && upc <= 'z') || (c == '_') || (c >= '0' && c <= '9');
+  return c > ' ' && c <= '~' && c != ';' && c != '(' && c != ')';
 }
 static jute::view next_atom_token(const char * start, reader & r) {
   while (is_atom_char(r.peek())) r.take();
   return r.token(start);
+}
+static void comment(reader & r) {
+  while (r && r.take() != '\n') continue;
 }
 static jute::view next_token(reader & r) {
   while (r) {
@@ -70,6 +72,7 @@ static jute::view next_token(reader & r) {
       case ' ': break;
       case '(': return r.token(start);
       case ')': return r.token(start);
+      case ';': comment(r); break;
       default: {
         if (is_atom_char(c)) return next_atom_token(start, r);
         r.err("character not allowed here");
@@ -211,7 +214,7 @@ static void eval(context & ctx, node & n) {
       }
     }
   } else {
-    n.r->err("invalid function name", n.loc);
+    n.r->err(*("invalid function name: "_hs + fn.atom), n.loc);
   }
 }
 
@@ -232,6 +235,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     eval(ctx, n);
     if (n.tmap) prefab = traits::move(n.tmap);
   }
+  if (!prefab) return nullptr;
 
   g_cache[filename] = traits::move(*prefab.release());
   return &g_cache[filename];
