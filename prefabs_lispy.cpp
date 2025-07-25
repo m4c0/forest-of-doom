@@ -257,7 +257,7 @@ static void eval(context & ctx, node & n) {
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
         if (!ctx.tiledefs.has(id)) n.r->err("unknown tiledef", c->loc + x);
-        map(i, x) = ctx.tiledefs[id];
+        map(x, i) = ctx.tiledefs[id];
       }
     }
   } else if (fn == "def") {
