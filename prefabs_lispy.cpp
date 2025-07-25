@@ -164,7 +164,6 @@ static int to_i(const node & n) {
 }
 
 struct context {
-  hashley::fin<prefabs::tiledef> tiledefs { 127 };
   hashley::fin<node> defs { 127 };
 };
 static void eval(context & ctx, node & n) {
@@ -213,10 +212,6 @@ static void eval(context & ctx, node & n) {
       }
       if (!valid) n.r->err("invalid element in tiledef", c->loc);
     }
-
-    if (n.tdef.id.size()) {
-      ctx.tiledefs[*n.tdef.id] = n.tdef;
-    }
   } else if (fn == "tile") {
     if (ls(n) != 6) n.r->err("tile should have uv, size and texid", n.loc);
 
@@ -246,10 +241,6 @@ static void eval(context & ctx, node & n) {
     c.z = to_f(*(args = &*args->next));
     c.w = to_f(*(args = &*args->next));
     n.has_collider = true;
-  } else if (fn == "id") {
-    if (ls(n) != 2) n.r->err("id requires a value", n.loc);
-    if (!is_atom(*args)) n.r->err("id must be an atom", n.loc);
-    n.tdef.id = args->atom;
   } else if (fn == "behaviour") {
     if (ls(n) != 2) n.r->err("behaviour requires a value", n.loc);
     if (!is_atom(*args)) n.r->err("behaviour must be an atom", n.loc);
@@ -265,8 +256,10 @@ static void eval(context & ctx, node & n) {
       if (c->atom.size() != prefabs::width) n.r->err("incorrect number of symbols in prefab", c->loc);
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
-        if (!ctx.tiledefs.has(id)) n.r->err("unknown tiledef", c->loc + x);
-        map(x, i) = ctx.tiledefs[id];
+        if (!ctx.defs.has(id)) n.r->err("unknown tiledef", c->loc + x);
+        auto & c = ctx.defs[id];
+        eval(ctx, c);
+        map(x, i) = c.tdef;
       }
     }
   } else if (fn == "random") {

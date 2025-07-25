@@ -1,7 +1,6 @@
-(tiledef
-  (id O)
+(def O (tiledef
   (tile 12 8 1 1 0)
-  (collision 0 0 1 1))
+  (collision 0 0 1 1)))
 
 (prefab
   OOOOOOOOOOOOOOOO

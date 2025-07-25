@@ -2,49 +2,48 @@
 (def camping  1)
 
 ; Water
-(tiledef
-  (id *)
+(def * (tiledef
   (tile 12 8 1 1 (terrains))
-  (collision 0 0 1 1))
+  (collision 0 0 1 1)))
+
+(def grass
+  (random
+    (tile  9 7 1 1 (terrains))
+    (tile 11 8 1 1 (terrains))))
 
 ; Water-to-Land
-(tiledef (id A) (tile  8 6 1 1 (terrains)))
-(tiledef (id B) (tile  9 6 1 1 (terrains)))
-(tiledef (id C) (tile 10 6 1 1 (terrains)))
-(tiledef (id D) (tile  8 7 1 1 (terrains)))
-(tiledef (id .) (tile  9 7 1 1 (terrains)))
-(tiledef (id E) (tile 10 7 1 1 (terrains)))
-(tiledef
-  (id F)
+(def A (tiledef (tile  8 6 1 1 (terrains))))
+(def B (tiledef (tile  9 6 1 1 (terrains))))
+(def C (tiledef (tile 10 6 1 1 (terrains))))
+(def D (tiledef (tile  8 7 1 1 (terrains))))
+(def . (tiledef (grass)))
+(def E (tiledef (tile 10 7 1 1 (terrains))))
+(def F (tiledef
   (tile 8 8 1 1 (terrains))
-  (collision 0 0.5 1 0.5))
-(tiledef
-  (id G)
+  (collision 0 0.5 1 0.5)))
+(def G (tiledef
   (tile 9 8 1 1 (terrains))
-  (collision 0 0.5 1 0.5))
-(tiledef
-  (id H)
+  (collision 0 0.5 1 0.5)))
+(def H (tiledef
   (tile 10 8 1 1 (terrains))
-  (collision 0 0.5 1 0.5))
-(tiledef (id ,) (tile  1 17 1 1 (terrains)))
-(tiledef (id c) (tile 12  6 1 1 (terrains)))
-(tiledef
-  (id f)
+  (collision 0 0.5 1 0.5)))
+(def c (tiledef (tile 12  6 1 1 (terrains))))
+(def f (tiledef
   (tile 11 7 1 1 (terrains))
-  (collision 0.9 0.9 0.1 0.1))
+  (collision 0.9 0.9 0.1 0.1)))
 
 ; Land-to-road
 (def road-center (tile 28 9 1 1 (terrains)))
 
-(tiledef (id L) (tile  3 16 1 1 (terrains)))
-(tiledef (id M) (tile  1 18 1 1 (terrains)))
-(tiledef (id N) (tile  4 16 1 1 (terrains)))
-(tiledef (id O) (tile  2 17 1 1 (terrains)))
-(tiledef (id /) (road-center))
-(tiledef (id P) (tile  0 17 1 1 (terrains)))
-(tiledef (id R) (tile  3 17 1 1 (terrains)))
-(tiledef (id S) (tile  1 16 1 1 (terrains)))
-(tiledef (id T) (tile  4 17 1 1 (terrains)))
+(def L (tiledef (tile  3 16 1 1 (terrains))))
+(def M (tiledef (tile  1 18 1 1 (terrains))))
+(def N (tiledef (tile  4 16 1 1 (terrains))))
+(def O (tiledef (tile  2 17 1 1 (terrains))))
+(def / (tiledef (road-center)))
+(def P (tiledef (tile  0 17 1 1 (terrains))))
+(def R (tiledef (tile  3 17 1 1 (terrains))))
+(def S (tiledef (tile  1 16 1 1 (terrains))))
+(def T (tiledef (tile  4 17 1 1 (terrains))))
 
 (def backpack
   (tiledef 
@@ -52,15 +51,15 @@
     (collision 0 0.7 1 0.4)
     (behaviour backpack)))
 
-(tiledef (id 1) (backpack) (entity 16 34 1 2 (camping)))
-(tiledef (id 2) (backpack) (entity 17 34 1 2 (camping)))
-(tiledef (id 3) (backpack) (entity 18 34 1 2 (camping)))
+(def 1 (tiledef (backpack) (entity 16 34 1 2 (camping))))
+(def 2 (tiledef (backpack) (entity 17 34 1 2 (camping))))
+(def 3 (tiledef (backpack) (entity 18 34 1 2 (camping))))
 
 (prefab
   ABBBBBBBBBBC****
-  D..,.,.,.,,fBBBC
-  D.,.,.,..,.,.,.E
-  D..,,..,..,.,..E
+  D..........fBBBC
+  D..............E
+  D..............E
   D..LMMMMMMMMN..E
   D..O////////P..E
   D..O////////P..E
