@@ -206,11 +206,11 @@ static void eval(context & ctx, node & n) {
     if (ls(n) != 6) n.r->err("tile should have uv, size and texid", n.loc);
 
     auto & t = n.tdef.tile;
-    t.uv.x   = to_i (*args);
-    t.uv.y   = to_i (*(args = &*args->next));
-    t.size.x = to_i (*(args = &*args->next));
-    t.size.y = to_i (*(args = &*args->next));
-    t.texid  = texid(*(args = &*args->next));
+    t.uv.x   = to_i(*args);
+    t.uv.y   = to_i(*(args = &*args->next));
+    t.size.x = to_i(*(args = &*args->next));
+    t.size.y = to_i(*(args = &*args->next));
+    t.texid  = to_i(*(args = &*args->next));
     n.has_tile = true;
   } else if (fn == "collision") {
     if (ls(n) != 5) n.r->err("collision should have pos and size", n.loc);

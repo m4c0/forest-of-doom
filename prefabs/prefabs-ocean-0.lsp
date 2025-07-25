@@ -1,6 +1,6 @@
 (tiledef
   (id O)
-  (tile 12 8 1 1 one_terrains_and_fences)
+  (tile 12 8 1 1 0)
   (collision 0 0 1 1))
 
 (prefab
