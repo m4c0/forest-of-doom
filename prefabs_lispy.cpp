@@ -4,6 +4,7 @@ import hashley;
 import jojo;
 import jute;
 import no;
+import rng;
 import silog;
 import sires;
 
@@ -168,11 +169,19 @@ struct context {
 };
 static void eval(context & ctx, node & n) {
   if (!n.list) return;
-
-  for (auto nn = &*n.list; nn; nn = &*nn->next) eval(ctx, *nn);
+  if (!is_atom(*n.list)) n.r->err("expecting an atom", n.list->loc);
 
   auto fn = n.list->atom;
   auto args = &*n.list->next;
+
+  if (fn == "def") {
+    if (ls(n) != 3) n.r->err("def requires a name and a value");
+    if (!is_atom(*args)) n.r->err("def name must be an atom");
+    ctx.defs[args->atom] = traits::move(*args->next.release());
+    return;
+  }
+
+  for (auto nn = &*n.list; nn; nn = &*nn->next) eval(ctx, *nn);
   
   if (fn == "tiledef") {
     if (ls(n) < 2) n.r->err("tiledef must have at least name", n.loc);
@@ -260,17 +269,24 @@ static void eval(context & ctx, node & n) {
         map(x, i) = ctx.tiledefs[id];
       }
     }
-  } else if (fn == "def") {
-    if (ls(n) != 3) n.r->err("def requires a name and a value");
-    if (!is_atom(*args)) n.r->err("def name must be an atom");
-    ctx.defs[args->atom] = traits::move(*args->next.release());
+  } else if (fn == "random") {
+    if (ls(n) == 0) n.r->err("rand requires at least a parameter");
+    auto r = rng::rand(ls(n));
+    silog::trace(r);
+    for (auto i = 0; i < r - 1; i++) args = &*args->next;
+    n.atom = args->atom;
+    n.tdef = args->tdef;
+    n.has_tile = args->has_tile;
+    n.has_entity = args->has_entity;
+    n.has_collider = args->has_collider;
   } else if (ctx.defs.has(fn)) {
-    auto * c = &ctx.defs[fn];
-    n.atom = c->atom;
-    n.tdef = c->tdef;
-    n.has_tile = c->has_tile;
-    n.has_entity = c->has_entity;
-    n.has_collider = c->has_collider;
+    auto & c = ctx.defs[fn];
+    eval(ctx, c);
+    n.atom = c.atom;
+    n.tdef = c.tdef;
+    n.has_tile = c.has_tile;
+    n.has_entity = c.has_entity;
+    n.has_collider = c.has_collider;
   } else {
     n.r->err(*("invalid function name: "_hs + fn), n.loc);
   }
