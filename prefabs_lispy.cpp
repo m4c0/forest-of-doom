@@ -90,6 +90,7 @@ struct node {
   hai::uptr<prefabs::tilemap> tmap {};
   const reader * r {};
   unsigned loc {};
+  bool has_entity   : 1;
   bool has_tile     : 1;
   bool has_collider : 1;
 
@@ -191,6 +192,11 @@ static void eval(context & ctx, node & n) {
         n.has_tile = true;
         valid = true;
       }
+      if (c->has_entity) {
+        n.tdef.entity = c->tdef.entity;
+        n.has_entity = true;
+        valid = true;
+      }
       if (c->has_collider) {
         n.tdef.collision = c->tdef.collision;
         n.has_collider = true;
@@ -212,6 +218,16 @@ static void eval(context & ctx, node & n) {
     t.size.y = to_i(*(args = &*args->next));
     t.texid  = to_i(*(args = &*args->next));
     n.has_tile = true;
+  } else if (fn == "entity") {
+    if (ls(n) != 6) n.r->err("entity should have uv, size and texid", n.loc);
+
+    auto & t = n.tdef.entity;
+    t.uv.x   = to_i(*args);
+    t.uv.y   = to_i(*(args = &*args->next));
+    t.size.x = to_i(*(args = &*args->next));
+    t.size.y = to_i(*(args = &*args->next));
+    t.texid  = to_i(*(args = &*args->next));
+    n.has_entity = true;
   } else if (fn == "collision") {
     if (ls(n) != 5) n.r->err("collision should have pos and size", n.loc);
 
