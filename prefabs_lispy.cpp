@@ -85,28 +85,37 @@ static jute::view next_token(reader & r) {
 
 struct node {
   jute::view atom {};
-  hai::varray<node> list {};
+  hai::uptr<node> list {};
   prefabs::tiledef tdef {};
   hai::uptr<prefabs::tilemap> tmap {};
   const reader * r {};
   unsigned loc {};
   bool has_tile     : 1;
   bool has_collider : 1;
+
+  hai::uptr<node> next {};
 };
 
 static node next_list(reader & r) {
-  node res { .list { 16 }, .r = &r, .loc = r.loc() };
+  node res {
+    .r = &r,
+    .loc = r.loc(),
+  };
+  auto * n = &res.list;
   while (r) {
     auto token = next_token(r);
     if (token == ")") return res;
+    if (token == "") break;
 
-    if (token == "(") {
-      res.list.push_back_doubling(next_list(r));
-    } else if (token == "") {
-      break;
-    } else {
-      res.list.push_back_doubling(node { .atom = token, .r = &r, .loc = static_cast<unsigned>(r.loc() - token.size()) });
-    }
+    auto nn = (token == "(") ?
+      new node { next_list(r) } :
+      new node {
+        .atom = token,
+        .r = &r,
+        .loc = static_cast<unsigned>(r.loc() - token.size()),
+      };
+    n->reset(nn);
+    n = &((*n)->next);
   }
   r.err("unbalanced open parenthesis");
 }
@@ -119,11 +128,21 @@ static node next_node(reader & r) {
   } else if (token == ")") {
     r.err("unbalanced close parenthesis");
   } else {
-    return { .atom = token, .r = &r, .loc = static_cast<unsigned>(r.loc() - token.size()) };
+    return { 
+      .atom = token,
+      .r = &r,
+      .loc = static_cast<unsigned>(r.loc() - token.size()),
+    };
   }
 }
 
-static bool is_atom(const node & n) { return n.list.size() == 0; }
+static bool is_atom(const node & n) { return n.atom.size(); }
+
+static auto ls(const node & n) {
+  unsigned sz = 0;
+  for (auto nn = &*n.list; nn; nn = &*nn->next) sz++;
+  return sz;
+}
 
 static int to_f(const node & n) {
   if (!is_atom(n)) n.r->err("non-numerical coordinate", n.loc);
@@ -140,81 +159,85 @@ static int texid(const node & n) {
 
 struct context {
   hashley::fin<prefabs::tiledef> tiledefs { 127 };
+  hashley::fin<node> defs { 127 };
 };
 static void eval(context & ctx, node & n) {
-  if (is_atom(n)) return;
+  if (!n.list) return;
 
-  for (auto & child : n.list) eval(ctx, child);
+  for (auto nn = &*n.list; nn; nn = &*nn->next) eval(ctx, *nn);
+
+  auto fn = n.list->atom;
+  auto args = &*n.list->next;
   
-  auto & fn = n.list[0];
-  if (!is_atom(fn)) n.r->err("trying to eval a list as a function", n.loc);
+  if (fn == "tiledef") {
+    if (ls(n) < 2) n.r->err("tiledef must have at least name", n.loc);
 
-  if (fn.atom == "tiledef") {
-    if (n.list.size() < 2) n.r->err("tiledef must have at least name", n.loc);
-
-    for (auto i = 1; i < n.list.size(); i++) {
-      auto & c = n.list[i];
+    for (auto * c = args; c; c = &*c->next) {
       bool valid = false;
-      if (c.tdef.id.size()) {
-        n.tdef.id = c.tdef.id;
+      if (c->tdef.id.size()) {
+        n.tdef.id = c->tdef.id;
         valid = true;
       }
-      if (c.has_tile) {
-        n.tdef.tile = c.tdef.tile;
+      if (c->has_tile) {
+        n.tdef.tile = c->tdef.tile;
         n.has_tile = true;
         valid = true;
       }
-      if (c.has_collider) {
-        n.tdef.collision = c.tdef.collision;
+      if (c->has_collider) {
+        n.tdef.collision = c->tdef.collision;
         n.has_collider = true;
         valid = true;
       }
-      if (!valid) n.r->err("invalid element in tiledef", c.loc);
+      if (!valid) n.r->err("invalid element in tiledef", c->loc);
     }
 
     if (n.tdef.id.size()) {
       ctx.tiledefs[*n.tdef.id] = n.tdef;
     }
-  } else if (fn.atom == "tile") {
-    if (n.list.size() != 6) n.r->err("tile should have uv, size and texid", n.loc);
+  } else if (fn == "tile") {
+    if (ls(n) != 6) n.r->err("tile should have uv, size and texid", n.loc);
 
     auto & t = n.tdef.tile;
-    t.uv.x = to_i(n.list[1]);
-    t.uv.y = to_i(n.list[2]);
-    t.size.x = to_i(n.list[3]);
-    t.size.y = to_i(n.list[4]);
-    t.texid = texid(n.list[5]);
+    t.uv.x   = to_i (*args);
+    t.uv.y   = to_i (*(args = &*args->next));
+    t.size.x = to_i (*(args = &*args->next));
+    t.size.y = to_i (*(args = &*args->next));
+    t.texid  = texid(*(args = &*args->next));
     n.has_tile = true;
-  } else if (fn.atom == "collision") {
-    if (n.list.size() != 5) n.r->err("collision should have pos and size", n.loc);
+  } else if (fn == "collision") {
+    if (ls(n) != 5) n.r->err("collision should have pos and size", n.loc);
 
     auto & c = n.tdef.collision;
-    c.x = to_f(n.list[1]);
-    c.y = to_f(n.list[2]);
-    c.z = to_f(n.list[3]);
-    c.w = to_f(n.list[4]);
+    c.x = to_f(*args);
+    c.y = to_f(*(args = &*args->next));
+    c.z = to_f(*(args = &*args->next));
+    c.w = to_f(*(args = &*args->next));
     n.has_collider = true;
-  } else if (fn.atom == "id") {
-    if (n.list.size() != 2) n.r->err("id requires a value", n.loc);
-    if (!is_atom(n.list[1])) n.r->err("id must be an atom", n.loc);
-    n.tdef.id = n.list[1].atom;
-  } else if (fn.atom == "prefab") {
-    if (n.list.size() != prefabs::height + 1) n.r->err("incorrect number of rows in prefab", n.loc);
+  } else if (fn == "id") {
+    if (ls(n) != 2) n.r->err("id requires a value", n.loc);
+    if (!is_atom(*args)) n.r->err("id must be an atom", n.loc);
+    n.tdef.id = args->atom;
+  } else if (fn == "prefab") {
+    if (ls(n) != prefabs::height + 1) n.r->err("incorrect number of rows in prefab", n.loc);
 
     n.tmap.reset(new prefabs::tilemap {});
     auto & map = *n.tmap;
-    for (auto i = 1; i < n.list.size(); i++) {
-      auto & c = n.list[i];
-      if (!is_atom(c)) n.r->err("rows in prefabs must be atoms", c.loc);
-      if (c.atom.size() != prefabs::width) n.r->err("incorrect number of symbols in prefab", c.loc);
-      for (auto x = 0; x < c.atom.size(); x++) {
-        auto id = c.atom.subview(x, 1).middle;
-        if (!ctx.tiledefs.has(id)) n.r->err("unknown tiledef", c.loc + x);
-        map(i - 1, x) = ctx.tiledefs[id];
+    auto i = 0;
+    for (auto * c = args; c; c = &*c->next, i++) {
+      if (!is_atom(*c)) n.r->err("rows in prefabs must be atoms", c->loc);
+      if (c->atom.size() != prefabs::width) n.r->err("incorrect number of symbols in prefab", c->loc);
+      for (auto x = 0; x < c->atom.size(); x++) {
+        auto id = c->atom.subview(x, 1).middle;
+        if (!ctx.tiledefs.has(id)) n.r->err("unknown tiledef", c->loc + x);
+        map(i, x) = ctx.tiledefs[id];
       }
     }
+  } else if (fn == "def") {
+    if (ls(n) != 3) n.r->err("def requires a name and a value");
+    if (!is_atom(*args)) n.r->err("def name must be an atom");
+    ctx.defs[args->atom] = traits::move(*args->next.release());
   } else {
-    n.r->err(*("invalid function name: "_hs + fn.atom), n.loc);
+    n.r->err(*("invalid function name: "_hs + fn), n.loc);
   }
 }
 
