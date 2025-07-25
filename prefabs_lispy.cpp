@@ -145,7 +145,7 @@ static auto ls(const node & n) {
   return sz;
 }
 
-static int to_f(const node & n) {
+static float to_f(const node & n) {
   if (!is_atom(n)) n.r->err("non-numerical coordinate", n.loc);
   try {
     return jute::to_f(n.atom);
