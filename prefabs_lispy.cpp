@@ -178,6 +178,10 @@ static void eval(context & ctx, node & n) {
         n.tdef.id = c->tdef.id;
         valid = true;
       }
+      if (c->tdef.behaviour.size()) {
+        n.tdef.behaviour = c->tdef.behaviour;
+        valid = true;
+      }
       if (c->has_tile) {
         n.tdef.tile = c->tdef.tile;
         n.has_tile = true;
@@ -217,6 +221,10 @@ static void eval(context & ctx, node & n) {
     if (ls(n) != 2) n.r->err("id requires a value", n.loc);
     if (!is_atom(*args)) n.r->err("id must be an atom", n.loc);
     n.tdef.id = args->atom;
+  } else if (fn == "behaviour") {
+    if (ls(n) != 2) n.r->err("behaviour requires a value", n.loc);
+    if (!is_atom(*args)) n.r->err("behaviour must be an atom", n.loc);
+    n.tdef.behaviour = args->atom;
   } else if (fn == "prefab") {
     if (ls(n) != prefabs::height + 1) n.r->err("incorrect number of rows in prefab", n.loc);
 
