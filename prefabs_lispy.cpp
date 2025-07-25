@@ -244,6 +244,12 @@ static void eval(context & ctx, node & n) {
     if (ls(n) != 3) n.r->err("def requires a name and a value");
     if (!is_atom(*args)) n.r->err("def name must be an atom");
     ctx.defs[args->atom] = traits::move(*args->next.release());
+  } else if (ctx.defs.has(fn)) {
+    auto * c = &ctx.defs[fn];
+    n.atom = c->atom;
+    n.tdef = c->tdef;
+    n.has_tile = c->has_tile;
+    n.has_collider = c->has_collider;
   } else {
     n.r->err(*("invalid function name: "_hs + fn), n.loc);
   }
