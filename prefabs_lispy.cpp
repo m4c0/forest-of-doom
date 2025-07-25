@@ -146,15 +146,19 @@ static auto ls(const node & n) {
 
 static int to_f(const node & n) {
   if (!is_atom(n)) n.r->err("non-numerical coordinate", n.loc);
-  return jute::to_f(n.atom);
+  try {
+    return jute::to_f(n.atom);
+  } catch (...) {
+    n.r->err("invalid number", n.loc);
+  }
 }
 static int to_i(const node & n) {
   if (!is_atom(n)) n.r->err("non-numerical coordinate", n.loc);
-  return jute::to_u32(n.atom);
-}
-static int texid(const node & n) {
-  if (n.atom == "one_terrains_and_fences") return 0;
-  n.r->err("invalid texture", n.loc);
+  try {
+    return jute::to_u32(n.atom);
+  } catch (...) {
+    n.r->err("invalid number", n.loc);
+  }
 }
 
 struct context {
