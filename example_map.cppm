@@ -34,20 +34,20 @@ namespace example_map {
         });
       });
     } catch (const prefabs::error & e) {
-      silog::log(silog::error, "%s:%d: %s", name.cstr().begin(), e.line_number, e.msg.begin());
+      silog::log(silog::error, "%s:%d:%d: %s", name.cstr().begin(), e.line, e.col, e.msg.begin());
     }
   }
 
   export void load(fox::memiter * m) {
-    load_prefab(m, "prefabs-ocean-0.txt", -16, -16);
-    load_prefab(m, "prefabs-ocean-0.txt",   0, -16);
-    load_prefab(m, "prefabs-ocean-0.txt",  16, -16);
-    load_prefab(m, "prefabs-ocean-0.txt", -16,   0);
-    load_prefab(m, "prefabs-ocean-0.txt",  16,   0);
-    load_prefab(m, "prefabs-ocean-0.txt", -16,  16);
-    load_prefab(m, "prefabs-ocean-0.txt",   0,  16);
-    load_prefab(m, "prefabs-ocean-0.txt",  16,  16);
+    load_prefab(m, "prefabs-ocean-0.lsp", -16, -16);
+    load_prefab(m, "prefabs-ocean-0.lsp",   0, -16);
+    load_prefab(m, "prefabs-ocean-0.lsp",  16, -16);
+    load_prefab(m, "prefabs-ocean-0.lsp", -16,   0);
+    load_prefab(m, "prefabs-ocean-0.lsp",  16,   0);
+    load_prefab(m, "prefabs-ocean-0.lsp", -16,  16);
+    load_prefab(m, "prefabs-ocean-0.lsp",   0,  16);
+    load_prefab(m, "prefabs-ocean-0.lsp",  16,  16);
   
-    load_prefab(m, "prefabs-island-0.txt", 0, 0);
+    load_prefab(m, "prefabs-island-0.lsp", 0, 0);
   }
 }

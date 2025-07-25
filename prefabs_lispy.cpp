@@ -1,11 +1,9 @@
-#pragma leco tool
-export module lispy;
+module prefabs;
 import jojo;
 import jute;
 import hai;
 import hashley;
 import no;
-import prefabs;
 import print;
 
 using namespace jute::literals;
@@ -222,13 +220,18 @@ static void eval(context & ctx, node & n) {
   }
 }
 
-int main() try {
-  jute::view file = "prefabs/prefabs-ocean-0.lsp";
-  auto code = jojo::read_cstr(file);
+// TODO: eviction rules
+hashley::fin<prefabs::tilemap> g_cache { 127 };
+
+const prefabs::tilemap * prefabs::load(jute::view filename) {
+  if (g_cache.has(filename)) return &g_cache[filename];
+
+  auto code = jojo::read_cstr(filename);
 
   context ctx {};
   reader r { code };
   hai::uptr<prefabs::tilemap> prefab {};
+
   try {
     while (r) {
       auto n = next_node(r);
@@ -236,10 +239,11 @@ int main() try {
       if (n.tmap) prefab = traits::move(n.tmap);
     }
   } catch (const error & e) {
-    die(file, ":", e.line, ":", e.col, ": ", e.msg);
+    die(filename, ":", e.line, ":", e.col, ": ", e.msg);
   }
-  if (!prefab) die("missing prefab definition");
-} catch (...) {
-  return 1;
-}
 
+  if (!prefab) die("missing prefab definition");
+
+  g_cache[filename] = traits::move(*prefab.release());
+  return &g_cache[filename];
+}

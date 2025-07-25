@@ -1,4 +1,4 @@
-#pragma leco add_impl prefabs_impl.cpp
+#pragma leco add_impl prefabs_lispy.cpp
 #pragma leco add_resource_dir prefabs
 export module prefabs;
 import dotz;
@@ -10,9 +10,10 @@ using namespace jute::literals;
 namespace prefabs {
   export struct error {
     hai::cstr msg;
-    unsigned line_number;
+    unsigned line;
+    unsigned col;
 
-    error(jute::heap h) : msg { (*h).cstr() } {}
+    explicit error(jute::heap h) : msg { (*h).cstr() } {}
   };
 
   export struct sprite {
