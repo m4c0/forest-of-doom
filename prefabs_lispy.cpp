@@ -269,6 +269,7 @@ static void eval(context & ctx, node & n) {
     n.atom = c->atom;
     n.tdef = c->tdef;
     n.has_tile = c->has_tile;
+    n.has_entity = c->has_entity;
     n.has_collider = c->has_collider;
   } else {
     n.r->err(*("invalid function name: "_hs + fn), n.loc);

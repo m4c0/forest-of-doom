@@ -1,5 +1,6 @@
 #pragma leco app
 
+import dotz;
 import fox;
 import jute;
 import prefabs;
@@ -11,9 +12,10 @@ fox::main * g_fox;
 const int i = [] {
   v::on_start = [] {
     g_fox = new fox::main {};
-    g_fox->load(fox::layers::floor, [](auto * m) {
-      jute::view name = "prefabs-ocean-0.lsp";
-      auto o0 = prefabs::load(name);
+
+    jute::view name = "prefabs-island-0.lsp";
+    auto o0 = prefabs::load(name);
+    g_fox->load(fox::layers::floor, [&](auto * m) {
       o0->for_each([&](float x, float y, const auto & def) {
         *m += fox::sprite {
           .pos   { x, y },
@@ -21,6 +23,17 @@ const int i = [] {
           .size  = def.tile.size,
           .texid = static_cast<fox::texids>(def.tile.texid),
         };
+      });
+    });
+    g_fox->load(fox::layers::entities, [&](auto * m) {
+      o0->for_each([&](float x, float y, const auto & def) {
+        if (dotz::length(def.entity.size))
+          *m += fox::sprite {
+            .pos   { x, y },
+            .uv    = def.entity.uv,
+            .size  = def.entity.size,
+            .texid = static_cast<fox::texids>(def.entity.texid),
+          };
       });
     });
   };
