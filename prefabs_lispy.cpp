@@ -264,9 +264,8 @@ static void eval(context & ctx, node & n) {
     }
   } else if (fn == "random") {
     if (ls(n) == 0) n.r->err("rand requires at least a parameter");
-    auto r = rng::rand(ls(n));
-    silog::trace(r);
-    for (auto i = 0; i < r - 1; i++) args = &*args->next;
+    int r = rng::rand(ls(n) - 1);
+    for (auto i = 0; i < r; i++) args = &*args->next;
     n.atom = args->atom;
     n.tdef = args->tdef;
     n.has_tile = args->has_tile;
