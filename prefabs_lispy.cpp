@@ -4,7 +4,8 @@ import jute;
 import hai;
 import hashley;
 import no;
-import print;
+import silog;
+import sires;
 
 using namespace jute::literals;
 
@@ -226,7 +227,7 @@ hashley::fin<prefabs::tilemap> g_cache { 127 };
 const prefabs::tilemap * prefabs::load(jute::view filename) {
   if (g_cache.has(filename)) return &g_cache[filename];
 
-  auto code = jojo::read_cstr(filename);
+  auto code = jojo::read_cstr(sires::real_path_name(filename));
 
   context ctx {};
   reader r { code };
@@ -239,10 +240,11 @@ const prefabs::tilemap * prefabs::load(jute::view filename) {
       if (n.tmap) prefab = traits::move(n.tmap);
     }
   } catch (const error & e) {
-    die(filename, ":", e.line, ":", e.col, ": ", e.msg);
+    silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
+    throw;
   }
 
-  if (!prefab) die("missing prefab definition");
+  if (!prefab) silog::die("missing prefab definition");
 
   g_cache[filename] = traits::move(*prefab.release());
   return &g_cache[filename];
