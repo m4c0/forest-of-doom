@@ -8,12 +8,10 @@ import hai;
 using namespace jute::literals;
 
 namespace prefabs {
-  export struct error {
+  export struct assert_error {
     hai::cstr msg;
-    unsigned line;
-    unsigned col;
 
-    explicit error(jute::heap h) : msg { (*h).cstr() } {}
+    explicit assert_error(jute::heap h) : msg { (*h).cstr() } {}
   };
 
   export struct sprite {
@@ -37,11 +35,11 @@ namespace prefabs {
     hai::array<tiledef> m_data { width * height };
   public:
     [[nodiscard]] constexpr const auto & operator()(unsigned x, unsigned y) const {
-      if (x >= width || y >= height) throw error { "out of map bounds"_hs };
+      if (x >= width || y >= height) throw assert_error { "out of map bounds"_hs };
       return m_data[y * width + x];
     }
     [[nodiscard]] constexpr auto & operator()(unsigned x, unsigned y) {
-      if (x >= width || y >= height) throw error { "out of map bounds"_hs };
+      if (x >= width || y >= height) throw assert_error { "out of map bounds"_hs };
       return m_data[y * width + x];
     }
 

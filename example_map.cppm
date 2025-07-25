@@ -5,7 +5,6 @@ import dotz;
 import fox;
 import jute;
 import prefabs;
-import silog;
 
 namespace example_map {
   void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
@@ -33,8 +32,7 @@ namespace example_map {
           .texid = static_cast<fox::texids>(def.entity.texid),
         });
       });
-    } catch (const prefabs::error & e) {
-      silog::log(silog::error, "%s:%d:%d: %s", name.cstr().begin(), e.line, e.col, e.msg.begin());
+    } catch (...) {
     }
   }
 
