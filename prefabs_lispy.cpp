@@ -187,10 +187,6 @@ static void eval(context & ctx, node & n) {
 
     for (auto * c = args; c; c = &*c->next) {
       bool valid = false;
-      if (c->tdef.id.size()) {
-        n.tdef.id = c->tdef.id;
-        valid = true;
-      }
       if (c->tdef.behaviour.size()) {
         n.tdef.behaviour = c->tdef.behaviour;
         valid = true;

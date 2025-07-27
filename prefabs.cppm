@@ -26,7 +26,6 @@ namespace prefabs {
   };
 
   export struct tiledef {
-    jute::heap id {};
     jute::heap behaviour {};
     sprite tile {};
     sprite entity {};
