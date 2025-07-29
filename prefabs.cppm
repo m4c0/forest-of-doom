@@ -27,6 +27,7 @@ namespace prefabs {
 
   export struct tiledef {
     jute::heap behaviour {};
+    jute::heap loottable {};
     sprite tile {};
     sprite entity {};
     dotz::vec4 collision {};

@@ -25,11 +25,14 @@ namespace example_map {
           collision::bodies().add_aabb(aa, bb, 'body', 1);
         }
   
-        if (*def.behaviour == "backpack") backpack::add(fox::sprite {
-          .pos   { dx + x, dy + y },
-          .uv    = def.entity.uv,
-          .size  = def.entity.size,
-          .texid = static_cast<fox::texids>(def.entity.texid),
+        if (*def.behaviour == "backpack") backpack::add({
+          .loot = def.loottable,
+          .sprite = {
+            .pos   { dx + x, dy + y },
+            .uv    = def.entity.uv,
+            .size  = def.entity.size,
+            .texid = static_cast<fox::texids>(def.entity.texid),
+          },
         });
       });
     } catch (...) {

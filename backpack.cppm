@@ -2,17 +2,23 @@ export module backpack;
 import dotz;
 import fox;
 import hai;
+import jute;
 
 namespace backpack {
-  hai::varray<fox::sprite> list { 128 };
+  struct t {
+    jute::heap loot;
+    fox::sprite sprite;
+  };
 
-  export void add(fox::sprite t) {
+  hai::varray<t> list { 128 };
+
+  export void add(t t) {
     list.push_back_doubling(t);
   }
 
   export void load(dotz::vec2 player, fox::memiter * m) {
     // TODO: use tiledef collision
-    for (auto i : list) {
+    for (auto [loot, i] : list) {
       auto c = i.pos + i.size / 2.0;
       if (dotz::length(player - c) < 0.5) i.alpha = 0.6;
       *m += i;
@@ -21,7 +27,7 @@ namespace backpack {
   
   export int open(dotz::vec2 player) {
     for (auto i = 0; i < list.size(); i++) {
-      auto c = list[i].pos + list[i].size / 2.0;
+      auto c = list[i].sprite.pos + list[i].sprite.size / 2.0;
       if (dotz::length(player - c) < 0.5) return i;
     }
     return -1;

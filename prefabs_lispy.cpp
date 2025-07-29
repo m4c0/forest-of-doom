@@ -191,6 +191,10 @@ static void eval(context & ctx, node & n) {
         n.tdef.behaviour = c->tdef.behaviour;
         valid = true;
       }
+      if (c->tdef.loottable.size()) {
+        n.tdef.loottable = c->tdef.loottable;
+        valid = true;
+      }
       if (c->has_tile) {
         n.tdef.tile = c->tdef.tile;
         n.has_tile = true;
@@ -241,6 +245,10 @@ static void eval(context & ctx, node & n) {
     if (ls(n) != 2) n.r->err("behaviour requires a value", n.loc);
     if (!is_atom(*args)) n.r->err("behaviour must be an atom", n.loc);
     n.tdef.behaviour = args->atom;
+  } else if (fn == "loottable") {
+    if (ls(n) != 2) n.r->err("loot table requires a value", n.loc);
+    if (!is_atom(*args)) n.r->err("loot table must be an atom", n.loc);
+    n.tdef.loottable = args->atom;
   } else if (fn == "prefab") {
     if (ls(n) != prefabs::height + 1) n.r->err("incorrect number of rows in prefab", n.loc);
 
