@@ -10,10 +10,13 @@ static constexpr const auto inv_h = 8U;
 
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {-1};
-static dotz::vec2 g_inventory[inv_w * inv_h] {};
+static hai::array<dotz::vec2> g_inventory {};
 
+static constexpr auto idx(dotz::ivec2 p) {
+  return p.y * inv_w + p.x;
+}
 static auto & inv(dotz::ivec2 p) {
-  return g_inventory[p.y * inv_w + p.x];
+  return g_inventory[idx(p)];
 }
 
 static void on_frame(float ms) {
@@ -46,6 +49,11 @@ static void on_frame(float ms) {
 
     for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
       for (p.x = 0; p.x < inv_w; p.x++) {
+        if (idx(p) >= g_inventory.size()) {
+          sp(p * csz + gtl, { 5, 9 });
+          continue;
+        }
+
         auto i = inv(p);
 
         dotz::vec2 uv {};
@@ -60,7 +68,10 @@ static void on_frame(float ms) {
 
     for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
       for (p.x = 0; p.x < inv_w; p.x++) {
+        if (idx(p) >= g_inventory.size()) continue;
+
         auto i = inv(p);
+        // TODO: merge this loop with previous?
         if (!i.x && !i.y) continue;
         *m += {
           .pos   = tl + p * csz + gtl,
@@ -98,11 +109,7 @@ static constexpr auto cursor(int dx, int dy) {
 }
 
 void fod::open_backpack(unsigned id) {
-  for (auto & n: g_inventory) n = {};
-  g_inventory[0] = { 8, 0 };
-  if (id > 0) g_inventory[1] = { 11, 3 };
-  if (id > 1) g_inventory[2] = { 12, 3 };
-  g_inventory[3] = { 12, 2 };
+  g_inventory = backpack::inventory(id);
 
   fod::on_frame = ::on_frame;
   g_cursor = {};

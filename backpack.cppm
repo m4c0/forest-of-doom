@@ -3,6 +3,7 @@ import dotz;
 import fox;
 import hai;
 import jute;
+import silog;
 
 namespace backpack {
   struct t {
@@ -31,5 +32,18 @@ namespace backpack {
       if (dotz::length(player - c) < 0.5) return i;
     }
     return -1;
+  }
+
+  export hai::array<dotz::vec2> inventory(unsigned id) {
+    if (id >= list.size()) silog::die("trying to use invalid backpack %d", id);
+
+    hai::array<dotz::vec2> res { 8 };
+    for (auto & n: res) n = {};
+    res[0] = { 8, 0 };
+    if (id > 0) res[1] = { 11, 3 };
+    if (id > 1) res[2] = { 12, 3 };
+    res[3] = { 12, 2 };
+
+    return res;
   }
 }
