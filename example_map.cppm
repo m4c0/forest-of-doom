@@ -26,7 +26,7 @@ namespace example_map {
         }
   
         if (*def.behaviour == "backpack") backpack::add({
-          .loot = def.loottable,
+          .inv { 8 }, 
           .sprite = {
             .pos   { dx + x, dy + y },
             .uv    = def.entity.uv,

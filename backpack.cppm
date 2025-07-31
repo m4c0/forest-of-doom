@@ -7,7 +7,7 @@ import silog;
 
 namespace backpack {
   struct t {
-    jute::heap loot;
+    hai::array<dotz::vec2> inv {};
     fox::sprite sprite;
   };
 
@@ -19,7 +19,8 @@ namespace backpack {
 
   export void load(dotz::vec2 player, fox::memiter * m) {
     // TODO: use tiledef collision
-    for (auto [loot, i] : list) {
+    for (auto & item : list) {
+      auto i = item.sprite;
       auto c = i.pos + i.size / 2.0;
       if (dotz::length(player - c) < 0.5) i.alpha = 0.6;
       *m += i;
@@ -34,16 +35,8 @@ namespace backpack {
     return -1;
   }
 
-  export hai::array<dotz::vec2> inventory(unsigned id) {
+  export hai::array<dotz::vec2> * inventory(unsigned id) {
     if (id >= list.size()) silog::die("trying to use invalid backpack %d", id);
-
-    hai::array<dotz::vec2> res { 8 };
-    for (auto & n: res) n = {};
-    res[0] = { 8, 0 };
-    if (id > 0) res[1] = { 11, 3 };
-    if (id > 1) res[2] = { 12, 3 };
-    res[3] = { 12, 2 };
-
-    return res;
+    return &list[id].inv;
   }
 }

@@ -10,13 +10,13 @@ static constexpr const auto inv_h = 8U;
 
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {-1};
-static hai::array<dotz::vec2> g_inventory {};
+static hai::array<dotz::vec2> * g_inventory {};
 
 static constexpr auto idx(dotz::ivec2 p) {
   return p.y * inv_w + p.x;
 }
 static auto & inv(dotz::ivec2 p) {
-  return g_inventory[idx(p)];
+  return (*g_inventory)[idx(p)];
 }
 
 static void on_frame(float ms) {
@@ -49,7 +49,7 @@ static void on_frame(float ms) {
 
     for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
       for (p.x = 0; p.x < inv_w; p.x++) {
-        if (idx(p) >= g_inventory.size()) {
+        if (idx(p) >= g_inventory->size()) {
           sp(p * csz + gtl, { 5, 9 });
           continue;
         }
@@ -68,7 +68,7 @@ static void on_frame(float ms) {
 
     for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
       for (p.x = 0; p.x < inv_w; p.x++) {
-        if (idx(p) >= g_inventory.size()) continue;
+        if (idx(p) >= g_inventory->size()) continue;
 
         auto i = inv(p);
         // TODO: merge this loop with previous?
