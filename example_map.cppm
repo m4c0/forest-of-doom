@@ -3,6 +3,7 @@ import backpack;
 import collision;
 import dotz;
 import fox;
+import hai;
 import jute;
 import prefabs;
 
@@ -25,15 +26,25 @@ namespace example_map {
           collision::bodies().add_aabb(aa, bb, 'body', 1);
         }
   
-        if (*def.behaviour == "backpack") backpack::add({
-          .inv { 8 }, 
-          .sprite = {
-            .pos   { dx + x, dy + y },
-            .uv    = def.entity.uv,
-            .size  = def.entity.size,
-            .texid = static_cast<fox::texids>(def.entity.texid),
-          },
-        });
+        if (*def.behaviour == "backpack") {
+          hai::array<dotz::vec2> inv { 8 };
+          if (*def.loottable == "loot0") {
+            inv[0] = { 11, 3 };
+          } else if (*def.loottable == "loot1") {
+            inv[0] = { 13, 3 };
+          } else if (*def.loottable == "loot2") {
+            inv[0] = { 12, 2 };
+          }
+          backpack::add({
+            .inv = traits::move(inv), 
+            .sprite = {
+              .pos   { dx + x, dy + y },
+              .uv    = def.entity.uv,
+              .size  = def.entity.size,
+              .texid = static_cast<fox::texids>(def.entity.texid),
+            },
+          });
+        }
       });
     } catch (...) {
     }
