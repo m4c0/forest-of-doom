@@ -28,11 +28,11 @@ namespace example_map {
   
         if (*def.behaviour == "backpack") {
           hai::array<dotz::vec2> inv { 8 };
-          if (*def.loottable == "loot0") {
+          if (*def.loot == "loot0") {
             inv[0] = { 11, 3 };
-          } else if (*def.loottable == "loot1") {
+          } else if (*def.loot == "loot1") {
             inv[0] = { 13, 3 };
-          } else if (*def.loottable == "loot2") {
+          } else if (*def.loot == "loot2") {
             inv[0] = { 12, 2 };
           }
           backpack::add({
