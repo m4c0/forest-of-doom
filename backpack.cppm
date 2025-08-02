@@ -3,11 +3,13 @@ import dotz;
 import fox;
 import hai;
 import jute;
+import loots;
 import silog;
 
 namespace backpack {
   struct t {
     hai::array<dotz::vec2> inv {};
+    jute::heap loot;
     fox::sprite sprite;
   };
 
@@ -29,8 +31,13 @@ namespace backpack {
   
   export int open(dotz::vec2 player) {
     for (auto i = 0; i < list.size(); i++) {
-      auto c = list[i].sprite.pos + list[i].sprite.size / 2.0;
-      if (dotz::length(player - c) < 0.5) return i;
+      auto & pack = list[i];
+
+      auto c = pack.sprite.pos + pack.sprite.size / 2.0;
+      if (dotz::length(player - c) > 0.5) continue;
+
+      if (pack.inv.size() == 0) pack.inv = loots::load(*pack.loot);
+      return i;
     }
     return -1;
   }

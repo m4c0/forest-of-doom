@@ -3,8 +3,8 @@ import backpack;
 import collision;
 import dotz;
 import fox;
-import hai;
 import jute;
+import loots;
 import prefabs;
 
 namespace example_map {
@@ -27,16 +27,8 @@ namespace example_map {
         }
   
         if (*def.behaviour == "backpack") {
-          hai::array<dotz::vec2> inv { 8 };
-          if (*def.loot == "loot0") {
-            inv[0] = { 11, 3 };
-          } else if (*def.loot == "loot1") {
-            inv[0] = { 13, 3 };
-          } else if (*def.loot == "loot2") {
-            inv[0] = { 12, 2 };
-          }
           backpack::add({
-            .inv = traits::move(inv), 
+            .loot = def.loot,
             .sprite = {
               .pos   { dx + x, dy + y },
               .uv    = def.entity.uv,
