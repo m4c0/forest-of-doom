@@ -88,11 +88,11 @@ struct node {
   jute::view atom {};
   hai::uptr<node> list {};
   hai::uptr<node> next {};
+  const reader * r {};
+  unsigned loc {};
 
   prefabs::tiledef tdef {};
   hai::uptr<prefabs::tilemap> tmap {};
-  const reader * r {};
-  unsigned loc {};
   bool has_entity   : 1;
   bool has_tile     : 1;
   bool has_collider : 1;
