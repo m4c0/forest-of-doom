@@ -87,6 +87,8 @@ static jute::view next_token(reader & r) {
 struct node {
   jute::view atom {};
   hai::uptr<node> list {};
+  hai::uptr<node> next {};
+
   prefabs::tiledef tdef {};
   hai::uptr<prefabs::tilemap> tmap {};
   const reader * r {};
@@ -94,8 +96,6 @@ struct node {
   bool has_entity   : 1;
   bool has_tile     : 1;
   bool has_collider : 1;
-
-  hai::uptr<node> next {};
 };
 
 static node next_list(reader & r) {
