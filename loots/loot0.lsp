@@ -1,0 +1,10 @@
+(def g_box (item 9 0))
+(def r_box (item 10 0))
+(def star (item 11 1))
+(def jar (item 11 2))
+(def pearl (item 12 2))
+(def ball (item 12 3))
+
+(ball)
+(random (g_box) (r_box))
+(random (star) (jar) (pearl))
