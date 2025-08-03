@@ -101,6 +101,8 @@ struct node {
   hai::uptr<data> data {};
 };
 
+[[noreturn]] static void err(const node & n, jute::view msg) { n.r->err(msg, n.loc); }
+
 static node next_list(reader & r) {
   node res {
     .r = &r,
@@ -150,19 +152,19 @@ static auto ls(const node & n) {
 }
 
 static float to_f(const node & n) {
-  if (!is_atom(n)) n.r->err("non-numerical coordinate", n.loc);
+  if (!is_atom(n)) err(n, "non-numerical coordinate");
   try {
     return jute::to_f(n.atom);
   } catch (...) {
-    n.r->err("invalid number", n.loc);
+    err(n, "invalid number");
   }
 }
 static int to_i(const node & n) {
-  if (!is_atom(n)) n.r->err("non-numerical coordinate", n.loc);
+  if (!is_atom(n)) err(n, "non-numerical coordinate");
   try {
     return jute::to_u32(n.atom);
   } catch (...) {
-    n.r->err("invalid number", n.loc);
+    err(n, "invalid number");
   }
 }
 
@@ -172,14 +174,14 @@ struct context {
 // TODO: return a copy and make "n" const
 static void eval(context & ctx, node & n) {
   if (!n.list) return;
-  if (!is_atom(*n.list)) n.r->err("expecting an atom", n.list->loc);
+  if (!is_atom(*n.list)) err(*n.list, "expecting an atom");
 
   auto fn = n.list->atom;
   auto args = &*n.list->next;
 
   if (fn == "def") {
-    if (ls(n) != 3) n.r->err("def requires a name and a value");
-    if (!is_atom(*args)) n.r->err("def name must be an atom");
+    if (ls(n) != 3) err(n, "def requires a name and a value");
+    if (!is_atom(*args)) err(*args, "def name must be an atom");
     ctx.defs[args->atom] = traits::move(*args->next.release());
     return;
   }
@@ -187,7 +189,7 @@ static void eval(context & ctx, node & n) {
   for (auto nn = &*n.list; nn; nn = &*nn->next) eval(ctx, *nn);
   
   if (fn == "tiledef") {
-    if (ls(n) < 2) n.r->err("tiledef must have at least name", n.loc);
+    if (ls(n) < 2) err(n, "tiledef must have at least name");
 
     n.data.reset(new data {});
     for (auto * c = args; c; c = &*c->next) {
@@ -215,10 +217,10 @@ static void eval(context & ctx, node & n) {
         n.data->has_collider = true;
         valid = true;
       }
-      if (!valid) n.r->err("invalid element in tiledef", c->loc);
+      if (!valid) err(*c, "invalid element in tiledef");
     }
   } else if (fn == "tile") {
-    if (ls(n) != 6) n.r->err("tile should have uv, size and texid", n.loc);
+    if (ls(n) != 6) err(n, "tile should have uv, size and texid");
 
     n.data.reset(new data {});
     auto & t = n.data->tdef.tile;
@@ -229,7 +231,7 @@ static void eval(context & ctx, node & n) {
     t.texid  = to_i(*(args = &*args->next));
     n.data->has_tile = true;
   } else if (fn == "entity") {
-    if (ls(n) != 6) n.r->err("entity should have uv, size and texid", n.loc);
+    if (ls(n) != 6) err(n, "entity should have uv, size and texid");
 
     n.data.reset(new data {});
     auto & t = n.data->tdef.entity;
@@ -240,7 +242,7 @@ static void eval(context & ctx, node & n) {
     t.texid  = to_i(*(args = &*args->next));
     n.data->has_entity = true;
   } else if (fn == "collision") {
-    if (ls(n) != 5) n.r->err("collision should have pos and size", n.loc);
+    if (ls(n) != 5) err(n, "collision should have pos and size");
 
     n.data.reset(new data {});
     auto & c = n.data->tdef.collision;
@@ -250,25 +252,25 @@ static void eval(context & ctx, node & n) {
     c.w = to_f(*(args = &*args->next));
     n.data->has_collider = true;
   } else if (fn == "behaviour") {
-    if (ls(n) != 2) n.r->err("behaviour requires a value", n.loc);
-    if (!is_atom(*args)) n.r->err("behaviour must be an atom", n.loc);
+    if (ls(n) != 2) err(n, "behaviour requires a value");
+    if (!is_atom(*args)) err(n, "behaviour must be an atom");
     n.data.reset(new data {});
     n.data->tdef.behaviour = args->atom;
   } else if (fn == "loot") {
-    if (ls(n) != 2) n.r->err("loot table requires a value", n.loc);
-    if (!is_atom(*args)) n.r->err("loot table must be an atom", n.loc);
+    if (ls(n) != 2) err(n, "loot table requires a value");
+    if (!is_atom(*args)) err(n, "loot table must be an atom");
     n.data.reset(new data {});
     n.data->tdef.loot = args->atom;
   } else if (fn == "prefab") {
-    if (ls(n) != prefabs::height + 1) n.r->err("incorrect number of rows in prefab", n.loc);
+    if (ls(n) != prefabs::height + 1) err(n, "incorrect number of rows in prefab");
 
     n.data.reset(new data {});
     n.data->tmap.reset(new prefabs::tilemap {});
     auto & map = *n.data->tmap;
     auto i = 0;
     for (auto * c = args; c; c = &*c->next, i++) {
-      if (!is_atom(*c)) n.r->err("rows in prefabs must be atoms", c->loc);
-      if (c->atom.size() != prefabs::width) n.r->err("incorrect number of symbols in prefab", c->loc);
+      if (!is_atom(*c)) err(*c, "rows in prefabs must be atoms");
+      if (c->atom.size() != prefabs::width) err(*c, "incorrect number of symbols in prefab");
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
         if (!ctx.defs.has(id)) n.r->err("unknown tiledef", c->loc + x);
@@ -280,7 +282,7 @@ static void eval(context & ctx, node & n) {
       }
     }
   } else if (fn == "random") {
-    if (ls(n) == 0) n.r->err("rand requires at least a parameter");
+    if (ls(n) == 0) err(n, "rand requires at least a parameter");
     int r = rng::rand(ls(n) - 1);
     for (auto i = 0; i < r; i++) args = &*args->next;
     // TODO: return the entire thing
@@ -305,7 +307,7 @@ static void eval(context & ctx, node & n) {
       n.data->has_collider = c.data->has_collider;
     }
   } else {
-    n.r->err(*("invalid function name: "_hs + fn), n.loc);
+    err(n, *("invalid function name: "_hs + fn));
   }
 }
 
