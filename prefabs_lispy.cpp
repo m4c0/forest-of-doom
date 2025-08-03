@@ -156,7 +156,7 @@ static bool is_atom(const node * n) { return n->atom.size(); }
 
 static auto ls(const node * n) {
   unsigned sz = 0;
-  for (auto nn = &*n->list; nn; nn = &*nn->next) sz++;
+  for (auto nn = n->list; nn; nn = nn->next) sz++;
   return sz;
 }
 
@@ -186,7 +186,7 @@ static void eval(context & ctx, node * n) {
   if (!is_atom(n->list)) err(*n->list, "expecting an atom");
 
   auto fn = n->list->atom;
-  auto args = &*n->list->next;
+  auto args = n->list->next;
 
   if (fn == "def") {
     if (ls(n) != 3) err(n, "def requires a name and a value");
@@ -195,13 +195,13 @@ static void eval(context & ctx, node * n) {
     return;
   }
 
-  for (auto nn = &*n->list; nn; nn = &*nn->next) eval(ctx, nn);
+  for (auto nn = n->list; nn; nn = nn->next) eval(ctx, nn);
   
   if (fn == "tiledef") {
     if (ls(n) < 2) err(n, "tiledef must have at least name");
 
     auto * nn = static_cast<tdef_node *>(n);
-    for (auto * c = args; c; c = &*c->next) {
+    for (auto * c = args; c; c = c->next) {
       auto * cc = static_cast<tdef_node *>(c);
       bool valid = false;
       if (cc->tdef.behaviour.size()) {
@@ -235,10 +235,10 @@ static void eval(context & ctx, node * n) {
     auto * nn = static_cast<tdef_node *>(n);
     auto & t = nn->tdef.tile;
     t.uv.x   = to_i(args);
-    t.uv.y   = to_i((args = &*args->next));
-    t.size.x = to_i((args = &*args->next));
-    t.size.y = to_i((args = &*args->next));
-    t.texid  = to_i((args = &*args->next));
+    t.uv.y   = to_i((args = args->next));
+    t.size.x = to_i((args = args->next));
+    t.size.y = to_i((args = args->next));
+    t.texid  = to_i((args = args->next));
     nn->has_tile = true;
   } else if (fn == "entity") {
     if (ls(n) != 6) err(n, "entity should have uv, size and texid");
@@ -246,10 +246,10 @@ static void eval(context & ctx, node * n) {
     auto * nn = static_cast<tdef_node *>(n);
     auto & t = nn->tdef.entity;
     t.uv.x   = to_i(args);
-    t.uv.y   = to_i((args = &*args->next));
-    t.size.x = to_i((args = &*args->next));
-    t.size.y = to_i((args = &*args->next));
-    t.texid  = to_i((args = &*args->next));
+    t.uv.y   = to_i((args = args->next));
+    t.size.x = to_i((args = args->next));
+    t.size.y = to_i((args = args->next));
+    t.texid  = to_i((args = args->next));
     nn->has_entity = true;
   } else if (fn == "collision") {
     if (ls(n) != 5) err(n, "collision should have pos and size");
@@ -257,9 +257,9 @@ static void eval(context & ctx, node * n) {
     auto * nn = static_cast<tdef_node *>(n);
     auto & c = nn->tdef.collision;
     c.x = to_f(args);
-    c.y = to_f((args = &*args->next));
-    c.z = to_f((args = &*args->next));
-    c.w = to_f((args = &*args->next));
+    c.y = to_f((args = args->next));
+    c.z = to_f((args = args->next));
+    c.w = to_f((args = args->next));
     nn->has_collider = true;
   } else if (fn == "behaviour") {
     if (ls(n) != 2) err(n, "behaviour requires a value");
@@ -278,7 +278,7 @@ static void eval(context & ctx, node * n) {
     nn->tmap.reset(new prefabs::tilemap {});
     auto & map = *nn->tmap;
     auto i = 0;
-    for (auto * c = args; c; c = &*c->next, i++) {
+    for (auto * c = args; c; c = c->next, i++) {
       if (!is_atom(c)) err(*c, "rows in prefabs must be atoms");
       if (c->atom.size() != prefabs::width) err(*c, "incorrect number of symbols in prefab");
       for (auto x = 0; x < c->atom.size(); x++) {
@@ -293,7 +293,7 @@ static void eval(context & ctx, node * n) {
   } else if (fn == "random") {
     if (ls(n) == 0) err(n, "rand requires at least a parameter");
     int r = rng::rand(ls(n) - 1);
-    for (auto i = 0; i < r; i++) args = &*args->next;
+    for (auto i = 0; i < r; i++) args = args->next;
     // TODO: return the entire thing
     auto * nn = static_cast<tdef_node *>(n);
     auto * aa = static_cast<tdef_node *>(args);
