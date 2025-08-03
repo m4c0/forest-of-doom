@@ -152,7 +152,7 @@ static node * next_node(reader & r) {
   }
 }
 
-static bool is_atom(const node & n) { return n.atom.size(); }
+static bool is_atom(const node * n) { return n->atom.size(); }
 
 static auto ls(const node * n) {
   unsigned sz = 0;
@@ -160,18 +160,18 @@ static auto ls(const node * n) {
   return sz;
 }
 
-static float to_f(const node & n) {
+static float to_f(const node * n) {
   if (!is_atom(n)) err(n, "non-numerical coordinate");
   try {
-    return jute::to_f(n.atom);
+    return jute::to_f(n->atom);
   } catch (...) {
     err(n, "invalid number");
   }
 }
-static int to_i(const node & n) {
+static int to_i(const node * n) {
   if (!is_atom(n)) err(n, "non-numerical coordinate");
   try {
-    return jute::to_u32(n.atom);
+    return jute::to_u32(n->atom);
   } catch (...) {
     err(n, "invalid number");
   }
@@ -183,14 +183,14 @@ struct context {
 // TODO: return a copy and make "n" const
 static void eval(context & ctx, node * n) {
   if (!n->list) return;
-  if (!is_atom(*n->list)) err(*n->list, "expecting an atom");
+  if (!is_atom(n->list)) err(*n->list, "expecting an atom");
 
   auto fn = n->list->atom;
   auto args = &*n->list->next;
 
   if (fn == "def") {
     if (ls(n) != 3) err(n, "def requires a name and a value");
-    if (!is_atom(*args)) err(*args, "def name must be an atom");
+    if (!is_atom(args)) err(*args, "def name must be an atom");
     ctx.defs[args->atom] = args->next;
     return;
   }
@@ -234,41 +234,41 @@ static void eval(context & ctx, node * n) {
 
     auto * nn = static_cast<tdef_node *>(n);
     auto & t = nn->tdef.tile;
-    t.uv.x   = to_i(*args);
-    t.uv.y   = to_i(*(args = &*args->next));
-    t.size.x = to_i(*(args = &*args->next));
-    t.size.y = to_i(*(args = &*args->next));
-    t.texid  = to_i(*(args = &*args->next));
+    t.uv.x   = to_i(args);
+    t.uv.y   = to_i((args = &*args->next));
+    t.size.x = to_i((args = &*args->next));
+    t.size.y = to_i((args = &*args->next));
+    t.texid  = to_i((args = &*args->next));
     nn->has_tile = true;
   } else if (fn == "entity") {
     if (ls(n) != 6) err(n, "entity should have uv, size and texid");
 
     auto * nn = static_cast<tdef_node *>(n);
     auto & t = nn->tdef.entity;
-    t.uv.x   = to_i(*args);
-    t.uv.y   = to_i(*(args = &*args->next));
-    t.size.x = to_i(*(args = &*args->next));
-    t.size.y = to_i(*(args = &*args->next));
-    t.texid  = to_i(*(args = &*args->next));
+    t.uv.x   = to_i(args);
+    t.uv.y   = to_i((args = &*args->next));
+    t.size.x = to_i((args = &*args->next));
+    t.size.y = to_i((args = &*args->next));
+    t.texid  = to_i((args = &*args->next));
     nn->has_entity = true;
   } else if (fn == "collision") {
     if (ls(n) != 5) err(n, "collision should have pos and size");
 
     auto * nn = static_cast<tdef_node *>(n);
     auto & c = nn->tdef.collision;
-    c.x = to_f(*args);
-    c.y = to_f(*(args = &*args->next));
-    c.z = to_f(*(args = &*args->next));
-    c.w = to_f(*(args = &*args->next));
+    c.x = to_f(args);
+    c.y = to_f((args = &*args->next));
+    c.z = to_f((args = &*args->next));
+    c.w = to_f((args = &*args->next));
     nn->has_collider = true;
   } else if (fn == "behaviour") {
     if (ls(n) != 2) err(n, "behaviour requires a value");
-    if (!is_atom(*args)) err(n, "behaviour must be an atom");
+    if (!is_atom(args)) err(n, "behaviour must be an atom");
     auto * nn = static_cast<tdef_node *>(n);
     nn->tdef.behaviour = args->atom;
   } else if (fn == "loot") {
     if (ls(n) != 2) err(n, "loot table requires a value");
-    if (!is_atom(*args)) err(n, "loot table must be an atom");
+    if (!is_atom(args)) err(n, "loot table must be an atom");
     auto * nn = static_cast<tdef_node *>(n);
     nn->tdef.loot = args->atom;
   } else if (fn == "prefab") {
@@ -279,7 +279,7 @@ static void eval(context & ctx, node * n) {
     auto & map = *nn->tmap;
     auto i = 0;
     for (auto * c = args; c; c = &*c->next, i++) {
-      if (!is_atom(*c)) err(*c, "rows in prefabs must be atoms");
+      if (!is_atom(c)) err(*c, "rows in prefabs must be atoms");
       if (c->atom.size() != prefabs::width) err(*c, "incorrect number of symbols in prefab");
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
