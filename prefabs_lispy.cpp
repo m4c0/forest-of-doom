@@ -94,40 +94,42 @@ struct data {
 
 struct node {
   jute::view atom {};
-  hai::uptr<node> list {};
-  hai::uptr<node> next {};
+  node * list {};
+  node * next {};
   const reader * r {};
   unsigned loc {};
   hai::uptr<data> data {};
+
+  void * operator new(traits::size_t n);
 };
 
 [[noreturn]] static void err(const node & n, jute::view msg) { n.r->err(msg, n.loc); }
 [[noreturn]] static void err(const node * n, jute::view msg) { n->r->err(msg, n->loc); }
 
-static node next_list(reader & r) {
-  node res {
+static node * next_list(reader & r) {
+  auto * res = new node {
     .r = &r,
     .loc = r.loc(),
   };
-  auto * n = &res.list;
+  auto * n = &res->list;
   while (r) {
     auto token = next_token(r);
     if (token == ")") return res;
     if (token == "") break;
 
     auto nn = (token == "(") ?
-      new node { next_list(r) } :
+      next_list(r) :
       new node {
         .atom = token,
         .r = &r,
         .loc = static_cast<unsigned>(r.loc() - token.size()),
       };
-    n->reset(nn);
+    *n = nn;
     n = &((*n)->next);
   }
   err(res, "unbalanced open parenthesis");
 }
-static node next_node(reader & r) {
+static node * next_node(reader & r) {
   if (!r) return {};
 
   auto token = next_token(r);
@@ -136,7 +138,7 @@ static node next_node(reader & r) {
   } else if (token == ")") {
     r.err("unbalanced close parenthesis");
   } else {
-    return { 
+    return new node { 
       .atom = token,
       .r = &r,
       .loc = static_cast<unsigned>(r.loc() - token.size()),
@@ -170,7 +172,7 @@ static int to_i(const node & n) {
 }
 
 struct context {
-  hashley::fin<node> defs { 127 };
+  hashley::fin<node *> defs { 127 };
 };
 // TODO: return a copy and make "n" const
 static void eval(context & ctx, node * n) {
@@ -183,7 +185,7 @@ static void eval(context & ctx, node * n) {
   if (fn == "def") {
     if (ls(n) != 3) err(n, "def requires a name and a value");
     if (!is_atom(*args)) err(*args, "def name must be an atom");
-    ctx.defs[args->atom] = traits::move(*args->next.release());
+    ctx.defs[args->atom] = args->next;
     return;
   }
 
@@ -275,11 +277,11 @@ static void eval(context & ctx, node * n) {
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
         if (!ctx.defs.has(id)) n->r->err("unknown tiledef", c->loc + x);
-        auto & cid = ctx.defs[id];
-        eval(ctx, &cid);
+        auto cid = ctx.defs[id];
+        eval(ctx, cid);
         // TODO: validate tiledef
-        if (!cid.data) n->r->err("def cannot be used as tiledef", c->loc + x);
-        map(x, i) = cid.data->tdef;
+        if (!cid->data) n->r->err("def cannot be used as tiledef", c->loc + x);
+        map(x, i) = cid->data->tdef;
       }
     }
   } else if (fn == "random") {
@@ -296,16 +298,16 @@ static void eval(context & ctx, node * n) {
       n->data->has_collider = args->data->has_collider;
     }
   } else if (ctx.defs.has(fn)) {
-    auto & c = ctx.defs[fn];
-    eval(ctx, &c);
+    auto c = ctx.defs[fn];
+    eval(ctx, c);
     // TODO: return the entire thing
-    n->atom = c.atom;
-    if (c.data) {
+    n->atom = c->atom;
+    if (c->data) {
       n->data.reset(new data {});
-      n->data->tdef = c.data->tdef;
-      n->data->has_tile = c.data->has_tile;
-      n->data->has_entity = c.data->has_entity;
-      n->data->has_collider = c.data->has_collider;
+      n->data->tdef = c->data->tdef;
+      n->data->has_tile = c->data->has_tile;
+      n->data->has_entity = c->data->has_entity;
+      n->data->has_collider = c->data->has_collider;
     }
   } else {
     err(n, *("invalid function name: "_hs + fn));
@@ -315,19 +317,26 @@ static void eval(context & ctx, node * n) {
 // TODO: eviction rules
 hashley::fin<prefabs::tilemap> g_cache { 127 };
 
+static hai::chain<node> g_instances {};
+void * node::operator new(traits::size_t sz) {
+  g_instances.push_back({});
+  return &g_instances.seek(g_instances.size() - 1);
+}
+
 const prefabs::tilemap * prefabs::parse(jute::view filename) {
   if (g_cache.has(filename)) return &g_cache[filename];
 
   auto code = jojo::read_cstr(filename);
 
+  g_instances = { 1024 };
   context ctx {};
   reader r { code };
   hai::uptr<prefabs::tilemap> prefab {};
 
   while (r) {
     auto n = next_node(r);
-    eval(ctx, &n);
-    if (n.data && n.data->tmap) prefab = traits::move(n.data->tmap);
+    eval(ctx, n);
+    if (n->data && n->data->tmap) prefab = traits::move(n->data->tmap);
   }
   if (!prefab) return nullptr;
 
