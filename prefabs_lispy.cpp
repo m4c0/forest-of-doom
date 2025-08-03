@@ -124,7 +124,7 @@ static node next_list(reader & r) {
     n->reset(nn);
     n = &((*n)->next);
   }
-  r.err("unbalanced open parenthesis");
+  err(res, "unbalanced open parenthesis");
 }
 static node next_node(reader & r) {
   if (!r) return {};
