@@ -50,7 +50,7 @@
     (road-center)
     (collision 0 0.7 1 0.4)
     (behaviour backpack)
-    (loot (random loot0 loot1 loot2))))
+    (loot loot0)))
 
 (def 1 (tiledef (backpack) (entity 16 34 1 2 (camping))))
 (def 2 (tiledef (backpack) (entity 17 34 1 2 (camping))))
