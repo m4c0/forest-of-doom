@@ -11,7 +11,10 @@ int main() {
     if (!(*fn).ends_with(".lsp")) continue;
     try {
       auto prefab = prefabs::parse(*fn);
-      if (!prefab) errln(fn, ": missing prefab definition");
+      if (!prefab) {
+        errln(fn, ": missing prefab definition");
+        result = 1;
+      }
     } catch (const prefabs::parser_error & e) {
       errln(fn, ":", e.line, ":", e.col, ": ", e.msg);
       result = 1;
