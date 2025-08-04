@@ -228,8 +228,6 @@ void * node::operator new(traits::size_t sz) {
 const prefabs::tilemap * prefabs::parse(jute::view filename) {
   if (g_cache.has(filename)) return &*g_cache[filename];
 
-  auto code = jojo::read_cstr(filename);
-
   g_instances = new tdef_node[10240] {};
   g_cur_instance = g_instances;
 
@@ -343,9 +341,10 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     return nn;
   };
 
-  reader r { code };
   const tdef_node * prefab {};
 
+  auto code = jojo::read_cstr(filename);
+  reader r { code };
   while (r) {
     auto n = static_cast<const tdef_node *>(eval(ctx, next_node(r)));
     if (n->tmap) prefab = n;
