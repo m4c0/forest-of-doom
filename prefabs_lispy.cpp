@@ -343,10 +343,8 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
 }
 const prefabs::tilemap * prefabs::load(jute::view filename) {
   try {
-    silog::log(silog::debug, "before");
     auto prefab = parse(sires::real_path_name(filename)); 
     if (!prefab) silog::die("missing prefab definition");
-    silog::log(silog::debug, "used %d lisp node instances", static_cast<unsigned>(g_cur_instance - g_instances));
     return prefab;
   } catch (const prefabs::parser_error & e) {
     silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
