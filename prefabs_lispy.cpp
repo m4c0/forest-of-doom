@@ -92,10 +92,10 @@ struct data {
   bool has_collider : 1;
 };
 
-struct node : no::no {
+struct node : no::move {
   jute::view atom {};
-  node * list {};
-  node * next {};
+  const node * list {};
+  const node * next {};
   const reader * r {};
   unsigned loc {};
 
@@ -103,7 +103,7 @@ struct node : no::no {
 };
 struct tdef_node : node {
   prefabs::tiledef tdef {};
-  hai::uptr<prefabs::tilemap> tmap {};
+  hai::sptr<prefabs::tilemap> tmap {};
   bool has_entity   : 1;
   bool has_tile     : 1;
   bool has_collider : 1;
@@ -131,7 +131,7 @@ static node * next_list(reader & r) {
         .loc = static_cast<unsigned>(r.loc() - token.size()),
       };
     *n = nn;
-    n = &((*n)->next);
+    n = &(nn->next);
   }
   err(res, "unbalanced open parenthesis");
 }
@@ -178,31 +178,34 @@ static int to_i(const node * n) {
 }
 
 struct context {
-  hashley::fin<node *> defs { 127 };
+  hashley::fin<const node *> defs { 127 };
 };
-// TODO: return a copy and make "n" const
-static void eval(context & ctx, node * n) {
-  if (!n->list) return;
+[[nodiscard]] static const node * eval(context & ctx, const node * n) {
+  if (!n->list) return n;
   if (!is_atom(n->list)) err(*n->list, "expecting an atom");
 
   auto fn = n->list->atom;
-  auto args = n->list->next;
 
   if (fn == "def") {
     if (ls(n) != 3) err(n, "def requires a name and a value");
+
+    auto args = n->list->next;
     if (!is_atom(args)) err(*args, "def name must be an atom");
     ctx.defs[args->atom] = args->next;
-    return;
+    return args->next;
   }
 
-  for (auto nn = n->list; nn; nn = nn->next) eval(ctx, nn);
+  const node * aa[128] {};
+  if (ls(n) >= 127) err(n, "too many parameters");
+  auto ap = aa;
+  for (auto nn = n->list->next; nn; nn = nn->next) *ap++ = eval(ctx, nn);
   
   if (fn == "tiledef") {
     if (ls(n) < 2) err(n, "tiledef must have at least name");
 
-    auto * nn = static_cast<tdef_node *>(n);
-    for (auto * c = args; c; c = c->next) {
-      auto * cc = static_cast<tdef_node *>(c);
+    auto * nn = new tdef_node { *n };
+    for (auto * c = aa; *c; c++) {
+      auto * cc = static_cast<const tdef_node *>(*c);
       bool valid = false;
       if (cc->tdef.behaviour.size()) {
         nn->tdef.behaviour = cc->tdef.behaviour;
@@ -229,96 +232,85 @@ static void eval(context & ctx, node * n) {
       }
       if (!valid) err(*c, "invalid element in tiledef");
     }
+    return nn;
   } else if (fn == "tile") {
     if (ls(n) != 6) err(n, "tile should have uv, size and texid");
 
-    auto * nn = static_cast<tdef_node *>(n);
+    auto * nn = new tdef_node { *n };
     auto & t = nn->tdef.tile;
-    t.uv.x   = to_i(args);
-    t.uv.y   = to_i((args = args->next));
-    t.size.x = to_i((args = args->next));
-    t.size.y = to_i((args = args->next));
-    t.texid  = to_i((args = args->next));
+    t.uv.x   = to_i(aa[0]);
+    t.uv.y   = to_i(aa[1]);
+    t.size.x = to_i(aa[2]);
+    t.size.y = to_i(aa[3]);
+    t.texid  = to_i(aa[4]);
     nn->has_tile = true;
+    return nn;
   } else if (fn == "entity") {
     if (ls(n) != 6) err(n, "entity should have uv, size and texid");
 
-    auto * nn = static_cast<tdef_node *>(n);
+    auto * nn = new tdef_node { *n };
     auto & t = nn->tdef.entity;
-    t.uv.x   = to_i(args);
-    t.uv.y   = to_i((args = args->next));
-    t.size.x = to_i((args = args->next));
-    t.size.y = to_i((args = args->next));
-    t.texid  = to_i((args = args->next));
+    t.uv.x   = to_i(aa[0]);
+    t.uv.y   = to_i(aa[1]);
+    t.size.x = to_i(aa[2]);
+    t.size.y = to_i(aa[3]);
+    t.texid  = to_i(aa[4]);
     nn->has_entity = true;
+    return nn;
   } else if (fn == "collision") {
     if (ls(n) != 5) err(n, "collision should have pos and size");
 
-    auto * nn = static_cast<tdef_node *>(n);
+    auto * nn = new tdef_node { *n };
     auto & c = nn->tdef.collision;
-    c.x = to_f(args);
-    c.y = to_f((args = args->next));
-    c.z = to_f((args = args->next));
-    c.w = to_f((args = args->next));
+    c.x = to_f(aa[0]);
+    c.y = to_f(aa[1]);
+    c.z = to_f(aa[2]);
+    c.w = to_f(aa[3]);
     nn->has_collider = true;
+    return nn;
   } else if (fn == "behaviour") {
     if (ls(n) != 2) err(n, "behaviour requires a value");
-    if (!is_atom(args)) err(n, "behaviour must be an atom");
-    auto * nn = static_cast<tdef_node *>(n);
-    nn->tdef.behaviour = args->atom;
+    if (!is_atom(aa[0])) err(n, "behaviour must be an atom");
+    auto * nn = new tdef_node { *n };
+    nn->tdef.behaviour = aa[0]->atom;
+    return nn;
   } else if (fn == "loot") {
     if (ls(n) != 2) err(n, "loot table requires a value");
-    if (!is_atom(args)) err(n, "loot table must be an atom");
-    auto * nn = static_cast<tdef_node *>(n);
-    nn->tdef.loot = args->atom;
+    if (!is_atom(aa[0])) err(n, "loot table must be an atom");
+    auto * nn = new tdef_node { *n };
+    nn->tdef.loot = aa[0]->atom;
+    return nn;
   } else if (fn == "prefab") {
     if (ls(n) != prefabs::height + 1) err(n, "incorrect number of rows in prefab");
 
-    auto * nn = static_cast<tdef_node *>(n);
-    nn->tmap.reset(new prefabs::tilemap {});
+    auto * nn = new tdef_node { *n };
+    nn->tmap = hai::sptr { new prefabs::tilemap {} };
     auto & map = *nn->tmap;
-    auto i = 0;
-    for (auto * c = args; c; c = c->next, i++) {
+    for (auto i = 0; aa[i]; i++) {
+      auto c = aa[i];
       if (!is_atom(c)) err(*c, "rows in prefabs must be atoms");
       if (c->atom.size() != prefabs::width) err(*c, "incorrect number of symbols in prefab");
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
         if (!ctx.defs.has(id)) n->r->err("unknown tiledef", c->loc + x);
-        auto cid = static_cast<tdef_node *>(ctx.defs[id]);
-        eval(ctx, cid);
+        auto cid = static_cast<const tdef_node *>(eval(ctx, ctx.defs[id]));
         // TODO: validate tiledef
         map(x, i) = cid->tdef;
       }
     }
+    return nn;
   } else if (fn == "random") {
     if (ls(n) == 0) err(n, "rand requires at least a parameter");
-    int r = rng::rand(ls(n) - 1);
-    for (auto i = 0; i < r; i++) args = args->next;
-    // TODO: return the entire thing
-    auto * nn = static_cast<tdef_node *>(n);
-    auto * aa = static_cast<tdef_node *>(args);
-    nn->atom = aa->atom;
-    nn->tdef = aa->tdef;
-    nn->has_tile = aa->has_tile;
-    nn->has_entity = aa->has_entity;
-    nn->has_collider = aa->has_collider;
+    return aa[rng::rand(ls(n) - 1)];
   } else if (ctx.defs.has(fn)) {
-    auto c = static_cast<tdef_node *>(ctx.defs[fn]);
-    eval(ctx, c);
-    // TODO: return the entire thing
-    auto * nn = static_cast<tdef_node *>(n);
-    nn->atom = c->atom;
-    nn->tdef = c->tdef;
-    nn->has_tile = c->has_tile;
-    nn->has_entity = c->has_entity;
-    nn->has_collider = c->has_collider;
+    return eval(ctx, ctx.defs[fn]);
   } else {
     err(n, *("invalid function name: "_hs + fn));
   }
 }
 
 // TODO: eviction rules
-hashley::fin<prefabs::tilemap> g_cache { 127 };
+hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
 
 static tdef_node * g_instances {};
 static tdef_node * g_cur_instance;
@@ -328,7 +320,7 @@ void * node::operator new(traits::size_t sz) {
 }
 
 const prefabs::tilemap * prefabs::parse(jute::view filename) {
-  if (g_cache.has(filename)) return &g_cache[filename];
+  if (g_cache.has(filename)) return &*g_cache[filename];
 
   auto code = jojo::read_cstr(filename);
 
@@ -336,23 +328,23 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   g_cur_instance = g_instances;
   context ctx {};
   reader r { code };
-  hai::uptr<prefabs::tilemap> prefab {};
+  const tdef_node * prefab {};
 
   while (r) {
-    auto n = static_cast<tdef_node *>(next_node(r));
-    eval(ctx, n);
-    if (n->tmap) prefab = traits::move(n->tmap);
+    auto n = static_cast<const tdef_node *>(eval(ctx, next_node(r)));
+    if (n->tmap) prefab = n;
   }
   if (!prefab) return nullptr;
 
-  g_cache[filename] = traits::move(*prefab.release());
-  return &g_cache[filename];
+  g_cache[filename] = prefab->tmap;
+  return &*g_cache[filename];
 }
 const prefabs::tilemap * prefabs::load(jute::view filename) {
   try {
+    silog::log(silog::debug, "before");
     auto prefab = parse(sires::real_path_name(filename)); 
     if (!prefab) silog::die("missing prefab definition");
-    //silog::log(silog::debug, "used %d lisp node instances", static_cast<unsigned>(g_cur_instance - g_instances));
+    silog::log(silog::debug, "used %d lisp node instances", static_cast<unsigned>(g_cur_instance - g_instances));
     return prefab;
   } catch (const prefabs::parser_error & e) {
     silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
