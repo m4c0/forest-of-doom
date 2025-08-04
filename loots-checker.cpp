@@ -1,5 +1,6 @@
 #pragma leco test
 import jute;
+import lispy;
 import pprent;
 import loots;
 import print;
@@ -15,8 +16,8 @@ int main() {
         errln(fn, ": missing items");
         result = 1;
       }
-    } catch (...) {
-      errln(fn, ": failed to check");
+    } catch (const lispy::parser_error & e) {
+      errln(fn, ":", e.line, ":", e.col, ": ", e.msg);
       result = 1;
     }
   }
