@@ -159,7 +159,7 @@ const prefabs::tilemap * prefabs::load(jute::view filename) {
     auto prefab = parse(sires::real_path_name(filename)); 
     if (!prefab) silog::die("missing prefab definition");
     return prefab;
-  } catch (const prefabs::parser_error & e) {
+  } catch (const parser_error & e) {
     silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
     throw;
   }

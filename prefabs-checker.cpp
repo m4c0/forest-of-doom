@@ -1,5 +1,6 @@
 #pragma leco test
 import jute;
+import lispy;
 import pprent;
 import prefabs;
 import print;
@@ -15,7 +16,7 @@ int main() {
         errln(fn, ": missing prefab definition");
         result = 1;
       }
-    } catch (const prefabs::parser_error & e) {
+    } catch (const lispy::parser_error & e) {
       errln(fn, ":", e.line, ":", e.col, ": ", e.msg);
       result = 1;
     }
