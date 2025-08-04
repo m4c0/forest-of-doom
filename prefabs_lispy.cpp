@@ -3,147 +3,14 @@ import hai;
 import hashley;
 import jojo;
 import jute;
+import lispy;
 import no;
 import rng;
 import silog;
 import sires;
 
 using namespace jute::literals;
-
-class reader : no::no {
-  jute::view m_data;
-  unsigned m_pos {};
-
-public:
-  explicit reader(jute::view data) : m_data { data } {}
-
-  explicit operator bool() const {
-    return m_pos < m_data.size();
-  }
-
-  unsigned loc() const { return m_pos; }
-  const char * mark() const { return m_data.begin() + m_pos; }
-
-  char peek() {
-    if (m_pos >= m_data.size()) return 0;
-    return m_data[m_pos];
-  }
-  char take() {
-    if (m_pos >= m_data.size()) return 0;
-    return m_data[m_pos++];
-  }
-
-  [[noreturn]] void err(jute::view msg, unsigned loc) const {
-    unsigned l = 1;
-    unsigned last = 0;
-    for (auto i = 0; i < loc; i++) {
-      if (m_data[i] == '\n') {
-        last = i;
-        l++;
-      }
-    }
-    throw prefabs::parser_error { msg, l, loc - last };
-  }
-  [[noreturn]] void err(jute::view msg) const {
-    err(msg, m_pos);
-  }
-
-  jute::view token(const char * start) const {
-    return { start, static_cast<unsigned>(mark() - start) };
-  }
-};
-
-static bool is_atom_char(char c) {
-  return c > ' ' && c <= '~' && c != ';' && c != '(' && c != ')';
-}
-static jute::view next_atom_token(const char * start, reader & r) {
-  while (is_atom_char(r.peek())) r.take();
-  return r.token(start);
-}
-static void comment(reader & r) {
-  while (r && r.take() != '\n') continue;
-}
-static jute::view next_token(reader & r) {
-  while (r) {
-    auto start = r.mark();
-    switch (char c = r.take()) {
-      case '\n':
-      case '\r':
-      case '\t':
-      case ' ': break;
-      case '(': return r.token(start);
-      case ')': return r.token(start);
-      case ';': comment(r); break;
-      default: {
-        if (is_atom_char(c)) return next_atom_token(start, r);
-        r.err("character not allowed here");
-        break;
-      }
-    }
-  }
-  return {};
-}
-
-struct node : no::move {
-  jute::view atom {};
-  const node * list {};
-  const node * next {};
-  const reader * r {};
-  unsigned loc {};
-
-  void * operator new(traits::size_t n);
-};
-
-[[noreturn]] static void err(const node & n, jute::view msg) { n.r->err(msg, n.loc); }
-[[noreturn]] static void err(const node * n, jute::view msg) { n->r->err(msg, n->loc); }
-
-static node * next_list(reader & r) {
-  auto * res = new node {
-    .r = &r,
-    .loc = r.loc(),
-  };
-  auto * n = &res->list;
-  while (r) {
-    auto token = next_token(r);
-    if (token == ")") return res;
-    if (token == "") break;
-
-    auto nn = (token == "(") ?
-      next_list(r) :
-      new node {
-        .atom = token,
-        .r = &r,
-        .loc = static_cast<unsigned>(r.loc() - token.size()),
-      };
-    *n = nn;
-    n = &(nn->next);
-  }
-  err(res, "unbalanced open parenthesis");
-}
-static node * next_node(reader & r) {
-  if (!r) return {};
-
-  auto token = next_token(r);
-  if (token == "(") {
-    return next_list(r);
-  } else if (token == ")") {
-    r.err("unbalanced close parenthesis");
-  } else {
-    return new node { 
-      .atom = token,
-      .r = &r,
-      .loc = static_cast<unsigned>(r.loc() - token.size()),
-    };
-  }
-}
-
-static bool is_atom(const node * n) { return n->atom.size(); }
-
-static auto ls(const node * n) {
-  unsigned sz = 0;
-  for (auto nn = n->list; nn; nn = nn->next) sz++;
-  return sz;
-}
+using namespace lispy;
 
 static float to_f(const node * n) {
   if (!is_atom(n)) err(n, "non-numerical coordinate");
@@ -162,46 +29,8 @@ static int to_i(const node * n) {
   }
 }
 
-struct context;
-using fn_t = const node * (*)(context & ctx, const node * n, const node * const * aa, unsigned as);
-struct context {
-  hashley::fin<const node *> defs { 127 };
-  hashley::fin<fn_t> fns { 127 };
-};
-[[nodiscard]] static const node * eval(context & ctx, const node * n) {
-  if (!n->list) return n;
-  if (!is_atom(n->list)) err(*n->list, "expecting an atom");
-
-  auto fn = n->list->atom;
-
-  if (fn == "def") {
-    if (ls(n) != 3) err(n, "def requires a name and a value");
-
-    auto args = n->list->next;
-    if (!is_atom(args)) err(*args, "def name must be an atom");
-    ctx.defs[args->atom] = args->next;
-    return args->next;
-  }
-
-  const node * aa[128] {};
-  if (ls(n) >= 127) err(n, "too many parameters");
-  auto ap = aa;
-  for (auto nn = n->list->next; nn; nn = nn->next) *ap++ = nn;
-  
-  if (ctx.fns.has(fn)) {
-    return ctx.fns[fn](ctx, n, aa, ap - aa);
-  } else if (fn == "random") {
-    if (ls(n) == 0) err(n, "rand requires at least a parameter");
-    return eval(ctx, aa[rng::rand(ls(n) - 1)]);
-  } else if (ctx.defs.has(fn)) {
-    return eval(ctx, ctx.defs[fn]);
-  } else {
-    err(n, *("invalid function name: "_hs + fn));
-  }
-}
-
 // TODO: eviction rules
-hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
+static hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
 
 struct tdef_node : node {
   prefabs::tiledef tdef {};
@@ -210,18 +39,15 @@ struct tdef_node : node {
   bool has_tile     : 1;
   bool has_collider : 1;
 };
-static tdef_node * g_instances {};
-static tdef_node * g_cur_instance;
-void * node::operator new(traits::size_t sz) {
-  if (g_cur_instance == g_instances + 10240) throw 0;
-  return g_cur_instance++;
-}
-
 const prefabs::tilemap * prefabs::parse(jute::view filename) {
   if (g_cache.has(filename)) return &*g_cache[filename];
 
-  g_instances = new tdef_node[10240] {};
-  g_cur_instance = g_instances;
+  hai::array<tdef_node> buf { 10240 };
+  auto cur = buf.begin();
+  alloc_node = [&] -> void * {
+    if (cur == buf.end()) throw 0;
+    return cur++;
+  };
 
   context ctx {};
   ctx.fns["tiledef"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
@@ -320,8 +146,8 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     auto & map = *nn->tmap;
     for (auto i = 0; aa[i]; i++) {
       auto c = aa[i];
-      if (!is_atom(c)) err(*c, "rows in prefabs must be atoms");
-      if (c->atom.size() != prefabs::width) err(*c, "incorrect number of symbols in prefab");
+      if (!is_atom(c)) err(c, "rows in prefabs must be atoms");
+      if (c->atom.size() != prefabs::width) err(c, "incorrect number of symbols in prefab");
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
         if (!ctx.defs.has(id)) n->r->err("unknown tiledef", c->loc + x);
@@ -334,14 +160,13 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   };
 
   const tdef_node * prefab {};
-
-  auto code = jojo::read_cstr(filename);
-  reader r { code };
-  while (r) {
-    auto n = static_cast<const tdef_node *>(eval(ctx, next_node(r)));
+  run(filename, ctx, [&](auto * node) {
+    auto n = static_cast<const tdef_node *>(node);
     if (n->tmap) prefab = n;
-  }
+  });
   if (!prefab) return nullptr;
+
+  alloc_node = [] -> void * { return nullptr; };
 
   g_cache[filename] = prefab->tmap;
   return &*g_cache[filename];
