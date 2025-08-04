@@ -1,4 +1,5 @@
 #pragma leco add_impl loots_lispy
+#pragma leco add_resource_dir loots
 export module loots;
 import dotz;
 import hai;
