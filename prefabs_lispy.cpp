@@ -12,23 +12,6 @@ import sires;
 using namespace jute::literals;
 using namespace lispy;
 
-static float to_f(const node * n) {
-  if (!is_atom(n)) err(n, "non-numerical coordinate");
-  try {
-    return jute::to_f(n->atom);
-  } catch (...) {
-    err(n, "invalid number");
-  }
-}
-static int to_i(const node * n) {
-  if (!is_atom(n)) err(n, "non-numerical coordinate");
-  try {
-    return jute::to_u32(n->atom);
-  } catch (...) {
-    err(n, "invalid number");
-  }
-}
-
 // TODO: eviction rules
 static hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
 

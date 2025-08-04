@@ -148,6 +148,23 @@ static lispy::node * next_node(reader & r) {
 
 namespace lispy {
   export constexpr bool is_atom(const node * n) { return n->atom.size(); }
+
+  export float to_f(const node * n) {
+    if (!is_atom(n)) err(n, "expecting number");
+    try {
+      return jute::to_f(n->atom);
+    } catch (...) {
+      err(n, "invalid number");
+    }
+  }
+  export int to_i(const node * n) {
+    if (!is_atom(n)) err(n, "expecting number");
+    try {
+      return jute::to_u32(n->atom);
+    } catch (...) {
+      err(n, "invalid number");
+    }
+  }
 }
 
 static auto ls(const lispy::node * n) {
