@@ -198,14 +198,14 @@ struct context {
   const node * aa[128] {};
   if (ls(n) >= 127) err(n, "too many parameters");
   auto ap = aa;
-  for (auto nn = n->list->next; nn; nn = nn->next) *ap++ = eval(ctx, nn);
+  for (auto nn = n->list->next; nn; nn = nn->next) *ap++ = nn;
   
   if (fn == "tiledef") {
     if (ls(n) < 2) err(n, "tiledef must have at least name");
 
     auto * nn = new tdef_node { *n };
     for (auto * c = aa; *c; c++) {
-      auto * cc = static_cast<const tdef_node *>(*c);
+      auto * cc = static_cast<const tdef_node *>(eval(ctx, *c));
       bool valid = false;
       if (cc->tdef.behaviour.size()) {
         nn->tdef.behaviour = cc->tdef.behaviour;
@@ -238,11 +238,11 @@ struct context {
 
     auto * nn = new tdef_node { *n };
     auto & t = nn->tdef.tile;
-    t.uv.x   = to_i(aa[0]);
-    t.uv.y   = to_i(aa[1]);
-    t.size.x = to_i(aa[2]);
-    t.size.y = to_i(aa[3]);
-    t.texid  = to_i(aa[4]);
+    t.uv.x   = to_i(eval(ctx, aa[0]));
+    t.uv.y   = to_i(eval(ctx, aa[1]));
+    t.size.x = to_i(eval(ctx, aa[2]));
+    t.size.y = to_i(eval(ctx, aa[3]));
+    t.texid  = to_i(eval(ctx, aa[4]));
     nn->has_tile = true;
     return nn;
   } else if (fn == "entity") {
@@ -250,11 +250,11 @@ struct context {
 
     auto * nn = new tdef_node { *n };
     auto & t = nn->tdef.entity;
-    t.uv.x   = to_i(aa[0]);
-    t.uv.y   = to_i(aa[1]);
-    t.size.x = to_i(aa[2]);
-    t.size.y = to_i(aa[3]);
-    t.texid  = to_i(aa[4]);
+    t.uv.x   = to_i(eval(ctx, aa[0]));
+    t.uv.y   = to_i(eval(ctx, aa[1]));
+    t.size.x = to_i(eval(ctx, aa[2]));
+    t.size.y = to_i(eval(ctx, aa[3]));
+    t.texid  = to_i(eval(ctx, aa[4]));
     nn->has_entity = true;
     return nn;
   } else if (fn == "collision") {
@@ -262,23 +262,25 @@ struct context {
 
     auto * nn = new tdef_node { *n };
     auto & c = nn->tdef.collision;
-    c.x = to_f(aa[0]);
-    c.y = to_f(aa[1]);
-    c.z = to_f(aa[2]);
-    c.w = to_f(aa[3]);
+    c.x = to_f(eval(ctx, aa[0]));
+    c.y = to_f(eval(ctx, aa[1]));
+    c.z = to_f(eval(ctx, aa[2]));
+    c.w = to_f(eval(ctx, aa[3]));
     nn->has_collider = true;
     return nn;
   } else if (fn == "behaviour") {
     if (ls(n) != 2) err(n, "behaviour requires a value");
-    if (!is_atom(aa[0])) err(n, "behaviour must be an atom");
+    auto val = eval(ctx, aa[0]);
+    if (!is_atom(val)) err(n, "behaviour must be an atom");
     auto * nn = new tdef_node { *n };
-    nn->tdef.behaviour = aa[0]->atom;
+    nn->tdef.behaviour = val->atom;
     return nn;
   } else if (fn == "loot") {
     if (ls(n) != 2) err(n, "loot table requires a value");
-    if (!is_atom(aa[0])) err(n, "loot table must be an atom");
+    auto val = eval(ctx, aa[0]);
+    if (!is_atom(val)) err(n, "loot table must be an atom");
     auto * nn = new tdef_node { *n };
-    nn->tdef.loot = aa[0]->atom;
+    nn->tdef.loot = val->atom;
     return nn;
   } else if (fn == "prefab") {
     if (ls(n) != prefabs::height + 1) err(n, "incorrect number of rows in prefab");
@@ -301,7 +303,7 @@ struct context {
     return nn;
   } else if (fn == "random") {
     if (ls(n) == 0) err(n, "rand requires at least a parameter");
-    return aa[rng::rand(ls(n) - 1)];
+    return eval(ctx, aa[rng::rand(ls(n) - 1)]);
   } else if (ctx.defs.has(fn)) {
     return eval(ctx, ctx.defs[fn]);
   } else {
