@@ -163,8 +163,10 @@ namespace lispy {
     hashley::fin<const node *> defs { 127 };
     hashley::fin<fn_t> fns { 127 };
   };
+
+  export [[nodiscard]] const node * eval(context & ctx, const node * n);
 }
-[[nodiscard]] static const lispy::node * eval(lispy::context & ctx, const lispy::node * n) {
+[[nodiscard]] const lispy::node * lispy::eval(lispy::context & ctx, const lispy::node * n) {
   if (!n->list) return n;
   if (!is_atom(n->list)) err(n->list, "expecting an atom");
 
