@@ -8,7 +8,7 @@ import silog;
 
 namespace backpack {
   struct t {
-    hai::array<dotz::vec2> inv {};
+    hai::array<loots::item> inv {};
     jute::heap loot;
     fox::sprite sprite;
   };
@@ -42,7 +42,7 @@ namespace backpack {
     return -1;
   }
 
-  export hai::array<dotz::vec2> * inventory(unsigned id) {
+  export hai::array<loots::item> * inventory(unsigned id) {
     if (id >= list.size()) silog::die("trying to use invalid backpack %d", id);
     return &list[id].inv;
   }

@@ -3,6 +3,7 @@ import backpack;
 import dotz;
 import fox;
 import input;
+import loots;
 import player;
 
 static constexpr const auto inv_w = 8U;
@@ -10,7 +11,7 @@ static constexpr const auto inv_h = 8U;
 
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {-1};
-static hai::array<dotz::vec2> * g_inventory {};
+static hai::array<loots::item> * g_inventory {};
 
 static constexpr auto idx(dotz::ivec2 p) {
   return p.y * inv_w + p.x;
@@ -54,7 +55,7 @@ static void on_frame(float ms) {
           continue;
         }
 
-        auto i = inv(p);
+        auto i = inv(p).sprite;
 
         dotz::vec2 uv {};
         if (g_sel.x < 0) {
@@ -70,7 +71,7 @@ static void on_frame(float ms) {
       for (p.x = 0; p.x < inv_w; p.x++) {
         if (idx(p) >= g_inventory->size()) continue;
 
-        auto i = inv(p);
+        auto i = inv(p).sprite;
         // TODO: merge this loop with previous?
         if (!i.x && !i.y) continue;
         *m += {
@@ -89,7 +90,7 @@ static void on_frame(float ms) {
 
 static void on_action() {
   if (g_sel == -1) {
-    auto i = inv(g_cursor);
+    auto i = inv(g_cursor).sprite;
     if (!i.x && !i.y) return;
     g_sel = g_cursor;
     return;
