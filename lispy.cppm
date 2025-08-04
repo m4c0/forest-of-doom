@@ -92,20 +92,22 @@ static jute::view next_token(reader & r) {
   return {};
 }
 
-struct node : no::move {
-  jute::view atom {};
-  const node * list {};
-  const node * next {};
-  const reader * r {};
-  unsigned loc {};
+namespace lispy {
+  export struct node : no::move {
+    jute::view atom {};
+    const node * list {};
+    const node * next {};
+    const reader * r {};
+    unsigned loc {};
 
-  void * operator new(traits::size_t n);
-};
+    void * operator new(traits::size_t n);
+  };
 
-[[noreturn]] static void err(const node * n, jute::view msg) { n->r->err(msg, n->loc); }
+  export [[noreturn]] void err(const lispy::node * n, jute::view msg) { n->r->err(msg, n->loc); }
+}
 
-static node * next_list(reader & r) {
-  auto * res = new node {
+static lispy::node * next_list(reader & r) {
+  auto * res = new lispy::node {
     .r = &r,
     .loc = r.loc(),
   };
@@ -117,7 +119,7 @@ static node * next_list(reader & r) {
 
     auto nn = (token == "(") ?
       next_list(r) :
-      new node {
+      new lispy::node {
         .atom = token,
         .r = &r,
         .loc = static_cast<unsigned>(r.loc() - token.size()),
@@ -127,7 +129,7 @@ static node * next_list(reader & r) {
   }
   err(res, "unbalanced open parenthesis");
 }
-static node * next_node(reader & r) {
+static lispy::node * next_node(reader & r) {
   if (!r) return {};
 
   auto token = next_token(r);
@@ -136,7 +138,7 @@ static node * next_node(reader & r) {
   } else if (token == ")") {
     r.err("unbalanced close parenthesis");
   } else {
-    return new node { 
+    return new lispy::node { 
       .atom = token,
       .r = &r,
       .loc = static_cast<unsigned>(r.loc() - token.size()),
@@ -144,9 +146,11 @@ static node * next_node(reader & r) {
   }
 }
 
-static bool is_atom(const node * n) { return n->atom.size(); }
+namespace lispy {
+  export constexpr bool is_atom(const node * n) { return n->atom.size(); }
+}
 
-static auto ls(const node * n) {
+static auto ls(const lispy::node * n) {
   unsigned sz = 0;
   for (auto nn = n->list; nn; nn = nn->next) sz++;
   return sz;
@@ -160,7 +164,7 @@ namespace lispy {
     hashley::fin<fn_t> fns { 127 };
   };
 }
-[[nodiscard]] static const node * eval(lispy::context & ctx, const node * n) {
+[[nodiscard]] static const lispy::node * eval(lispy::context & ctx, const lispy::node * n) {
   if (!n->list) return n;
   if (!is_atom(n->list)) err(n->list, "expecting an atom");
 
@@ -175,7 +179,7 @@ namespace lispy {
     return args->next;
   }
 
-  const node * aa[128] {};
+  const lispy::node * aa[128] {};
   if (ls(n) >= 127) err(n, "too many parameters");
   auto ap = aa;
   for (auto nn = n->list->next; nn; nn = nn->next) *ap++ = nn;
@@ -205,4 +209,4 @@ namespace lispy {
   }
 }
 
-void * node::operator new(traits::size_t sz) { return lispy::alloc_node(); }
+void * lispy::node::operator new(traits::size_t sz) { return lispy::alloc_node(); }
