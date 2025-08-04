@@ -102,7 +102,6 @@ struct node : no::move {
   void * operator new(traits::size_t n);
 };
 
-[[noreturn]] static void err(const node & n, jute::view msg) { n.r->err(msg, n.loc); }
 [[noreturn]] static void err(const node * n, jute::view msg) { n->r->err(msg, n->loc); }
 
 static node * next_list(reader & r) {
@@ -163,7 +162,7 @@ namespace lispy {
 }
 [[nodiscard]] static const node * eval(lispy::context & ctx, const node * n) {
   if (!n->list) return n;
-  if (!is_atom(n->list)) err(*n->list, "expecting an atom");
+  if (!is_atom(n->list)) err(n->list, "expecting an atom");
 
   auto fn = n->list->atom;
 
@@ -171,7 +170,7 @@ namespace lispy {
     if (ls(n) != 3) err(n, "def requires a name and a value");
 
     auto args = n->list->next;
-    if (!is_atom(args)) err(*args, "def name must be an atom");
+    if (!is_atom(args)) err(args, "def name must be an atom");
     ctx.defs[args->atom] = args->next;
     return args->next;
   }
