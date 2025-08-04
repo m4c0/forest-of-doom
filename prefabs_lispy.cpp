@@ -177,8 +177,11 @@ static int to_i(const node * n) {
   }
 }
 
+struct context;
+using fn_t = const node * (*)(context & ctx, const node * n, const node * const * aa, unsigned as);
 struct context {
   hashley::fin<const node *> defs { 127 };
+  hashley::fin<fn_t> fns { 127 };
 };
 [[nodiscard]] static const node * eval(context & ctx, const node * n) {
   if (!n->list) return n;
@@ -200,8 +203,39 @@ struct context {
   auto ap = aa;
   for (auto nn = n->list->next; nn; nn = nn->next) *ap++ = nn;
   
-  if (fn == "tiledef") {
-    if (ls(n) < 2) err(n, "tiledef must have at least name");
+  if (ctx.fns.has(fn)) {
+    return ctx.fns[fn](ctx, n, aa, ap - aa);
+  } else if (fn == "random") {
+    if (ls(n) == 0) err(n, "rand requires at least a parameter");
+    return eval(ctx, aa[rng::rand(ls(n) - 1)]);
+  } else if (ctx.defs.has(fn)) {
+    return eval(ctx, ctx.defs[fn]);
+  } else {
+    err(n, *("invalid function name: "_hs + fn));
+  }
+}
+
+// TODO: eviction rules
+hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
+
+static tdef_node * g_instances {};
+static tdef_node * g_cur_instance;
+void * node::operator new(traits::size_t sz) {
+  if (g_cur_instance == g_instances + 10240) throw 0;
+  return g_cur_instance++;
+}
+
+const prefabs::tilemap * prefabs::parse(jute::view filename) {
+  if (g_cache.has(filename)) return &*g_cache[filename];
+
+  auto code = jojo::read_cstr(filename);
+
+  g_instances = new tdef_node[10240] {};
+  g_cur_instance = g_instances;
+
+  context ctx {};
+  ctx.fns["tiledef"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as == 0) err(n, "tiledef must have at least name");
 
     auto * nn = new tdef_node { *n };
     for (auto * c = aa; *c; c++) {
@@ -233,8 +267,9 @@ struct context {
       if (!valid) err(*c, "invalid element in tiledef");
     }
     return nn;
-  } else if (fn == "tile") {
-    if (ls(n) != 6) err(n, "tile should have uv, size and texid");
+  };
+  ctx.fns["tile"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as != 5) err(n, "tile should have uv, size and texid");
 
     auto * nn = new tdef_node { *n };
     auto & t = nn->tdef.tile;
@@ -245,8 +280,9 @@ struct context {
     t.texid  = to_i(eval(ctx, aa[4]));
     nn->has_tile = true;
     return nn;
-  } else if (fn == "entity") {
-    if (ls(n) != 6) err(n, "entity should have uv, size and texid");
+  };
+  ctx.fns["entity"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as != 5) err(n, "entity should have uv, size and texid");
 
     auto * nn = new tdef_node { *n };
     auto & t = nn->tdef.entity;
@@ -257,8 +293,9 @@ struct context {
     t.texid  = to_i(eval(ctx, aa[4]));
     nn->has_entity = true;
     return nn;
-  } else if (fn == "collision") {
-    if (ls(n) != 5) err(n, "collision should have pos and size");
+  };
+  ctx.fns["collision"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as != 4) err(n, "collision should have pos and size");
 
     auto * nn = new tdef_node { *n };
     auto & c = nn->tdef.collision;
@@ -268,22 +305,25 @@ struct context {
     c.w = to_f(eval(ctx, aa[3]));
     nn->has_collider = true;
     return nn;
-  } else if (fn == "behaviour") {
-    if (ls(n) != 2) err(n, "behaviour requires a value");
+  };
+  ctx.fns["behaviour"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as != 1) err(n, "behaviour requires a value");
     auto val = eval(ctx, aa[0]);
     if (!is_atom(val)) err(n, "behaviour must be an atom");
     auto * nn = new tdef_node { *n };
     nn->tdef.behaviour = val->atom;
     return nn;
-  } else if (fn == "loot") {
-    if (ls(n) != 2) err(n, "loot table requires a value");
+  };
+  ctx.fns["loot"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as != 1) err(n, "loot table requires a value");
     auto val = eval(ctx, aa[0]);
     if (!is_atom(val)) err(n, "loot table must be an atom");
     auto * nn = new tdef_node { *n };
     nn->tdef.loot = val->atom;
     return nn;
-  } else if (fn == "prefab") {
-    if (ls(n) != prefabs::height + 1) err(n, "incorrect number of rows in prefab");
+  };
+  ctx.fns["prefab"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as != prefabs::height) err(n, "incorrect number of rows in prefab");
 
     auto * nn = new tdef_node { *n };
     nn->tmap = hai::sptr { new prefabs::tilemap {} };
@@ -301,34 +341,8 @@ struct context {
       }
     }
     return nn;
-  } else if (fn == "random") {
-    if (ls(n) == 0) err(n, "rand requires at least a parameter");
-    return eval(ctx, aa[rng::rand(ls(n) - 1)]);
-  } else if (ctx.defs.has(fn)) {
-    return eval(ctx, ctx.defs[fn]);
-  } else {
-    err(n, *("invalid function name: "_hs + fn));
-  }
-}
+  };
 
-// TODO: eviction rules
-hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
-
-static tdef_node * g_instances {};
-static tdef_node * g_cur_instance;
-void * node::operator new(traits::size_t sz) {
-  if (g_cur_instance == g_instances + 10240) throw 0;
-  return g_cur_instance++;
-}
-
-const prefabs::tilemap * prefabs::parse(jute::view filename) {
-  if (g_cache.has(filename)) return &*g_cache[filename];
-
-  auto code = jojo::read_cstr(filename);
-
-  g_instances = new tdef_node[10240] {};
-  g_cur_instance = g_instances;
-  context ctx {};
   reader r { code };
   const tdef_node * prefab {};
 
