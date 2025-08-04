@@ -101,13 +101,6 @@ struct node : no::move {
 
   void * operator new(traits::size_t n);
 };
-struct tdef_node : node {
-  prefabs::tiledef tdef {};
-  hai::sptr<prefabs::tilemap> tmap {};
-  bool has_entity   : 1;
-  bool has_tile     : 1;
-  bool has_collider : 1;
-};
 
 [[noreturn]] static void err(const node & n, jute::view msg) { n.r->err(msg, n.loc); }
 [[noreturn]] static void err(const node * n, jute::view msg) { n->r->err(msg, n->loc); }
@@ -218,6 +211,13 @@ struct context {
 // TODO: eviction rules
 hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
 
+struct tdef_node : node {
+  prefabs::tiledef tdef {};
+  hai::sptr<prefabs::tilemap> tmap {};
+  bool has_entity   : 1;
+  bool has_tile     : 1;
+  bool has_collider : 1;
+};
 static tdef_node * g_instances {};
 static tdef_node * g_cur_instance;
 void * node::operator new(traits::size_t sz) {
