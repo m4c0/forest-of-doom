@@ -1,5 +1,6 @@
 module loots;
 import lispy;
+import rng;
 import silog;
 import sires;
 
@@ -19,6 +20,10 @@ hai::array<loots::item> loots::parse(jute::view filename) {
   };
 
   context ctx {};
+  ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as == 0) err(n, "rand requires at least a parameter");
+    return eval(ctx, aa[rng::rand(as - 1)]);
+  };
   ctx.fns["item"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as != 2) err(n, "item expects two coordinates");
 
