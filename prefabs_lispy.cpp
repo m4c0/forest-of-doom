@@ -133,7 +133,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
       if (c->atom.size() != prefabs::width) err(c, "incorrect number of symbols in prefab");
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
-        if (!ctx.defs.has(id)) n->r->err("unknown tiledef", c->loc + x);
+        if (!ctx.defs.has(id)) err(c, "unknown tiledef", x);
         auto cid = static_cast<const tdef_node *>(eval(ctx, ctx.defs[id]));
         // TODO: validate tiledef
         map(x, i) = cid->tdef;
