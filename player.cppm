@@ -1,4 +1,5 @@
 export module player;
+export import :inv;
 import collision;
 import dotz;
 import fox;
