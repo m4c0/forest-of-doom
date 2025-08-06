@@ -12,6 +12,7 @@ const int i = [] {
     fox::g = new fox::main {};
     fox::g->load(fox::layers::floor, [](auto * m) {
       example_map::load(m);
+      fod::poc();
     });
   };
   v::on_resize = [] {};
@@ -25,7 +26,5 @@ const int i = [] {
   };
 
   input::setup();
-
-  fod::poc();
   return 0;
 }();
