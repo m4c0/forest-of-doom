@@ -29,7 +29,7 @@ namespace backpack {
     }
   }
   
-  export int open(dotz::vec2 player) {
+  export hai::array<loots::item> * open(dotz::vec2 player) {
     for (auto i = 0; i < list.size(); i++) {
       auto & pack = list[i];
 
@@ -37,13 +37,8 @@ namespace backpack {
       if (dotz::length(player - c) > 0.5) continue;
 
       if (pack.inv.size() == 0) pack.inv = loots::load(*pack.loot);
-      return i;
+      return &pack.inv;
     }
-    return -1;
-  }
-
-  export hai::array<loots::item> * inventory(unsigned id) {
-    if (id >= list.size()) silog::die("trying to use invalid backpack %d", id);
-    return &list[id].inv;
+    return nullptr;
   }
 }

@@ -1,5 +1,4 @@
 module fod;
-import backpack;
 import dotz;
 import fox;
 import input;
@@ -109,8 +108,8 @@ static constexpr auto cursor(int dx, int dy) {
   };
 }
 
-void fod::open_backpack(unsigned id) {
-  g_inventory = backpack::inventory(id);
+void fod::open_backpack(hai::array<loots::item> * inv) {
+  g_inventory = inv;
 
   fod::on_frame = ::on_frame;
   g_cursor = {};
