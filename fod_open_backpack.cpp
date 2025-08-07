@@ -4,12 +4,17 @@ import fox;
 import input;
 import loots;
 import player;
+import silog;
 
 namespace fui {
   class inv {
   public:
     static constexpr const auto w = 8;
     static constexpr const auto h = 3;
+
+    static constexpr auto idx(dotz::ivec2 p) {
+      return p.y * w + p.x;
+    }
 
   private:
     static constexpr const dotz::vec2 size { w, h };
@@ -21,9 +26,6 @@ namespace fui {
     dotz::vec2 m_pos;
     dotz::ivec2 m_sel;
 
-    constexpr auto idx(dotz::ivec2 p) {
-      return p.y * w + p.x;
-    }
     constexpr loots::item & at(dotz::ivec2 p) {
       return (*m_inventory)[idx(p)];
     }
@@ -108,6 +110,20 @@ static auto cursor(inv_e inv) {
 static auto sel(inv_e inv) {
   return inv == g_sel_inv ? g_sel : dotz::ivec2 { -1 };
 }
+static auto inv(inv_e inv) {
+  switch (inv) {
+    case inv_backpack: return g_inv;
+    case inv_player: return &player::inv::inv();
+    default: silog::die("unreachable: invalid inventory");
+  }
+}
+
+static loots::item * at(inv_e i, dotz::ivec2 p) {
+  auto idx = fui::inv::idx(g_cursor);
+  auto ii = inv(i);
+  if (idx >= ii->size()) return nullptr;
+  return &(*ii)[idx];
+}
 
 static auto open_inv() {
   return fui::inv { g_inv, { 0, -2 }, sel(inv_backpack) };
@@ -125,18 +141,22 @@ static void on_frame(float ms) {
 }
 
 static void on_action() {
-  //if (g_sel == -1) {
-  //  auto i = inv(g_cursor).sprite;
-  //  if (!i.x && !i.y) return;
-  //  g_sel = g_cursor;
-  //  return;
-  //}
+  if (g_sel == -1) {
+    auto item = at(g_cur_inv, g_cursor);
+    if (!item) return;
 
-  //auto tmp = inv(g_sel);
-  //inv(g_sel) = inv(g_cursor);
-  //inv(g_cursor) = tmp;
+    auto i = item->sprite;
+    if (!i.x && !i.y) return;
+    g_sel = g_cursor;
+    g_sel_inv = g_cur_inv;
+    return;
+  }
 
-  //g_sel = -1;
+  auto tmp = *at(g_sel_inv, g_sel);
+  *at(g_sel_inv, g_sel) = *at(g_cur_inv, g_cursor);
+  *at(g_cur_inv, g_cursor) = tmp;
+
+  g_sel = -1;
 }
 
 static constexpr auto move_cursor(dotz::ivec2 d) {
@@ -169,7 +189,7 @@ void fod::open_backpack(hai::array<loots::item> * inv) {
   using namespace input;
   reset();
   on_key_down(keys::ACTION, on_action);
-  on_key_down(keys::CANCEL, fod::poc);
+  on_key_down(keys::CANCEL, fod::poc); // TODO: discard selection or quit
   on_key_down(keys::MOVE_DOWN,  move_cursor({ 0,  1}));
   on_key_down(keys::MOVE_UP,    move_cursor({ 0, -1}));
   on_key_down(keys::MOVE_LEFT,  move_cursor({-1,  0}));
