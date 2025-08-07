@@ -14,7 +14,6 @@ namespace fui {
     static constexpr const dotz::vec2 gtl = 0.5f;
     static constexpr const dotz::vec2 csz = 1.0f;
 
-
     dotz::ivec2 m_cursor {};
     dotz::ivec2 m_sel {-1};
     hai::array<loots::item> * m_inventory;
@@ -30,34 +29,22 @@ namespace fui {
     void sp(auto * m, dotz::vec2 pos, dotz::vec2 uv, dotz::vec2 size = 1) {
       *m += { .pos = m_pos + tl + pos, .uv = uv, .size = size, .texid = fox::texids::ui_paper };
     }
+    void load_box(auto * m) {
+      sp(m, { 0, 0 }, { 1, 1 });
+      for (auto x = 1; x < size.x; x++) sp(m, { x, 0 }, { 2, 1 });
+      sp(m, { w, 0 }, { 3, 1 });
 
-  public:
-    constexpr inv() = default;
+      for (auto y = 1; y < size.y; y++) {
+        sp(m, { 0, y }, { 1, 2 });
+        for (auto x = 1; x < size.x; x++) sp(m, { x, y }, { 2, 2 });
+        sp(m, { w, y }, { 3, 2 });
+      }
 
-    constexpr inv(hai::array<loots::item> * i, dotz::vec2 p) :
-      m_inventory { i }
-    , m_pos { p }
-    {}
-
-    void load(auto * m) {
-      const auto box = [&] {
-        sp(m, { 0, 0 }, { 1, 1 });
-        for (auto x = 1; x < size.x; x++) sp(m, { x, 0 }, { 2, 1 });
-        sp(m, { w, 0 }, { 3, 1 });
-
-        for (auto y = 1; y < size.y; y++) {
-          sp(m, { 0, y }, { 1, 2 });
-          for (auto x = 1; x < size.x; x++) sp(m, { x, y }, { 2, 2 });
-          sp(m, { w, y }, { 3, 2 });
-        }
-
-        sp(m, { 0.0f, size.y }, { 1, 3 });
-        for (auto x = 0; x < size.x; x++) sp(m, { x, h }, { 2, 3 });
-        sp(m, size, { 3, 3 });
-      };
-
-      box();
-
+      sp(m, { 0.0f, size.y }, { 1, 3 });
+      for (auto x = 0; x < size.x; x++) sp(m, { x, h }, { 2, 3 });
+      sp(m, size, { 3, 3 });
+    }
+    void load_slots(auto * m) {
       for (dotz::ivec2 p = 0; p.y < h; p.y++) {
         for (p.x = 0; p.x < w; p.x++) {
           if (idx(p) >= m_inventory->size()) {
@@ -76,7 +63,8 @@ namespace fui {
           sp(m, p * csz + gtl, uv);
         }
       }
-
+    }
+    void load_inv(auto * m) {
       for (dotz::ivec2 p = 0; p.y < h; p.y++) {
         for (p.x = 0; p.x < w; p.x++) {
           if (idx(p) >= m_inventory->size()) continue;
@@ -92,6 +80,20 @@ namespace fui {
           };
         }
       }
+    }
+
+  public:
+    constexpr inv() = default;
+
+    constexpr inv(hai::array<loots::item> * i, dotz::vec2 p) :
+      m_inventory { i }
+    , m_pos { p }
+    {}
+
+    void load(auto * m) {
+      load_box(m);
+      load_slots(m);
+      load_inv(m);
 
       sp(m, m_cursor * csz + gtl, { 15, 4 });
     }
