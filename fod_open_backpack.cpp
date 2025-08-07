@@ -119,7 +119,7 @@ static auto inv(inv_e inv) {
 }
 
 static loots::item * at(inv_e i, dotz::ivec2 p) {
-  auto idx = fui::inv::idx(g_cursor);
+  auto idx = fui::inv::idx(p);
   auto ii = inv(i);
   if (idx >= ii->size()) return nullptr;
   return &(*ii)[idx];
