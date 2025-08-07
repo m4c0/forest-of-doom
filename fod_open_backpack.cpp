@@ -5,8 +5,8 @@ import input;
 import loots;
 import player;
 
-static constexpr const auto inv_w = 8U;
-static constexpr const auto inv_h = 8U;
+static constexpr const auto inv_w = 7;
+static constexpr const auto inv_h = 5;
 
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {-1};
@@ -22,27 +22,27 @@ static auto & inv(dotz::ivec2 p) {
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
     const dotz::vec2 size { inv_w, inv_h };
-    const dotz::vec2 tl = -(size + 3) / 2.0;
-    const dotz::vec2 gtl = 0.3f;
-    const dotz::vec2 csz = 1.2f;
+    const dotz::vec2 tl = -(size + 2) / 2.0;
+    const dotz::vec2 gtl = 0.5f;
+    const dotz::vec2 csz = 1.0f;
 
     const auto sp = [&](dotz::vec2 pos, dotz::vec2 uv, dotz::vec2 size = 1) {
       *m += { .pos = tl + pos, .uv = uv, .size = size, .texid = fox::texids::ui_paper };
     };
     const auto box = [&] {
       sp({ 0, 0 }, { 1, 1 });
-      for (auto x = 0; x < size.x; x++) sp({ x + 1, 0 }, { 2, 1 });
-      sp({ size.x + 1, 0.f }, { 3, 1 });
+      for (auto x = 1; x < size.x; x++) sp({ x, 0 }, { 2, 1 });
+      sp({ inv_w, 0 }, { 3, 1 });
 
-      for (auto y = 0; y < size.y; y++) {
-        sp({ 0, y + 1 }, { 1, 2 });
-        for (auto x = 0; x < size.x; x++) sp({ x + 1, y + 1 }, { 2, 2 });
-        sp({ size.x + 1, y + 1.f }, { 3, 2 });
+      for (auto y = 1; y < size.y; y++) {
+        sp({ 0, y }, { 1, 2 });
+        for (auto x = 1; x < size.x; x++) sp({ x, y }, { 2, 2 });
+        sp({ inv_w, y }, { 3, 2 });
       }
 
-      sp({ 0.0f, size.y + 1 }, { 1, 3 });
-      for (auto x = 0; x < size.x; x++) sp({ x + 1.f, size.y + 1 }, { 2, 3 });
-      sp({ size.x + 1, size.y + 1 }, { 3, 3 });
+      sp({ 0.0f, size.y }, { 1, 3 });
+      for (auto x = 0; x < size.x; x++) sp({ x, inv_h }, { 2, 3 });
+      sp(size, { 3, 3 });
     };
 
     box();
