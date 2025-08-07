@@ -26,29 +26,35 @@ namespace fui {
       return (*m_inventory)[idx(p)];
     }
 
-    void sp(auto * m, dotz::vec2 pos, dotz::vec2 uv, dotz::vec2 size = 1) {
-      *m += { .pos = m_pos + tl + pos, .uv = uv, .size = size, .texid = fox::texids::ui_paper };
+    // Sprite aligned to box.
+    void sb(auto * m, dotz::vec2 pos, dotz::vec2 uv) {
+      *m += { .pos = m_pos + tl + pos, .uv = uv, .size = 1, .texid = fox::texids::ui_paper };
     }
+    // Sprite aligned to inventory.
+    void sp(auto * m, dotz::vec2 pos, dotz::vec2 uv, fox::texids texid) {
+      *m += { .pos = m_pos + tl + pos * csz + gtl, .uv = uv, .size = 1, .texid = texid };
+    }
+
     void load_box(auto * m) {
-      sp(m, { 0, 0 }, { 1, 1 });
-      for (auto x = 1; x < size.x; x++) sp(m, { x, 0 }, { 2, 1 });
-      sp(m, { w, 0 }, { 3, 1 });
+      sb(m, { 0, 0 }, { 1, 1 });
+      for (auto x = 1; x < size.x; x++) sb(m, { x, 0 }, { 2, 1 });
+      sb(m, { w, 0 }, { 3, 1 });
 
       for (auto y = 1; y < size.y; y++) {
-        sp(m, { 0, y }, { 1, 2 });
-        for (auto x = 1; x < size.x; x++) sp(m, { x, y }, { 2, 2 });
-        sp(m, { w, y }, { 3, 2 });
+        sb(m, { 0, y }, { 1, 2 });
+        for (auto x = 1; x < size.x; x++) sb(m, { x, y }, { 2, 2 });
+        sb(m, { w, y }, { 3, 2 });
       }
 
-      sp(m, { 0.0f, size.y }, { 1, 3 });
-      for (auto x = 0; x < size.x; x++) sp(m, { x, h }, { 2, 3 });
-      sp(m, size, { 3, 3 });
+      sb(m, { 0.0f, size.y }, { 1, 3 });
+      for (auto x = 0; x < size.x; x++) sb(m, { x, h }, { 2, 3 });
+      sb(m, size, { 3, 3 });
     }
     void load_slots(auto * m) {
       for (dotz::ivec2 p = 0; p.y < h; p.y++) {
         for (p.x = 0; p.x < w; p.x++) {
           if (idx(p) >= m_inventory->size()) {
-            sp(m, p * csz + gtl, { 5, 9 });
+            sp(m, p, { 5, 9 }, fox::texids::ui_paper);
             continue;
           }
 
@@ -60,7 +66,7 @@ namespace fui {
           } else {
             uv = (p == m_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
           }
-          sp(m, p * csz + gtl, uv);
+          sp(m, p, uv, fox::texids::ui_paper);
         }
       }
     }
@@ -72,12 +78,7 @@ namespace fui {
           auto i = at(p).sprite;
           // TODO: merge this loop with previous?
           if (!i.x && !i.y) continue;
-          *m += {
-            .pos   = tl + p * csz + gtl,
-            .uv    = i,
-            .size  = 1,
-            .texid = fox::texids::ui_style,
-          };
+          sp(m, p, i, fox::texids::ui_style);
         }
       }
     }
@@ -95,7 +96,7 @@ namespace fui {
       load_slots(m);
       load_inv(m);
 
-      sp(m, m_cursor * csz + gtl, { 15, 4 });
+      sp(m, m_cursor, { 15, 4 }, fox::texids::ui_paper);
     }
   };
 }
