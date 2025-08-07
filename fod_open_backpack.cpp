@@ -5,115 +5,130 @@ import input;
 import loots;
 import player;
 
-static constexpr const auto inv_w = 7;
-static constexpr const auto inv_h = 5;
+namespace fui {
+  class inv {
+    static constexpr const auto w = 8;
+    static constexpr const auto h = 3;
 
-static dotz::ivec2 g_cursor {};
-static dotz::ivec2 g_sel {-1};
-static hai::array<loots::item> * g_inventory {};
+    dotz::ivec2 m_cursor {};
+    dotz::ivec2 m_sel {-1};
+    hai::array<loots::item> * m_inventory;
 
-static constexpr auto idx(dotz::ivec2 p) {
-  return p.y * inv_w + p.x;
+    constexpr auto idx(dotz::ivec2 p) {
+      return p.y * w + p.x;
+    }
+    constexpr loots::item & at(dotz::ivec2 p) {
+      return (*m_inventory)[idx(p)];
+    }
+  public:
+    constexpr inv(hai::array<loots::item> * i) : m_inventory { i } {}
+
+    void load(auto * m) {
+      const dotz::vec2 size { w, h };
+      const dotz::vec2 tl = -(size + 2) / 2.0;
+      const dotz::vec2 gtl = 0.5f;
+      const dotz::vec2 csz = 1.0f;
+
+      const auto sp = [&](dotz::vec2 pos, dotz::vec2 uv, dotz::vec2 size = 1) {
+        *m += { .pos = tl + pos, .uv = uv, .size = size, .texid = fox::texids::ui_paper };
+      };
+      const auto box = [&] {
+        sp({ 0, 0 }, { 1, 1 });
+        for (auto x = 1; x < size.x; x++) sp({ x, 0 }, { 2, 1 });
+        sp({ w, 0 }, { 3, 1 });
+
+        for (auto y = 1; y < size.y; y++) {
+          sp({ 0, y }, { 1, 2 });
+          for (auto x = 1; x < size.x; x++) sp({ x, y }, { 2, 2 });
+          sp({ w, y }, { 3, 2 });
+        }
+
+        sp({ 0.0f, size.y }, { 1, 3 });
+        for (auto x = 0; x < size.x; x++) sp({ x, h }, { 2, 3 });
+        sp(size, { 3, 3 });
+      };
+
+      box();
+
+      for (dotz::ivec2 p = 0; p.y < h; p.y++) {
+        for (p.x = 0; p.x < w; p.x++) {
+          if (idx(p) >= m_inventory->size()) {
+            sp(p * csz + gtl, { 5, 9 });
+            continue;
+          }
+
+          auto i = at(p).sprite;
+
+          dotz::vec2 uv {};
+          if (m_sel.x < 0) {
+            uv = i.x || i.y ? dotz::vec2 { 5, 7 } : dotz::vec2 { 5, 9 };
+          } else {
+            uv = (p == m_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
+          }
+          sp(p * csz + gtl, uv);
+        }
+      }
+
+      for (dotz::ivec2 p = 0; p.y < h; p.y++) {
+        for (p.x = 0; p.x < w; p.x++) {
+          if (idx(p) >= m_inventory->size()) continue;
+
+          auto i = at(p).sprite;
+          // TODO: merge this loop with previous?
+          if (!i.x && !i.y) continue;
+          *m += {
+            .pos   = tl + p * csz + gtl,
+            .uv    = i,
+            .size  = 1,
+            .texid = fox::texids::ui_style,
+          };
+        }
+      }
+
+      sp(m_cursor * csz + gtl, { 15, 4 });
+    }
+  };
 }
-static auto & inv(dotz::ivec2 p) {
-  return (*g_inventory)[idx(p)];
-}
+
+static fui::inv g_inv { nullptr };
+static fui::inv g_p_inv { nullptr };
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
-    const dotz::vec2 size { inv_w, inv_h };
-    const dotz::vec2 tl = -(size + 2) / 2.0;
-    const dotz::vec2 gtl = 0.5f;
-    const dotz::vec2 csz = 1.0f;
-
-    const auto sp = [&](dotz::vec2 pos, dotz::vec2 uv, dotz::vec2 size = 1) {
-      *m += { .pos = tl + pos, .uv = uv, .size = size, .texid = fox::texids::ui_paper };
-    };
-    const auto box = [&] {
-      sp({ 0, 0 }, { 1, 1 });
-      for (auto x = 1; x < size.x; x++) sp({ x, 0 }, { 2, 1 });
-      sp({ inv_w, 0 }, { 3, 1 });
-
-      for (auto y = 1; y < size.y; y++) {
-        sp({ 0, y }, { 1, 2 });
-        for (auto x = 1; x < size.x; x++) sp({ x, y }, { 2, 2 });
-        sp({ inv_w, y }, { 3, 2 });
-      }
-
-      sp({ 0.0f, size.y }, { 1, 3 });
-      for (auto x = 0; x < size.x; x++) sp({ x, inv_h }, { 2, 3 });
-      sp(size, { 3, 3 });
-    };
-
-    box();
-
-    for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
-      for (p.x = 0; p.x < inv_w; p.x++) {
-        if (idx(p) >= g_inventory->size()) {
-          sp(p * csz + gtl, { 5, 9 });
-          continue;
-        }
-
-        auto i = inv(p).sprite;
-
-        dotz::vec2 uv {};
-        if (g_sel.x < 0) {
-          uv = i.x || i.y ? dotz::vec2 { 5, 7 } : dotz::vec2 { 5, 9 };
-        } else {
-          uv = (p == g_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
-        }
-        sp(p * csz + gtl, uv);
-      }
-    }
-
-    for (dotz::ivec2 p = 0; p.y < inv_h; p.y++) {
-      for (p.x = 0; p.x < inv_w; p.x++) {
-        if (idx(p) >= g_inventory->size()) continue;
-
-        auto i = inv(p).sprite;
-        // TODO: merge this loop with previous?
-        if (!i.x && !i.y) continue;
-        *m += {
-          .pos   = tl + p * csz + gtl,
-          .uv    = i,
-          .size  = 1,
-          .texid = fox::texids::ui_style,
-        };
-      }
-    }
-
-    sp(g_cursor * csz + gtl, { 15, 4 });
+    g_inv.load(m);
+    g_p_inv.load(m);
   });
   fox::g->on_frame(16, 16, player::center());
 }
 
 static void on_action() {
-  if (g_sel == -1) {
-    auto i = inv(g_cursor).sprite;
-    if (!i.x && !i.y) return;
-    g_sel = g_cursor;
-    return;
-  }
+  //if (g_sel == -1) {
+  //  auto i = inv(g_cursor).sprite;
+  //  if (!i.x && !i.y) return;
+  //  g_sel = g_cursor;
+  //  return;
+  //}
 
-  auto tmp = inv(g_sel);
-  inv(g_sel) = inv(g_cursor);
-  inv(g_cursor) = tmp;
+  //auto tmp = inv(g_sel);
+  //inv(g_sel) = inv(g_cursor);
+  //inv(g_cursor) = tmp;
 
-  g_sel = -1;
+  //g_sel = -1;
 }
 
 static constexpr auto cursor(int dx, int dy) {
   return [=] {
-    g_cursor = dotz::clamp(g_cursor + dotz::ivec2 { dx, dy }, {0}, {7});
+    //g_cursor = dotz::clamp(g_cursor + dotz::ivec2 { dx, dy }, {0}, {7});
   };
 }
 
 void fod::open_backpack(hai::array<loots::item> * inv) {
-  g_inventory = inv;
+  g_inv = fui::inv { inv };
+  g_p_inv = fui::inv { &player::inv::inv() };
 
   fod::on_frame = ::on_frame;
-  g_cursor = {};
-  g_sel = -1;
+  //g_cursor = {};
+  //g_sel = -1;
 
   using namespace input;
   reset();
