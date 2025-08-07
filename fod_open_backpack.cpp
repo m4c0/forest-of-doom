@@ -90,13 +90,12 @@ namespace fui {
   };
 }
 
-static fui::inv g_inv {};
-static fui::inv g_p_inv {};
+static hai::array<loots::item> * g_inv;
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
-    g_inv.load(m);
-    g_p_inv.load(m);
+    fui::inv { g_inv, { 0, -2 } }.load(m);
+    fui::inv { &player::inv::inv(), { 0, 2 } }.load(m);
   });
   fox::g->on_frame(16, 16, player::center());
 }
@@ -123,8 +122,7 @@ static constexpr auto cursor(int dx, int dy) {
 }
 
 void fod::open_backpack(hai::array<loots::item> * inv) {
-  g_inv = fui::inv { inv, { 0, -2 } };
-  g_p_inv = fui::inv { &player::inv::inv(), { 0, 2 } };
+  g_inv = inv;
 
   fod::on_frame = ::on_frame;
   //g_cursor = {};
