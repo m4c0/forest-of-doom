@@ -7,8 +7,11 @@ import player;
 
 namespace fui {
   class inv {
+  public:
     static constexpr const auto w = 8;
     static constexpr const auto h = 3;
+
+  private:
     static constexpr const dotz::vec2 size { w, h };
     static constexpr const dotz::vec2 tl = -(size + 2) / 2.0;
     static constexpr const dotz::vec2 gtl = 0.5f;
@@ -131,9 +134,21 @@ static void on_action() {
   //g_sel = -1;
 }
 
-static constexpr auto cursor(int dx, int dy) {
+static constexpr auto move_cursor(dotz::ivec2 d) {
   return [=] {
-    //g_cursor = dotz::clamp(g_cursor + dotz::ivec2 { dx, dy }, {0}, {7});
+    auto c = g_cursor + d;
+    if (c.x < 0) return;
+    if (c.x >= fui::inv::w) return;
+    if (c.y < 0) {
+      if (g_cur_inv == inv_backpack) return;
+      g_cur_inv = inv_backpack;
+      c.y += fui::inv::h;
+    } else if (c.y >= fui::inv::h) {
+      if (g_cur_inv == inv_player) return;
+      g_cur_inv = inv_player;
+      c.y -= fui::inv::h;
+    }
+    g_cursor = c;
   };
 }
 
@@ -149,8 +164,8 @@ void fod::open_backpack(hai::array<loots::item> * inv) {
   reset();
   on_key_down(keys::ACTION, on_action);
   on_key_down(keys::CANCEL, fod::poc);
-  on_key_down(keys::MOVE_DOWN,  cursor( 0,  1));
-  on_key_down(keys::MOVE_UP,    cursor( 0, -1));
-  on_key_down(keys::MOVE_LEFT,  cursor(-1,  0));
-  on_key_down(keys::MOVE_RIGHT, cursor( 1,  0));
+  on_key_down(keys::MOVE_DOWN,  move_cursor({ 0,  1}));
+  on_key_down(keys::MOVE_UP,    move_cursor({ 0, -1}));
+  on_key_down(keys::MOVE_LEFT,  move_cursor({-1,  0}));
+  on_key_down(keys::MOVE_RIGHT, move_cursor({ 1,  0}));
 }
