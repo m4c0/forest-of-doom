@@ -14,7 +14,6 @@ namespace fui {
     static constexpr const dotz::vec2 gtl = 0.5f;
     static constexpr const dotz::vec2 csz = 1.0f;
 
-    dotz::ivec2 m_cursor {};
     dotz::ivec2 m_sel {-1};
     hai::array<loots::item> * m_inventory;
     dotz::vec2 m_pos;
@@ -81,21 +80,38 @@ namespace fui {
     , m_pos { p }
     {}
 
-    void load(auto * m) {
+    void load(auto * m, dotz::vec2 cursor) {
       load_box(m);
       load_slots(m);
 
-      sp(m, m_cursor, { 15, 4 }, fox::texids::ui_paper);
+      if (cursor.x >= 0) sp(m, cursor, { 15, 4 }, fox::texids::ui_paper);
     }
   };
 }
 
 static hai::array<loots::item> * g_inv;
+static enum inv_e {
+  inv_backpack = 0,
+  inv_player,
+  inv_count,
+} g_cur_inv;
+static dotz::vec2 g_cursor {};
+
+static auto open_inv() {
+  return fui::inv { g_inv, { 0, -2 } };
+}
+static auto player_inv() {
+  return fui::inv { &player::inv::inv(), { 0, 2 } };
+}
+
+static auto cursor(inv_e inv) {
+  return inv == g_cur_inv ? g_cursor : dotz::vec2 { -1 };
+}
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
-    fui::inv { g_inv, { 0, -2 } }.load(m);
-    fui::inv { &player::inv::inv(), { 0, 2 } }.load(m);
+    open_inv().load(m, cursor(inv_backpack));
+    player_inv().load(m, cursor(inv_player));
   });
   fox::g->on_frame(16, 16, player::center());
 }
@@ -125,7 +141,8 @@ void fod::open_backpack(hai::array<loots::item> * inv) {
   g_inv = inv;
 
   fod::on_frame = ::on_frame;
-  //g_cursor = {};
+  g_cursor = {};
+  g_cur_inv = inv_backpack;
   //g_sel = -1;
 
   using namespace input;
