@@ -152,9 +152,13 @@ static void on_action() {
     return;
   }
 
-  auto tmp = *at(g_sel_inv, g_sel);
-  *at(g_sel_inv, g_sel) = *at(g_cur_inv, g_cursor);
-  *at(g_cur_inv, g_cursor) = tmp;
+  auto sp = at(g_sel_inv, g_sel);
+  auto cp = at(g_cur_inv, g_cursor);
+  if (sp && cp) {
+    auto tmp = *sp;
+    *sp = *cp;
+    *cp = tmp;
+  }
 
   g_sel = -1;
 }
