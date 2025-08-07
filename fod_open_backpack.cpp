@@ -9,6 +9,11 @@ namespace fui {
   class inv {
     static constexpr const auto w = 8;
     static constexpr const auto h = 3;
+    static constexpr const dotz::vec2 size { w, h };
+    static constexpr const dotz::vec2 tl = -(size + 2) / 2.0;
+    static constexpr const dotz::vec2 gtl = 0.5f;
+    static constexpr const dotz::vec2 csz = 1.0f;
+
 
     dotz::ivec2 m_cursor {};
     dotz::ivec2 m_sel {-1};
@@ -21,6 +26,11 @@ namespace fui {
     constexpr loots::item & at(dotz::ivec2 p) {
       return (*m_inventory)[idx(p)];
     }
+
+    void sp(auto * m, dotz::vec2 pos, dotz::vec2 uv, dotz::vec2 size = 1) {
+      *m += { .pos = m_pos + tl + pos, .uv = uv, .size = size, .texid = fox::texids::ui_paper };
+    }
+
   public:
     constexpr inv() = default;
 
@@ -30,28 +40,20 @@ namespace fui {
     {}
 
     void load(auto * m) {
-      const dotz::vec2 size { w, h };
-      const dotz::vec2 tl = -(size + 2) / 2.0;
-      const dotz::vec2 gtl = 0.5f;
-      const dotz::vec2 csz = 1.0f;
-
-      const auto sp = [&](dotz::vec2 pos, dotz::vec2 uv, dotz::vec2 size = 1) {
-        *m += { .pos = m_pos + tl + pos, .uv = uv, .size = size, .texid = fox::texids::ui_paper };
-      };
       const auto box = [&] {
-        sp({ 0, 0 }, { 1, 1 });
-        for (auto x = 1; x < size.x; x++) sp({ x, 0 }, { 2, 1 });
-        sp({ w, 0 }, { 3, 1 });
+        sp(m, { 0, 0 }, { 1, 1 });
+        for (auto x = 1; x < size.x; x++) sp(m, { x, 0 }, { 2, 1 });
+        sp(m, { w, 0 }, { 3, 1 });
 
         for (auto y = 1; y < size.y; y++) {
-          sp({ 0, y }, { 1, 2 });
-          for (auto x = 1; x < size.x; x++) sp({ x, y }, { 2, 2 });
-          sp({ w, y }, { 3, 2 });
+          sp(m, { 0, y }, { 1, 2 });
+          for (auto x = 1; x < size.x; x++) sp(m, { x, y }, { 2, 2 });
+          sp(m, { w, y }, { 3, 2 });
         }
 
-        sp({ 0.0f, size.y }, { 1, 3 });
-        for (auto x = 0; x < size.x; x++) sp({ x, h }, { 2, 3 });
-        sp(size, { 3, 3 });
+        sp(m, { 0.0f, size.y }, { 1, 3 });
+        for (auto x = 0; x < size.x; x++) sp(m, { x, h }, { 2, 3 });
+        sp(m, size, { 3, 3 });
       };
 
       box();
@@ -59,7 +61,7 @@ namespace fui {
       for (dotz::ivec2 p = 0; p.y < h; p.y++) {
         for (p.x = 0; p.x < w; p.x++) {
           if (idx(p) >= m_inventory->size()) {
-            sp(p * csz + gtl, { 5, 9 });
+            sp(m, p * csz + gtl, { 5, 9 });
             continue;
           }
 
@@ -71,7 +73,7 @@ namespace fui {
           } else {
             uv = (p == m_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
           }
-          sp(p * csz + gtl, uv);
+          sp(m, p * csz + gtl, uv);
         }
       }
 
@@ -91,7 +93,7 @@ namespace fui {
         }
       }
 
-      sp(m_cursor * csz + gtl, { 15, 4 });
+      sp(m, m_cursor * csz + gtl, { 15, 4 });
     }
   };
 }
