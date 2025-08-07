@@ -17,9 +17,9 @@ namespace fui {
     static constexpr const dotz::vec2 gtl = 0.5f;
     static constexpr const dotz::vec2 csz = 1.0f;
 
-    dotz::ivec2 m_sel {-1};
     hai::array<loots::item> * m_inventory;
     dotz::vec2 m_pos;
+    dotz::ivec2 m_sel;
 
     constexpr auto idx(dotz::ivec2 p) {
       return p.y * w + p.x;
@@ -78,12 +78,13 @@ namespace fui {
   public:
     constexpr inv() = default;
 
-    constexpr inv(hai::array<loots::item> * i, dotz::vec2 p) :
+    constexpr inv(hai::array<loots::item> * i, dotz::vec2 p, dotz::ivec2 sel) :
       m_inventory { i }
     , m_pos { p }
+    , m_sel { sel }
     {}
 
-    void load(auto * m, dotz::vec2 cursor) {
+    void load(auto * m, dotz::ivec2 cursor) {
       load_box(m);
       load_slots(m);
 
@@ -97,18 +98,22 @@ static enum inv_e {
   inv_backpack = 0,
   inv_player,
   inv_count,
-} g_cur_inv;
-static dotz::vec2 g_cursor {};
-
-static auto open_inv() {
-  return fui::inv { g_inv, { 0, -2 } };
-}
-static auto player_inv() {
-  return fui::inv { &player::inv::inv(), { 0, 2 } };
-}
+} g_cur_inv, g_sel_inv;
+static dotz::ivec2 g_cursor {};
+static dotz::ivec2 g_sel {};
 
 static auto cursor(inv_e inv) {
-  return inv == g_cur_inv ? g_cursor : dotz::vec2 { -1 };
+  return inv == g_cur_inv ? g_cursor : dotz::ivec2 { -1 };
+}
+static auto sel(inv_e inv) {
+  return inv == g_sel_inv ? g_sel : dotz::ivec2 { -1 };
+}
+
+static auto open_inv() {
+  return fui::inv { g_inv, { 0, -2 }, sel(inv_backpack) };
+}
+static auto player_inv() {
+  return fui::inv { &player::inv::inv(), { 0, 2 }, sel(inv_player) };
 }
 
 static void on_frame(float ms) {
@@ -158,7 +163,8 @@ void fod::open_backpack(hai::array<loots::item> * inv) {
   fod::on_frame = ::on_frame;
   g_cursor = {};
   g_cur_inv = inv_backpack;
-  //g_sel = -1;
+  g_sel = -1;
+  g_sel_inv = inv_backpack;
 
   using namespace input;
   reset();
