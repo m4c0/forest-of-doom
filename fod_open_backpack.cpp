@@ -22,20 +22,6 @@ static auto cursor(inv_e inv) {
 static auto sel(inv_e inv) {
   return inv == g_sel_inv ? g_sel : dotz::ivec2 { -1 };
 }
-static auto inv(inv_e inv) {
-  switch (inv) {
-    case inv_backpack: return g_inv;
-    case inv_player: return &player::inv::inv();
-    default: silog::die("unreachable: invalid inventory");
-  }
-}
-
-static loots::item * at(inv_e i, dotz::ivec2 p) {
-  auto idx = fui::inv::idx(p);
-  auto ii = inv(i);
-  if (idx >= ii->size()) return nullptr;
-  return &(*ii)[idx];
-}
 
 static auto open_inv() {
   return fui::inv { g_inv, { 0, -2 }, sel(inv_backpack) };
@@ -43,6 +29,15 @@ static auto open_inv() {
 static auto player_inv() {
   return fui::inv { &player::inv::inv(), { 0, 2 }, sel(inv_player) };
 }
+static auto inv(inv_e inv) {
+  switch (inv) {
+    case inv_backpack: return open_inv();
+    case inv_player:   return player_inv();
+    default: silog::die("unreachable: invalid inventory");
+  }
+}
+
+static loots::item * at(inv_e i, dotz::ivec2 p) { return inv(i).at(p); }
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {

@@ -24,10 +24,6 @@ namespace fui {
     dotz::vec2 m_pos;
     dotz::ivec2 m_sel;
 
-    constexpr loots::item & at(dotz::ivec2 p) {
-      return (*m_inventory)[idx(p)];
-    }
-
     // Sprite aligned to box.
     void sb(auto * m, dotz::vec2 pos, dotz::vec2 uv) {
       *m += { .pos = m_pos + tl + pos, .uv = uv, .size = 1, .texid = fox::texids::ui_paper };
@@ -60,7 +56,7 @@ namespace fui {
             continue;
           }
 
-          auto i = at(p).sprite;
+          auto i = at(p)->sprite;
 
           dotz::vec2 uv {};
           if (m_sel.x < 0) {
@@ -89,6 +85,11 @@ namespace fui {
       load_slots(m);
 
       if (cursor.x >= 0) sp(m, cursor, { 15, 4 }, fox::texids::ui_paper);
+    }
+
+    [[nodiscard]] constexpr loots::item * at(dotz::ivec2 p) {
+      auto i = idx(p);
+      return i < m_inventory->size() ? &(*m_inventory)[i] : nullptr;
     }
   };
 }
