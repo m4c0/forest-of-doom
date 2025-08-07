@@ -67,18 +67,8 @@ namespace fui {
             uv = (p == m_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
           }
           sp(m, p, uv, fox::texids::ui_paper);
-        }
-      }
-    }
-    void load_inv(auto * m) {
-      for (dotz::ivec2 p = 0; p.y < h; p.y++) {
-        for (p.x = 0; p.x < w; p.x++) {
-          if (idx(p) >= m_inventory->size()) continue;
 
-          auto i = at(p).sprite;
-          // TODO: merge this loop with previous?
-          if (!i.x && !i.y) continue;
-          sp(m, p, i, fox::texids::ui_style);
+          if (i.x || i.y) sp(m, p, i, fox::texids::ui_style);
         }
       }
     }
@@ -94,7 +84,6 @@ namespace fui {
     void load(auto * m) {
       load_box(m);
       load_slots(m);
-      load_inv(m);
 
       sp(m, m_cursor, { 15, 4 }, fox::texids::ui_paper);
     }
