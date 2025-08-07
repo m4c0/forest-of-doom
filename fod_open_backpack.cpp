@@ -59,8 +59,8 @@ static void on_action() {
     return;
   }
 
-  auto sp = at(g_sel_inv, g_sel);
-  auto cp = at(g_cur_inv, g_cursor);
+  auto sp = inv(g_sel_inv).at(g_sel);
+  auto cp = inv(g_cur_inv).at(g_cursor);
   if (sp && cp) {
     auto tmp = *sp;
     *sp = *cp;
