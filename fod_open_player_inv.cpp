@@ -16,53 +16,18 @@ static enum {
 static auto player_inv() {
   return fui::inv { &player::inv::inv(), {}, g_sel };
 }
+static auto drop_inv() {
+  return fui::slot { { -1, 2 }, { 40, 19 } };
+}
+static auto garbage_inv() {
+  return fui::slot { { 0, 2 }, { 42, 18 } };
+}
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
     player_inv().load(m, g_cursor);
-
-    *m += {
-      .pos { 0.0f, 2.0f },
-      .uv { 5, 5 },
-      .size = 1,
-      .texid = fox::texids::ui_paper,
-    };
-    *m += {
-      .pos { -1.0f, 2.0f },
-      .uv { 5, 5 },
-      .size = 1,
-      .texid = fox::texids::ui_paper,
-    };
-
-    *m += {
-      .pos { 0.0f, 2.0f },
-      .uv { 42, 18 },
-      .size = 1,
-      .texid = fox::texids::ui_style,
-    };
-    *m += {
-      .pos { -1.0f, 2.0f },
-      .uv { 40, 19 },
-      .size = 1,
-      .texid = fox::texids::ui_style,
-    };
-
-    if (g_cur_inv == inv_garbage) {
-      *m += {
-        .pos { 0.0f, 2.0f },
-        .uv { 15, 4 },
-        .size = 1,
-        .texid = fox::texids::ui_paper,
-      };
-    }
-    if (g_cur_inv == inv_drop) {
-      *m += {
-        .pos { -1.0f, 2.0f },
-        .uv { 15, 4 },
-        .size = 1,
-        .texid = fox::texids::ui_paper,
-      };
-    }
+    drop_inv().load(m, g_cur_inv == inv_drop);
+    garbage_inv().load(m, g_cur_inv == inv_garbage);
   });
   fox::g->on_frame(16, 16, player::center());
 }

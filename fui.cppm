@@ -92,4 +92,38 @@ namespace fui {
       return i < m_inventory->size() ? &(*m_inventory)[i] : nullptr;
     }
   };
+
+  export class slot {
+    dotz::vec2 m_pos;
+    dotz::ivec2 m_uv;
+
+  public:
+    constexpr slot() = default;
+    constexpr slot(dotz::vec2 p, dotz::ivec2 uv) :
+      m_pos { p }
+    , m_uv { uv }
+    {}
+
+    void load(auto * m, bool selected) {
+      *m += {
+        .pos = m_pos,
+        .uv { 5, 5 },
+        .size = 1,
+        .texid = fox::texids::ui_paper,
+      };
+      *m += {
+        .pos = m_pos,
+        .uv = m_uv,
+        .size = 1,
+        .texid = fox::texids::ui_style,
+      };
+      if (selected) *m += {
+        .pos = m_pos,
+        .uv { 15, 4 },
+        .size = 1,
+        .texid = fox::texids::ui_paper,
+      };
+    }
+  };
+
 }
