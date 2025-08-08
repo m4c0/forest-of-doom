@@ -7,6 +7,11 @@ import player;
 
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {};
+static enum {
+  inv_player,
+  inv_drop,
+  inv_garbage,
+} g_cur_inv;
 
 static auto player_inv() {
   return fui::inv { &player::inv::inv(), {}, g_sel };
@@ -41,6 +46,23 @@ static void on_frame(float ms) {
       .size = 1,
       .texid = fox::texids::ui_style,
     };
+
+    if (g_cur_inv == inv_garbage) {
+      *m += {
+        .pos { 0.0f, 2.0f },
+        .uv { 15, 4 },
+        .size = 1,
+        .texid = fox::texids::ui_paper,
+      };
+    }
+    if (g_cur_inv == inv_drop) {
+      *m += {
+        .pos { -1.0f, 2.0f },
+        .uv { 15, 4 },
+        .size = 1,
+        .texid = fox::texids::ui_paper,
+      };
+    }
   });
   fox::g->on_frame(16, 16, player::center());
 }
@@ -69,16 +91,38 @@ static void on_action() {
 
 static constexpr auto move_cursor(dotz::ivec2 d) {
   return [=] {
-    auto c = g_cursor + d;
-    if (c.x < 0) return;
-    if (c.x >= fui::inv::w) return;
-    if (c.y < 0) return;
-    if (c.y >= fui::inv::h) return;
-    g_cursor = c;
+    switch (g_cur_inv) {
+      case inv_drop:
+        if (d.x == 1) g_cur_inv = inv_garbage;
+        else if (d.y == -1) {
+          g_cursor = { 3, fui::inv::h - 1 };
+          g_cur_inv = inv_player;
+        }
+        break;
+      case inv_garbage:
+        if (d.x == -1) g_cur_inv = inv_drop;
+        else if (d.y == -1) {
+          g_cursor = { 4, fui::inv::h - 1 };
+          g_cur_inv = inv_player;
+        }
+        break;
+      case inv_player:
+        auto c = g_cursor + d;
+        if (c.x < 0) return;
+        if (c.x >= fui::inv::w) return;
+        if (c.y < 0) return;
+        if (c.y >= fui::inv::h) {
+          g_cur_inv = g_cursor.x <= 3 ? inv_drop : inv_garbage;
+          g_cursor = -1;
+          return;
+        }
+        g_cursor = c;
+    }
   };
 }
 
 void fod::open_player_inv() {
+  g_cur_inv = inv_player;
   g_cursor = {};
   g_sel = -1;
 
