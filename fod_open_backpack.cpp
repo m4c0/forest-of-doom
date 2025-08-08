@@ -81,6 +81,23 @@ static void on_action() {
 
 static constexpr auto move_cursor(dotz::ivec2 d) {
   return [=] {
+    if (g_cur_inv == inv_drop) {
+      if (d.x == 1) g_cur_inv = inv_garbage;
+      else if (d.y == -1) {
+        g_cursor = { 3, fui::inv::h - 1 };
+        g_cur_inv = inv_player;
+      }
+      return;
+    }
+    if (g_cur_inv == inv_garbage) {
+      if (d.x == -1) g_cur_inv = inv_drop;
+      else if (d.y == -1) {
+        g_cursor = { 4, fui::inv::h - 1 };
+        g_cur_inv = inv_player;
+      }
+      return;
+    }
+
     auto c = g_cursor + d;
     if (c.x < 0) return;
     if (c.x >= fui::inv::w) return;
@@ -89,7 +106,11 @@ static constexpr auto move_cursor(dotz::ivec2 d) {
       g_cur_inv = inv_backpack;
       c.y += fui::inv::h;
     } else if (c.y >= fui::inv::h) {
-      if (g_cur_inv == inv_player) return;
+      if (g_cur_inv == inv_player) {
+        g_cur_inv = g_cursor.x <= 3 ? inv_drop : inv_garbage;
+        g_cursor = -1;
+        return;
+      }
       g_cur_inv = inv_player;
       c.y -= fui::inv::h;
     }
