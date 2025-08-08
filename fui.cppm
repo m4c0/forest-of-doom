@@ -16,7 +16,7 @@ namespace fui {
 
   private:
     static constexpr const dotz::vec2 size { w, h };
-    static constexpr const dotz::vec2 tl = -(size + 2) / 2.0;
+    static constexpr const dotz::vec2 tl = -(size + 1) / 2.0;
     static constexpr const dotz::vec2 gtl = 0.5f;
     static constexpr const dotz::vec2 csz = 1.0f;
 
