@@ -36,15 +36,14 @@ static auto drop_inv() {
 static auto garbage_inv() {
   return fui::slot { { 0, 4 }, { 42, 18 } };
 }
-static auto inv(inv_e inv) {
-  switch (inv) {
-    case inv_backpack: return open_inv();
-    case inv_player:   return player_inv();
+
+static loots::item * at(inv_e i, dotz::ivec2 p) {
+  switch (i) {
+    case inv_backpack: return open_inv().at(p);
+    case inv_player:   return player_inv().at(p);
     default: silog::die("unreachable: invalid inventory");
   }
 }
-
-static loots::item * at(inv_e i, dotz::ivec2 p) { return inv(i).at(p); }
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
@@ -68,8 +67,8 @@ static void on_action() {
     return;
   }
 
-  auto sp = inv(g_sel_inv).at(g_sel);
-  auto cp = inv(g_cur_inv).at(g_cursor);
+  auto sp = at(g_sel_inv, g_sel);
+  auto cp = at(g_cur_inv, g_cursor);
   if (sp && cp) {
     auto tmp = *sp;
     *sp = *cp;
