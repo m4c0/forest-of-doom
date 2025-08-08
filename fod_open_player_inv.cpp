@@ -15,6 +15,32 @@ static auto player_inv() {
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
     player_inv().load(m, g_cursor);
+
+    *m += {
+      .pos { 0.0f, 2.0f },
+      .uv { 5, 5 },
+      .size = 1,
+      .texid = fox::texids::ui_paper,
+    };
+    *m += {
+      .pos { -1.0f, 2.0f },
+      .uv { 5, 5 },
+      .size = 1,
+      .texid = fox::texids::ui_paper,
+    };
+
+    *m += {
+      .pos { 0.0f, 2.0f },
+      .uv { 42, 18 },
+      .size = 1,
+      .texid = fox::texids::ui_style,
+    };
+    *m += {
+      .pos { -1.0f, 2.0f },
+      .uv { 40, 19 },
+      .size = 1,
+      .texid = fox::texids::ui_style,
+    };
   });
   fox::g->on_frame(16, 16, player::center());
 }
