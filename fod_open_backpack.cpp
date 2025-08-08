@@ -9,9 +9,10 @@ import silog;
 
 static hai::array<loots::item> * g_inv;
 static enum inv_e {
-  inv_backpack = 0,
+  inv_backpack,
   inv_player,
-  inv_count,
+  inv_drop,
+  inv_garbage,
 } g_cur_inv, g_sel_inv;
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {};
@@ -29,6 +30,12 @@ static auto open_inv() {
 static auto player_inv() {
   return fui::inv { &player::inv::inv(), { 0, 2 }, sel(inv_player) };
 }
+static auto drop_inv() {
+  return fui::slot { { -1, 4 }, { 40, 19 } };
+}
+static auto garbage_inv() {
+  return fui::slot { { 0, 4 }, { 42, 18 } };
+}
 static auto inv(inv_e inv) {
   switch (inv) {
     case inv_backpack: return open_inv();
@@ -43,6 +50,8 @@ static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
     open_inv().load(m, cursor(inv_backpack));
     player_inv().load(m, cursor(inv_player));
+    drop_inv().load(m, g_cur_inv == inv_drop);
+    garbage_inv().load(m, g_cur_inv == inv_garbage);
   });
   fox::g->on_frame(16, 16, player::center());
 }
