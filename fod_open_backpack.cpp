@@ -16,6 +16,8 @@ static enum inv_e {
 } g_cur_inv, g_sel_inv;
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {};
+static loots::item g_drop {};
+static loots::item g_garbage {};
 
 static auto cursor(inv_e inv) {
   return inv == g_cur_inv ? g_cursor : dotz::ivec2 { -1 };
@@ -31,10 +33,10 @@ static auto player_inv() {
   return fui::inv { &player::inv::inv(), { 0, 2 }, sel(inv_player) };
 }
 static auto drop_inv() {
-  return fui::slot { { -1, 4 }, { 40, 19 } };
+  return fui::slot { { -1, 4 }, { 40, 19 }, &g_drop };
 }
 static auto garbage_inv() {
-  return fui::slot { { 0, 4 }, { 42, 18 } };
+  return fui::slot { { 0, 4 }, { 42, 18 }, &g_garbage };
 }
 
 static loots::item * at(inv_e i, dotz::ivec2 p) {

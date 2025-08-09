@@ -5,6 +5,8 @@ import fui;
 import input;
 import player;
 
+static loots::item g_drop {};
+static loots::item g_garbage {};
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {};
 static enum {
@@ -17,10 +19,10 @@ static auto player_inv() {
   return fui::inv { &player::inv::inv(), {}, g_sel };
 }
 static auto drop_inv() {
-  return fui::slot { { -1, 2 }, { 40, 19 } };
+  return fui::slot { { -1, 2 }, { 40, 19 }, &g_drop };
 }
 static auto garbage_inv() {
-  return fui::slot { { 0, 2 }, { 42, 18 } };
+  return fui::slot { { 0, 2 }, { 42, 18 }, &g_garbage };
 }
 
 static void on_frame(float ms) {

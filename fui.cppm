@@ -96,12 +96,14 @@ namespace fui {
   export class slot {
     dotz::vec2 m_pos;
     dotz::ivec2 m_uv;
+    loots::item * m_item;
 
   public:
     constexpr slot() = default;
-    constexpr slot(dotz::vec2 p, dotz::ivec2 uv) :
+    constexpr slot(dotz::vec2 p, dotz::ivec2 uv, loots::item * i) :
       m_pos { p }
     , m_uv { uv }
+    , m_item { i }
     {}
 
     void load(auto * m, bool selected) {
@@ -114,6 +116,12 @@ namespace fui {
       *m += {
         .pos = m_pos,
         .uv = m_uv,
+        .size = 1,
+        .texid = fox::texids::ui_style,
+      };
+      if (m_item) *m += {
+        .pos = m_pos,
+        .uv = m_item->sprite,
         .size = 1,
         .texid = fox::texids::ui_style,
       };
