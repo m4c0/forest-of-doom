@@ -57,6 +57,9 @@ static void on_frame(float ms) {
 
 static void on_action() {
   if (g_sel == -1) {
+    if (g_cur_inv == inv_drop) return;
+    if (g_cur_inv == inv_garbage) return;
+
     auto item = at(g_cur_inv, g_cursor);
     if (!item) return;
 
