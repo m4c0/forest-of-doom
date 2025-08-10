@@ -113,7 +113,7 @@ namespace fox {
     auto aspect() const { return dotz::vec2 { v::dq()->aspect_of(), 1.0f }; }
 
     void on_frame(float grid_size, float ui_size, dotz::vec2 center) {
-      auto cb = v::sw()->command_buffer();
+      auto cb = v::cb();
       vee::cmd_bind_gr_pipeline(cb, *m_ppl);
       vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset.descriptor_set());
 

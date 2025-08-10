@@ -13,8 +13,8 @@ static struct extent_globals {
 } * g_eg;
 
 voo::device_and_queue * v::dq() { return &g_ag->dq; }
+vee::command_buffer v::cb() { return g_eg->sw.command_buffer(); } // TODO: move to "ag"
 vee::render_pass::type v::rp() { return *g_ag->rp; }
-voo::swapchain_and_stuff * v::sw() { return &g_eg->sw; }
 
 static void on_start() {
   g_ag = new app_globals {};

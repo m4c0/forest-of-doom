@@ -6,7 +6,7 @@ import voo;
 
 namespace v {
   export voo::device_and_queue * dq();
-  export voo::swapchain_and_stuff * sw();
+  export vee::command_buffer cb();
   export vee::render_pass::type rp();
 
   export hai::fn<void> on_start  {};
