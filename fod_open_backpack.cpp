@@ -120,8 +120,13 @@ static constexpr auto move_cursor(dotz::ivec2 d) {
 }
 
 static void on_cancel() {
+  if (g_sel != -1) {
+    g_sel = -1;
+    g_sel_inv = {};
+    return;
+  }
+
   // TODO: drop if inv has something
-  // TODO: discard selection or quit
   g_drop = g_garbage = {};
   fod::poc();
 }
