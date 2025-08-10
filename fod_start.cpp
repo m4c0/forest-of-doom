@@ -15,7 +15,6 @@ const int i = [] {
       fod::poc();
     });
   };
-  v::on_resize = [] {};
   v::on_frame  = [] {
     static sitime::stopwatch timer {};
     fod::on_frame(timer.millis());

@@ -23,7 +23,6 @@ static void on_start() {
 static void on_resize() {
   delete g_eg;
   g_eg = new extent_globals {};
-  v::on_resize();
 }
 static void on_frame() {
   v::sw()->acquire_next_image();

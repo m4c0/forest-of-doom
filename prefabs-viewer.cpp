@@ -51,7 +51,6 @@ const int i = [] {
   v::on_frame = [] {
     g_fox->on_frame(16, 32, 8);
   };
-  v::on_resize = [] {};
   v::on_stop = [] {
     delete g_fox;
   };
