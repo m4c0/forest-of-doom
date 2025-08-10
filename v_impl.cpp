@@ -22,9 +22,11 @@ static void on_start() {
 }
 static void on_resize() {
   delete g_eg;
-  g_eg = new extent_globals {};
+  g_eg = nullptr;
 }
 static void on_frame() {
+  if (!g_eg) g_eg = new extent_globals {};
+
   v::sw()->acquire_next_image();
   v::sw()->queue_one_time_submit(v::dq()->queue(), [] {
     auto rp = v::sw()->cmd_render_pass();

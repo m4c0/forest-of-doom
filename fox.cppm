@@ -110,7 +110,7 @@ namespace fox {
     void load(layers l, auto && fn) { m_buf[static_cast<unsigned>(l)].load(fn); }
     void load_ui(auto && fn) { m_ui_buf.load(fn); }
 
-    auto aspect() const { return dotz::vec2 { v::sw()->aspect(), 1.0f }; }
+    auto aspect() const { return dotz::vec2 { v::dq()->aspect_of(), 1.0f }; }
 
     void on_frame(float grid_size, float ui_size, dotz::vec2 center) {
       auto cb = v::sw()->command_buffer();
