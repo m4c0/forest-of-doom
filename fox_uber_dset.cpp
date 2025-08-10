@@ -21,16 +21,18 @@ static auto create_sampler() {
   return vee::create_sampler(info);
 }
 
+static auto create_dset(auto smp) {
+  hai::array<vee::sampler::type> smps { fox::uber_dset_smps };
+  for (auto & s : smps) s = smp;
+  return voo::single_dset {
+    vee::dsl_fragment_samplers(smps),
+    vee::combined_image_sampler(fox::uber_dset_smps),
+  };
+}
+
 fox::uber_dset::uber_dset() :
   m_smp { create_sampler() }
-, m_dset {
-  vee::dsl_fragment_samplers([this] {
-    hai::array<vee::sampler::type> res { uber_dset_smps };
-    for (auto & s : res) s = *m_smp;
-    return res;
-  }()),
-  vee::combined_image_sampler(uber_dset_smps),
-}
+, m_dset { create_dset(*m_smp) }
 , m_img {}
 {
   for (auto i = 0; i < uber_dset_smps; i++) {
