@@ -119,6 +119,13 @@ static constexpr auto move_cursor(dotz::ivec2 d) {
   };
 }
 
+static void on_cancel() {
+  // TODO: drop if inv has something
+  // TODO: discard selection or quit
+  g_drop = g_garbage = {};
+  fod::poc();
+}
+
 void fod::open_backpack(hai::array<loots::item> * inv) {
   g_inv = inv;
 
@@ -132,7 +139,7 @@ void fod::open_backpack(hai::array<loots::item> * inv) {
   using namespace input;
   reset();
   on_key_down(keys::ACTION, on_action);
-  on_key_down(keys::CANCEL, fod::poc); // TODO: discard selection or quit
+  on_key_down(keys::CANCEL, on_cancel);
   on_key_down(keys::MOVE_DOWN,  move_cursor({ 0,  1}));
   on_key_down(keys::MOVE_UP,    move_cursor({ 0, -1}));
   on_key_down(keys::MOVE_LEFT,  move_cursor({-1,  0}));
