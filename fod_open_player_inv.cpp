@@ -4,16 +4,17 @@ import fox;
 import fui;
 import input;
 import player;
+import silog;
 
 static loots::item g_drop {};
 static loots::item g_garbage {};
 static dotz::ivec2 g_cursor {};
 static dotz::ivec2 g_sel {};
-static enum {
+static enum inv_e {
   inv_player,
   inv_drop,
   inv_garbage,
-} g_cur_inv;
+} g_cur_inv, g_sel_inv;
 
 static auto player_inv() {
   return fui::inv { &player::inv::inv(), {}, g_sel };
@@ -23,6 +24,14 @@ static auto drop_inv() {
 }
 static auto garbage_inv() {
   return fui::slot { { 0, 2 }, { 42, 18 }, &g_garbage };
+}
+static auto at(inv_e i, dotz::ivec2 p) {
+  switch (i) {
+    case inv_player:  return player_inv().at(p);
+    case inv_drop:    return &g_drop;
+    case inv_garbage: return &g_garbage;
+    default: silog::die("unreachable: invalid inventory");
+  }
 }
 
 static void on_frame(float ms) {
@@ -36,20 +45,16 @@ static void on_frame(float ms) {
 
 static void on_action() {
   if (g_sel == -1) {
-    if (g_cur_inv == inv_drop) return;
-    if (g_cur_inv == inv_garbage) return;
-
-    auto item = player_inv().at(g_cursor);
-    if (!item) return;
-    auto i = item->sprite;
-    if (!i.x && !i.y) return;
+    auto item = at(g_cur_inv, g_cursor);
+    if (!item || !*item) return;
 
     g_sel = g_cursor;
+    g_sel_inv = g_cur_inv;
     return;
   }
 
-  auto sp = player_inv().at(g_sel);
-  auto cp = player_inv().at(g_cursor);
+  auto sp = at(g_sel_inv, g_sel);
+  auto cp = at(g_cur_inv, g_cursor);
   if (sp && cp) {
     auto tmp = *sp;
     *sp = *cp;
@@ -92,8 +97,9 @@ static constexpr auto move_cursor(dotz::ivec2 d) {
 }
 
 void fod::open_player_inv() {
-  g_cur_inv = inv_player;
+  g_cur_inv = {};
   g_cursor = {};
+  g_sel_inv = {};
   g_sel = -1;
 
   fod::on_frame = ::on_frame;

@@ -43,6 +43,8 @@ static loots::item * at(inv_e i, dotz::ivec2 p) {
   switch (i) {
     case inv_backpack: return open_inv().at(p);
     case inv_player:   return player_inv().at(p);
+    case inv_drop:     return &g_drop;
+    case inv_garbage:  return &g_garbage;
     default: silog::die("unreachable: invalid inventory");
   }
 }
@@ -59,14 +61,9 @@ static void on_frame(float ms) {
 
 static void on_action() {
   if (g_sel == -1) {
-    if (g_cur_inv == inv_drop) return;
-    if (g_cur_inv == inv_garbage) return;
-
     auto item = at(g_cur_inv, g_cursor);
-    if (!item) return;
+    if (!item || !*item) return;
 
-    auto i = item->sprite;
-    if (!i.x && !i.y) return;
     g_sel = g_cursor;
     g_sel_inv = g_cur_inv;
     return;
@@ -127,9 +124,9 @@ void fod::open_backpack(hai::array<loots::item> * inv) {
 
   fod::on_frame = ::on_frame;
   g_cursor = {};
-  g_cur_inv = inv_backpack;
+  g_cur_inv = {};
   g_sel = -1;
-  g_sel_inv = inv_backpack;
+  g_sel_inv = {};
 
   using namespace input;
   reset();
