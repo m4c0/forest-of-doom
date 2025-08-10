@@ -36,7 +36,7 @@ static auto at(inv_e i, dotz::ivec2 p) {
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
-    player_inv().load(m, g_cursor);
+    player_inv().load(m, g_cur_inv == inv_player ? g_cursor : -1);
     drop_inv().load(m);
     garbage_inv().load(m);
   });
