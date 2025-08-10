@@ -88,7 +88,6 @@ static constexpr auto move_cursor(dotz::ivec2 d) {
         if (c.y < 0) return;
         if (c.y >= fui::inv::h) {
           g_cur_inv = g_cursor.x <= 3 ? inv_drop : inv_garbage;
-          g_cursor = -1;
           return;
         }
         g_cursor = c;

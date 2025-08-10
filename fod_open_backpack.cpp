@@ -109,7 +109,6 @@ static constexpr auto move_cursor(dotz::ivec2 d) {
     } else if (c.y >= fui::inv::h) {
       if (g_cur_inv == inv_player) {
         g_cur_inv = g_cursor.x <= 3 ? inv_drop : inv_garbage;
-        g_cursor = -1;
         return;
       }
       g_cur_inv = inv_player;
@@ -122,11 +121,12 @@ static constexpr auto move_cursor(dotz::ivec2 d) {
 void fod::open_backpack(hai::array<loots::item> * inv) {
   g_inv = inv;
 
-  fod::on_frame = ::on_frame;
   g_cursor = {};
   g_cur_inv = {};
   g_sel = -1;
   g_sel_inv = {};
+
+  fod::on_frame = ::on_frame;
 
   using namespace input;
   reset();
