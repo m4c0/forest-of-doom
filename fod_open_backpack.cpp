@@ -33,10 +33,10 @@ static auto player_inv() {
   return fui::inv { &player::inv::inv(), { 0, 2 }, sel(inv_player) };
 }
 static auto drop_inv() {
-  return fui::slot { { -1, 4 }, { 40, 19 }, &g_drop };
+  return fui::slot { { -1, 4 }, { 40, 19 }, &g_drop, g_cur_inv == inv_drop, g_sel_inv == inv_drop };
 }
 static auto garbage_inv() {
-  return fui::slot { { 0, 4 }, { 42, 18 }, &g_garbage };
+  return fui::slot { { 0, 4 }, { 42, 18 }, &g_garbage, g_cur_inv == inv_garbage, g_sel_inv == inv_garbage };
 }
 
 static loots::item * at(inv_e i, dotz::ivec2 p) {
@@ -53,8 +53,8 @@ static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
     open_inv().load(m, cursor(inv_backpack));
     player_inv().load(m, cursor(inv_player));
-    drop_inv().load(m, g_cur_inv == inv_drop);
-    garbage_inv().load(m, g_cur_inv == inv_garbage);
+    drop_inv().load(m);
+    garbage_inv().load(m);
   });
   fox::g->on_frame(16, 16, player::center());
 }

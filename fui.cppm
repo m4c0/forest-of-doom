@@ -97,19 +97,23 @@ namespace fui {
     dotz::vec2 m_pos;
     dotz::ivec2 m_uv;
     loots::item * m_item;
+    bool m_hover;
+    bool m_selected;
 
   public:
     constexpr slot() = default;
-    constexpr slot(dotz::vec2 p, dotz::ivec2 uv, loots::item * i) :
+    constexpr slot(dotz::vec2 p, dotz::ivec2 uv, loots::item * i, bool h, bool s) :
       m_pos { p }
     , m_uv { uv }
     , m_item { i }
+    , m_hover { h }
+    , m_selected { s }
     {}
 
-    void load(auto * m, bool selected) {
+    void load(auto * m) {
       *m += {
         .pos = m_pos,
-        .uv { 5, 5 },
+        .uv = m_selected ? dotz::ivec2 { 11, 5 } : dotz::ivec2 { 5, 5 },
         .size = 1,
         .texid = fox::texids::ui_paper,
       };
@@ -125,7 +129,7 @@ namespace fui {
         .size = 1,
         .texid = fox::texids::ui_style,
       };
-      if (selected) *m += {
+      if (m_hover) *m += {
         .pos = m_pos,
         .uv { 15, 4 },
         .size = 1,
