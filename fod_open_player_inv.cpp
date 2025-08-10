@@ -62,6 +62,7 @@ static void on_action() {
   }
 
   g_sel = -1;
+  g_sel_inv = {};
 }
 
 static constexpr auto move_cursor(dotz::ivec2 d) {
