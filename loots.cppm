@@ -8,6 +8,10 @@ import jute;
 namespace loots {
   export struct item {
     dotz::vec2 sprite;
+
+    [[nodiscard]] constexpr operator bool() {
+      return sprite.x || sprite.y;
+    }
   };
 
   export hai::array<item> parse(jute::view filename);

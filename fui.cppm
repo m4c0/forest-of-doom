@@ -56,17 +56,17 @@ namespace fui {
             continue;
           }
 
-          auto i = at(p)->sprite;
+          auto * i = at(p);
 
           dotz::vec2 uv {};
           if (m_sel.x < 0) {
-            uv = i.x || i.y ? dotz::vec2 { 5, 7 } : dotz::vec2 { 5, 9 };
+            uv = *i ? dotz::vec2 { 5, 7 } : dotz::vec2 { 5, 9 };
           } else {
             uv = (p == m_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
           }
           sp(m, p, uv, fox::texids::ui_paper);
 
-          if (i.x || i.y) sp(m, p, i, fox::texids::ui_style);
+          if (*i) sp(m, p, i->sprite, fox::texids::ui_style);
         }
       }
     }
@@ -119,7 +119,7 @@ namespace fui {
         .size = 1,
         .texid = fox::texids::ui_style,
       };
-      if (m_item) *m += {
+      if (*m_item) *m += {
         .pos = m_pos,
         .uv = m_item->sprite,
         .size = 1,
