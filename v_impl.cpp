@@ -27,15 +27,15 @@ static void on_resize() {
 static void on_frame() {
   if (!g_eg) g_eg = new extent_globals {};
 
-  v::sw()->acquire_next_image();
-  v::sw()->queue_one_time_submit(v::dq()->queue(), [] {
-    auto rp = v::sw()->cmd_render_pass();
-    auto cb = v::sw()->command_buffer();
-    vee::cmd_set_viewport(cb, v::sw()->extent());
-    vee::cmd_set_scissor(cb, v::sw()->extent());
+  g_eg->sw.acquire_next_image();
+  g_eg->sw.queue_one_time_submit(g_ag->dq.queue(), [] {
+    auto rp = g_eg->sw.cmd_render_pass();
+    auto cb = g_eg->sw.command_buffer();
+    vee::cmd_set_viewport(cb, g_eg->sw.extent());
+    vee::cmd_set_scissor(cb, g_eg->sw.extent());
     v::on_frame();
   });
-  v::sw()->queue_present(v::dq()->queue());
+  g_eg->sw.queue_present(g_ag->dq.queue());
 }
 static void on_stop() {
   v::on_stop();
