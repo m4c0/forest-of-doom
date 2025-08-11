@@ -69,6 +69,8 @@ static void on_action() {
     return;
   }
 
+  if (g_cur_inv == inv_garbage) g_garbage = {};
+
   auto sp = at(g_sel_inv, g_sel);
   auto cp = at(g_cur_inv, g_cursor);
   if (sp && cp) {
