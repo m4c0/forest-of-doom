@@ -6,15 +6,22 @@ import input;
 import player;
 import silog;
 
-static loots::item g_drop {};
-static loots::item g_garbage {};
-static dotz::ivec2 g_cursor {};
-static dotz::ivec2 g_sel {};
 static enum inv_e {
   inv_player,
   inv_drop,
   inv_garbage,
 } g_cur_inv, g_sel_inv;
+static dotz::ivec2 g_cursor {};
+static dotz::ivec2 g_sel {};
+static loots::item g_drop {};
+static loots::item g_garbage {};
+
+static auto cursor(inv_e inv) {
+  return inv == g_cur_inv ? g_cursor : dotz::ivec2 { -1 };
+}
+static auto sel(inv_e inv) {
+  return inv == g_sel_inv ? g_sel : dotz::ivec2 { -1 };
+}
 
 static auto player_inv() {
   return fui::inv { &player::inv::inv(), {}, g_sel };
@@ -25,7 +32,8 @@ static auto drop_inv() {
 static auto garbage_inv() {
   return fui::slot { { 0, 2 }, { 42, 18 }, &g_garbage, g_cur_inv == inv_garbage, g_sel_inv == inv_garbage };
 }
-static auto at(inv_e i, dotz::ivec2 p) {
+
+static loots::item * at(inv_e i, dotz::ivec2 p) {
   switch (i) {
     case inv_player:  return player_inv().at(p);
     case inv_drop:    return &g_drop;
@@ -36,7 +44,7 @@ static auto at(inv_e i, dotz::ivec2 p) {
 
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
-    player_inv().load(m, g_cur_inv == inv_player ? g_cursor : -1);
+    player_inv().load(m, cursor(inv_player));
     drop_inv().load(m);
     garbage_inv().load(m);
   });
