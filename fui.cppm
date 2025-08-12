@@ -60,7 +60,7 @@ namespace fui {
 
           dotz::vec2 uv {};
           if (m_sel.x < 0) {
-            uv = *i ? dotz::vec2 { 5, 7 } : dotz::vec2 { 5, 9 };
+            uv = { 5, 7 };
           } else {
             uv = (p == m_sel) ? dotz::vec2 { 5, 8 } : dotz::vec2 { 5, 7 };
           }
