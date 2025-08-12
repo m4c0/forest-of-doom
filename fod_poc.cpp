@@ -1,5 +1,6 @@
 module fod;
 import backpack;
+import drops;
 import dotz;
 import fox;
 import hud;
@@ -26,6 +27,7 @@ static void on_frame(float ms) {
   fox::g->load(fox::layers::entities, [](auto * m) {
     auto p = player::center();
     backpack::load(p, m);
+    drops::load(p, m);
   });
   fox::g->load(fox::layers::player, [](auto * m) {
     player::load(m);
