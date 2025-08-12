@@ -3,6 +3,9 @@ import dotz;
 import fox;
 import hai;
 
+// TODO: move items to avoid collisions
+//       This should move away from blocks etc
+
 namespace drops {
   struct t {
     fox::sprite sprite;
