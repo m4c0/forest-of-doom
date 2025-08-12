@@ -1,5 +1,6 @@
 module fod;
 import dotz;
+import drops;
 import fox;
 import fui;
 import input;
@@ -49,6 +50,19 @@ static loots::item * at(inv_e i, dotz::ivec2 p) {
   }
 }
 
+static void drop() {
+  if (!g_drop) return;
+  drops::add({
+    .sprite {
+      .pos   = player::center(),
+      .uv    = g_drop.sprite,
+      .size  = 1,
+      .texid = fox::texids::ui_style,
+    },
+  });
+  g_drop = {};
+}
+
 static void on_frame(float ms) {
   fox::g->load_ui([](auto * m) {
     open_inv().load(m, cursor(inv_backpack));
@@ -70,6 +84,7 @@ static void on_action() {
   }
 
   if (g_cur_inv == inv_garbage) g_garbage = {};
+  if (g_cur_inv == inv_drop) drop();
 
   auto sp = at(g_sel_inv, g_sel);
   auto cp = at(g_cur_inv, g_cursor);
@@ -128,7 +143,7 @@ static void on_cancel() {
     return;
   }
 
-  // TODO: drop if inv has something
+  drop();
   g_drop = g_garbage = {};
   fod::poc();
 }

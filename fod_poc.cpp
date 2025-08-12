@@ -10,8 +10,9 @@ import silog;
 
 static void on_action() {
   auto i = backpack::open(player::center());
-  if (i) fod::open_backpack(i);
-  else fod::open_player_inv();
+  if (i) return fod::open_backpack(i);
+
+  fod::open_player_inv();
 }
 static void on_rest() {
   player::rest();
