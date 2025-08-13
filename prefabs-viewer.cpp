@@ -13,7 +13,7 @@ const int i = [] {
   v::on_start = [] {
     g_fox = new fox::main {};
 
-    jute::view name = "prefabs-island-0.lsp";
+    jute::view name = "prefabs-plains-0.lsp";
     auto o0 = prefabs::load(name);
     g_fox->load(fox::layers::floor, [&](auto * m) {
       o0->for_each([&](float x, float y, const auto & def) {
