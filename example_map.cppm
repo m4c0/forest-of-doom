@@ -8,12 +8,12 @@ import loots;
 import prefabs;
 
 namespace example_map {
-  void load_prefab(fox::memiter * m, jute::view name, int dx, int dy) {
+  void load_prefab(fox::memiter * m, jute::view name) {
     try {
       auto o0 = prefabs::load(name);
       o0->for_each([&](float x, float y, const auto & def) {
         *m += fox::sprite {
-          .pos   { dx + x, dy + y },
+          .pos   { x, y },
           .uv    = def.tile.uv,
           .size  = def.tile.size,
           .texid = static_cast<fox::texids>(def.tile.texid),
@@ -21,7 +21,7 @@ namespace example_map {
       });
       o0->for_each([&](float x, float y, const auto & def) {
         if (dotz::length(def.collision.zw()) > 0) {
-          auto aa = def.collision.xy() + dotz::vec2 { dx + x, dy + y };
+          auto aa = def.collision.xy() + dotz::vec2 { x, y };
           auto bb = aa + def.collision.zw();
           collision::bodies().add_aabb(aa, bb, 'body', 1);
         }
@@ -30,7 +30,7 @@ namespace example_map {
           backpack::add({
             .loot = def.loot,
             .sprite = {
-              .pos   { dx + x, dy + y },
+              .pos   { x, y },
               .uv    = def.entity.uv,
               .size  = def.entity.size,
               .texid = static_cast<fox::texids>(def.entity.texid),
@@ -43,15 +43,6 @@ namespace example_map {
   }
 
   export void load(fox::memiter * m) {
-    load_prefab(m, "prefabs-ocean-0.lsp", -16, -16);
-    load_prefab(m, "prefabs-ocean-0.lsp",   0, -16);
-    load_prefab(m, "prefabs-ocean-0.lsp",  16, -16);
-    load_prefab(m, "prefabs-ocean-0.lsp", -16,   0);
-    load_prefab(m, "prefabs-ocean-0.lsp",  16,   0);
-    load_prefab(m, "prefabs-ocean-0.lsp", -16,  16);
-    load_prefab(m, "prefabs-ocean-0.lsp",   0,  16);
-    load_prefab(m, "prefabs-ocean-0.lsp",  16,  16);
-  
-    load_prefab(m, "prefabs-island-0.lsp", 0, 0);
+    load_prefab(m, "prefabs-island-0.lsp");
   }
 }
