@@ -126,21 +126,23 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     return nn;
   };
   ctx.fns["prefab"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
-    if (as != prefabs::height) err(n, "incorrect number of rows in prefab");
+    unsigned w = 0;
+    unsigned h = as;
 
     auto * nn = new tdef_node { *n };
-    nn->tmap = hai::sptr { new prefabs::tilemap {} };
-    auto & map = *nn->tmap;
     for (auto i = 0; aa[i]; i++) {
       auto c = aa[i];
       if (!is_atom(c)) err(c, "rows in prefabs must be atoms");
-      if (c->atom.size() != prefabs::width) err(c, "incorrect number of symbols in prefab");
+      if (w == 0) w = c->atom.size();
+      if (c->atom.size() != w) err(c, "inconsistent number of symbols in prefab");
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
         if (!ctx.defs.has(id)) err(c, "unknown tiledef", x);
         auto cid = static_cast<const tdef_node *>(eval(ctx, ctx.defs[id]));
         // TODO: validate tiledef
-        map(x, i) = cid->tdef;
+
+        if (!nn->tmap) nn->tmap = hai::sptr { new prefabs::tilemap { w, h } };
+        (*nn->tmap)(x, i) = cid->tdef;
       }
     }
     return nn;
