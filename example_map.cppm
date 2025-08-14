@@ -36,6 +36,13 @@ namespace example_map {
               .texid = static_cast<fox::texids>(def.entity.texid),
             },
           });
+        } else if (def.entity.size.x) {
+          *m += {
+            .pos   { x, y },
+            .uv    = def.entity.uv,
+            .size  = def.entity.size,
+            .texid = static_cast<fox::texids>(def.entity.texid),
+          };
         }
       });
     } catch (...) {
@@ -43,6 +50,6 @@ namespace example_map {
   }
 
   export void load(fox::memiter * m) {
-    load_prefab(m, "prefabs-island-0.lsp");
+    load_prefab(m, "prefabs-plains-0.lsp");
   }
 }
