@@ -29,7 +29,9 @@ static void on_frame() {
 
   g_eg->sw.acquire_next_image();
   g_eg->sw.queue_one_time_submit(g_ag->dq.queue(), [] {
-    auto rp = g_eg->sw.cmd_render_pass();
+    auto rp = g_eg->sw.cmd_render_pass({
+      .clear_colours = { vee::clear_colour(0, 0, 0, 0) },
+    });
     auto cb = g_eg->sw.command_buffer();
     vee::cmd_set_viewport(cb, g_eg->sw.extent());
     vee::cmd_set_scissor(cb, g_eg->sw.extent());
