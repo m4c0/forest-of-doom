@@ -35,7 +35,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   context ctx {};
   ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as == 0) err(n, "rand requires at least a parameter");
-    return eval(ctx, aa[rng::rand(as - 1)]);
+    return eval(ctx, aa[rng::rand(as)]);
   };
   ctx.fns["tiledef"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as == 0) err(n, "tiledef must have at least name");

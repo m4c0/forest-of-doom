@@ -3,6 +3,7 @@
 (def grass
   (random
     (tile  9 7 1 1 (terrains))
+    (tile 11 8 1 1 (terrains))
     (tile 11 8 1 1 (terrains))))
 
 (def . (tiledef (grass)))
