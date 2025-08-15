@@ -9,17 +9,18 @@
 (def . (tiledef (grass)))
 
 (def P (tiledef (grass) (entry start)))
+(def > (tiledef (grass) (exit prefabs-island-0 start)))
 
 (def X (tiledef
          (grass) 
          (entity 14 42 1 5 (terrains))
-         (collision 0 0 1 5)))
+         (collision 0 0.3 1 5)))
 
 (prefab
   ......................
   ......................
   .......P..............
-  ......................
+  .....................>
   .....................X
   ......................
   ......................

@@ -45,6 +45,8 @@
 (def S (tiledef (tile  1 16 1 1 (terrains))))
 (def T (tiledef (tile  4 17 1 1 (terrains))))
 
+(def ! (tiledef (road-center) (entry start)))
+
 (def backpack
   (tiledef 
     (road-center)
@@ -66,7 +68,7 @@
   D..O////////P..E
   D..O/////123P..E
   D..O////////P..E
-  D..O////////P..E
+  D..O//!/////P..E
   D..RSSSSSSSST..E
   D..............E
   FGGGc..........E
