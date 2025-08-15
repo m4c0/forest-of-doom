@@ -151,6 +151,15 @@ namespace player {
     const auto collides = [&](float dx, float dy) {
       auto aa = g_state.sprite.pos + dotz::vec2 { dx, dy + 0.9f };
       auto bb = aa + 1;
+
+      bool in_field = false;
+      collision::field().collides_aabb(aa, bb, [&](auto owner, auto id) {
+        in_field = true;
+        return false;
+      });
+      // Field is a "positive space": we only allow moving if inside
+      if (!in_field) return true;
+
       bool result = false;
       collision::bodies().collides_aabb(aa, bb, [&](auto owner, auto id) {
         result = true;
