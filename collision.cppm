@@ -149,6 +149,10 @@ namespace collision {
     }
   };
 
+  export [[nodiscard]] auto & field() {
+    static layer i {};
+    return i;
+  }
   export [[nodiscard]] auto & bodies() {
     static layer i {};
     return i;
@@ -156,6 +160,12 @@ namespace collision {
   export [[nodiscard]] auto & entities() {
     static layer i {};
     return i;
+  }
+
+  export void purge_all() {
+    field() = {};
+    bodies() = {};
+    entities() = {};
   }
 }
 
