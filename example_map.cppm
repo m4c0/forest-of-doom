@@ -11,7 +11,11 @@ namespace example_map {
   void load_prefab(fox::memiter * m, jute::view name) {
     try {
       auto o0 = prefabs::load(name);
-      collision::field().add_aabb({}, o0->size(), 'fild', 1);
+
+      // Add the field with a margin (otherwise we only limit the player from
+      // fully leaving the field)
+      collision::field().add_aabb({1}, o0->size() - 1, 'fild', 1);
+
       o0->for_each([&](float x, float y, const auto & def) {
         *m += fox::sprite {
           .pos   { x, y },
