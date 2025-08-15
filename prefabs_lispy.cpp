@@ -48,6 +48,10 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
         nn->tdef.behaviour = cc->tdef.behaviour;
         valid = true;
       }
+      if (cc->tdef.entry.size()) {
+        nn->tdef.entry = cc->tdef.entry;
+        valid = true;
+      }
       if (cc->tdef.loot.size()) {
         nn->tdef.loot = cc->tdef.loot;
         valid = true;
@@ -115,6 +119,14 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     if (!is_atom(val)) err(n, "behaviour must be an atom");
     auto * nn = new tdef_node { *n };
     nn->tdef.behaviour = val->atom;
+    return nn;
+  };
+  ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as != 1) err(n, "entry point requires a name");
+    auto val = eval(ctx, aa[0]);
+    if (!is_atom(val)) err(n, "entry point must be an atom");
+    auto * nn = new tdef_node { *n };
+    nn->tdef.entry = val->atom;
     return nn;
   };
   ctx.fns["loot"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
