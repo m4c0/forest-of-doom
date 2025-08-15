@@ -47,6 +47,10 @@ namespace player {
   } g_state;
 
   export gauges status() { return g_state; }
+
+  export void teleport(dotz::vec2 p) {
+    g_state.sprite.pos = p;
+  }
   
   export void load(fox::memiter * m) {
     *m += g_state.sprite;

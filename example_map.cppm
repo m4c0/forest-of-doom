@@ -5,6 +5,7 @@ import dotz;
 import fox;
 import jute;
 import loots;
+import player;
 import prefabs;
 
 namespace example_map {
@@ -15,6 +16,11 @@ namespace example_map {
       // Add the field with a margin (otherwise we only limit the player from
       // fully leaving the field)
       collision::field().add_aabb({1}, o0->size() - 1, 'fild', 1);
+
+      o0->for_each([&](float x, float y, const auto & def) {
+        if (*def.entry != "start") return;
+        player::teleport({ x, y - 1.f }); // compensate player height
+      });
 
       o0->for_each([&](float x, float y, const auto & def) {
         *m += fox::sprite {
@@ -30,7 +36,7 @@ namespace example_map {
           auto bb = aa + def.collision.zw();
           collision::bodies().add_aabb(aa, bb, 'body', 1);
         }
-  
+
         if (*def.behaviour == "backpack") {
           backpack::add({
             .loot = def.loot,
