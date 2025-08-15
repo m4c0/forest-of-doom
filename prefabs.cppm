@@ -45,6 +45,8 @@ namespace prefabs {
       return m_data[y * m_width + x];
     }
 
+    [[nodiscard]] constexpr dotz::ivec2 size() const { return { m_width, m_height }; }
+
     void for_each(auto && fn) const {
       for (auto y = 0; y < m_height; y++) {
         for (auto x = 0; x < m_width; x++) {
