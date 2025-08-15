@@ -37,7 +37,7 @@ namespace player {
 
   struct state : gauges {
     fox::sprite sprite {
-      .pos { 8, 8 },
+      .pos { 6, 6 },
       .size { 1, 2 },
       .texid = fox::texids::char_scout,
     };
