@@ -6,7 +6,7 @@ import jute;
 import loots;
 import silog;
 
-namespace exit {
+namespace exits {
   struct t {
     dotz::vec2 pos;
     jute::heap file;

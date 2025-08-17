@@ -23,7 +23,7 @@ namespace example_map {
 
         if (*def.entry == "start") player::teleport({ x, y - player_h });
 
-        if (def.exit.file.size()) exit::add({
+        if (def.exit.file.size()) exits::add({
           .pos   { x, y },
           .file  = def.exit.file,
           .entry = def.exit.entry,
