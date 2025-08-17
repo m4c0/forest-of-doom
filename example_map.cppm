@@ -15,7 +15,7 @@ namespace example_map {
 
       // Add the field with a margin (otherwise we only limit the player from
       // fully leaving the field)
-      collision::field().add_aabb({1}, o0->size() - 1, 'fild', 1);
+      player::playfield().add_aabb({1}, o0->size() - 1, 'fild', 1);
 
       o0->for_each([&](float x, float y, const auto & def) {
         if (*def.entry != "start") return;

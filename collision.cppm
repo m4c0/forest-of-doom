@@ -18,7 +18,7 @@ namespace collision {
     float dist;
   };
 
-  class layer {
+  export class layer {
     // TODO: this might grow really fast
     hai::varray<item> m_data { 102400 };
 
@@ -149,10 +149,6 @@ namespace collision {
     }
   };
 
-  export [[nodiscard]] auto & field() {
-    static layer i {};
-    return i;
-  }
   export [[nodiscard]] auto & bodies() {
     static layer i {};
     return i;
@@ -163,7 +159,6 @@ namespace collision {
   }
 
   export void purge_all() {
-    field() = {};
     bodies() = {};
     entities() = {};
   }

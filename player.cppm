@@ -36,6 +36,7 @@ namespace player {
   };
 
   struct state : gauges {
+    collision::layer field {};
     fox::sprite sprite {
       .pos { 6, 6 },
       .size { 1, 2 },
@@ -47,6 +48,8 @@ namespace player {
   } g_state;
 
   export gauges status() { return g_state; }
+
+  export auto & playfield() { return g_state.field; }
 
   export void teleport(dotz::vec2 p) {
     g_state.sprite.pos = p;
@@ -157,7 +160,7 @@ namespace player {
       auto bb = aa + 1;
 
       bool in_field = false;
-      collision::field().collides_aabb(aa, bb, [&](auto owner, auto id) {
+      g_state.field.collides_aabb(aa, bb, [&](auto owner, auto id) {
         in_field = true;
         return false;
       });
