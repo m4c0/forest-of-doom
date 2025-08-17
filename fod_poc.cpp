@@ -2,6 +2,7 @@ module fod;
 import backpack;
 import drops;
 import dotz;
+import exit;
 import fox;
 import hud;
 import input;
@@ -9,8 +10,10 @@ import player;
 import silog;
 
 static void on_action() {
-  auto i = backpack::open(player::center());
-  if (i) return fod::open_backpack(i);
+  auto pc = player::center();
+
+  if (auto i = backpack::open(pc)) return fod::open_backpack(i);
+  if (auto i = exit::open(pc)) return fod::exit(*i->file, *i->entry);
 
   fod::open_player_inv();
 }
