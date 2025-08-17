@@ -2,6 +2,7 @@ export module example_map;
 import backpack;
 import collision;
 import dotz;
+import exit;
 import fox;
 import jute;
 import loots;
@@ -18,8 +19,15 @@ namespace example_map {
       player::playfield().add_aabb({1}, o0->size() - 1, 'fild', 1);
 
       o0->for_each([&](float x, float y, const auto & def) {
-        if (*def.entry != "start") return;
-        player::teleport({ x, y - 1.f }); // compensate player height
+        static constexpr const auto player_h = 1.f;
+
+        if (*def.entry == "start") player::teleport({ x, y - player_h });
+
+        if (def.exit.file.size()) exit::add({
+          .pos   { x, y },
+          .file  = def.exit.file,
+          .entry = def.exit.entry,
+        });
       });
 
       o0->for_each([&](float x, float y, const auto & def) {
