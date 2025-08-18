@@ -10,7 +10,7 @@ import player;
 import prefabs;
 
 namespace example_map {
-  void load_prefab(fox::memiter * m, jute::view name) {
+  void load_prefab(fox::memiter * m, jute::view name, jute::view entry) {
     try {
       auto o0 = prefabs::load(name);
 
@@ -21,7 +21,7 @@ namespace example_map {
       o0->for_each([&](float x, float y, const auto & def) {
         static constexpr const auto player_h = 1.f;
 
-        if (*def.entry == "start") player::teleport({ x, y - player_h });
+        if (*def.entry == entry) player::teleport({ x, y - player_h });
 
         if (def.exit.file.size()) exits::add({
           .pos   { x, y },
@@ -69,6 +69,6 @@ namespace example_map {
   }
 
   export void load(fox::memiter * m) {
-    load_prefab(m, "prefabs-plains-0.lsp");
+    load_prefab(m, "prefabs-plains-0.lsp", "start");
   }
 }

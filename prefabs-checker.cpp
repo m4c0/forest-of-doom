@@ -5,6 +5,7 @@ import pprent;
 import prefabs;
 import print;
 
+// TODO: validate entry/exit
 int main() {
   int result = 0;
   for (auto p : pprent::list("prefabs")) {
