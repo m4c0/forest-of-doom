@@ -34,22 +34,28 @@ namespace player {
     float health = 1;
     float satiation = 1;
   };
-
-  struct state : gauges {
+  struct data {
     collision::layer field {};
+    anim anim {};
+    side side {};
+    bool resting = false;
+  };
+
+  struct state : gauges, data {
     fox::sprite sprite {
       .pos { 6, 6 },
       .size { 1, 2 },
       .texid = fox::texids::char_scout,
     };
-    anim anim {};
-    side side;
-    bool resting;
   } g_state;
 
   export gauges status() { return g_state; }
 
   export auto & playfield() { return g_state.field; }
+
+  export void reset() {
+    g_state = {};
+  }
 
   export void teleport(dotz::vec2 p) {
     g_state.sprite.pos = p;
