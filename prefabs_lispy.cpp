@@ -191,7 +191,8 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
 }
 const prefabs::tilemap * prefabs::load(jute::view filename) {
   try {
-    auto prefab = parse(sires::real_path_name(filename)); 
+    auto fn = (filename + ".lsp").cstr();
+    auto prefab = parse(sires::real_path_name(fn)); 
     if (!prefab) silog::die("missing prefab definition");
     return prefab;
   } catch (const parser_error & e) {
