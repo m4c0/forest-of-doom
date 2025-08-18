@@ -19,6 +19,10 @@ namespace exits {
     list.push_back_doubling(t);
   }
 
+  export void purge() {
+    list.truncate(0);
+  }
+
   export t * open(dotz::vec2 player) {
     for (auto i = 0; i < list.size(); i++) {
       auto & e = list[i];

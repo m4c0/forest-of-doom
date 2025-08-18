@@ -1,5 +1,6 @@
 export module backpack;
 import dotz;
+import drops;
 import fox;
 import hai;
 import jute;
@@ -17,6 +18,10 @@ namespace backpack {
 
   export void add(t t) {
     list.push_back_doubling(t);
+  }
+
+  export void purge() {
+    list.truncate(0);
   }
 
   export void load(dotz::vec2 player, fox::memiter * m) {

@@ -16,6 +16,10 @@ namespace drops {
     list.push_back_doubling(t);
   }
 
+  export void purge() {
+    list.truncate(0);
+  }
+
   export void load(dotz::vec2 player, fox::memiter * m) {
     // TODO: use tiledef collision
     for (auto & item : list) {
