@@ -38,7 +38,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     return eval(ctx, aa[rng::rand(as)]);
   };
   ctx.fns["tiledef"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
-    if (as == 0) err(n, "tiledef must have at least name");
+    if (as == 0) err(n, "tiledef must have at least one attribute");
 
     auto * nn = new tdef_node { *n };
     for (auto * c = aa; *c; c++) {
