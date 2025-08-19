@@ -9,7 +9,7 @@ sitime::stopwatch g_timer {};
 const int i = [] {
   v::on_start  = [] {
     fox::g = new fox::main {};
-    fod::exit("prefabs-plains-0", "start");
+    fod::exit("prefabs-camping-0", "start");
   };
   v::on_frame  = [] {
     static sitime::stopwatch timer {};
