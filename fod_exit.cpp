@@ -64,6 +64,16 @@ static void load_prefab(fox::memiter * m, jute::view name, jute::view entry) {
         };
       }
     });
+    o0->for_each([&](float x, float y, const auto & def) {
+      if (def.hover.size.x) {
+        *m += {
+          .pos   { x, y },
+          .uv    = def.hover.uv,
+          .size  = def.hover.size,
+          .texid = static_cast<fox::texids>(def.hover.texid),
+        };
+      }
+    });
   } catch (...) {
   }
 }
