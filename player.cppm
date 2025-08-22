@@ -162,7 +162,7 @@ namespace player {
     walk_animation(ms, s);
   
     const auto collides = [&](float dx, float dy) {
-      auto aa = g_state.sprite.pos + dotz::vec2 { dx, dy + 0.9f };
+      auto aa = g_state.sprite.pos + dotz::vec2 { dx, dy + 1.f };
       auto bb = aa + 1;
 
       bool in_field = false;
