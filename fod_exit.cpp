@@ -10,10 +10,10 @@ import player;
 import prefabs;
 import silog;
 
-static void load_prefab(fox::memiter * m, jute::view name, jute::view entry) {
-  try {
-    auto o0 = prefabs::load(name);
+static void load_prefab(jute::view file, jute::view entry) {
+  auto o0 = prefabs::load(file);
 
+  fox::g->load(fox::layers::floor, [=](auto * m) {
     // Add the field with a margin (otherwise we only limit the player from
     // fully leaving the field)
     player::playfield().add_aabb({1}, o0->size() - 1, 'fild', 1);
@@ -64,6 +64,8 @@ static void load_prefab(fox::memiter * m, jute::view name, jute::view entry) {
         };
       }
     });
+  });
+  fox::g->load(fox::layers::over, [=](auto * m) {
     o0->for_each([&](float x, float y, const auto & def) {
       if (def.hover.size.x) {
         *m += {
@@ -74,8 +76,7 @@ static void load_prefab(fox::memiter * m, jute::view name, jute::view entry) {
         };
       }
     });
-  } catch (...) {
-  }
+  });
 }
 
 void fod::exit(jute::view file, jute::view entry) {
@@ -89,8 +90,9 @@ void fod::exit(jute::view file, jute::view entry) {
   exits::purge();
   player::reset();
 
-  fox::g->load(fox::layers::floor, [=](auto * m) {
-    load_prefab(m, file, entry);
-  });
-  fod::poc();
+  try {
+    load_prefab(file, entry);
+    fod::poc();
+  } catch (...) {
+  }
 }
