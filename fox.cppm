@@ -15,6 +15,7 @@ namespace fox {
     floor = 0,
     entities,
     player,
+    over,
     max,
   };
   export enum class texids : unsigned {
