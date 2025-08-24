@@ -57,6 +57,14 @@ namespace player {
     g_state = {};
   }
 
+  export auto aabb() {
+    struct {
+      dotz::vec2 aa = g_state.sprite.pos + dotz::vec2 { 0, 1 };
+      dotz::vec2 bb = aa + 1;
+    } res;
+    return res;
+  }
+
   export void teleport(dotz::vec2 p) {
     g_state.sprite.pos = p;
   }

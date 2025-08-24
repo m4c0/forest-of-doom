@@ -1,4 +1,5 @@
 export module exit;
+import collision;
 import dotz;
 import fox;
 import hai;
@@ -14,24 +15,25 @@ namespace exits {
   };
 
   hai::varray<t> list { 128 };
+  collision::layer collisions {};
 
   export void add(t t) {
     list.push_back_doubling(t);
+    collisions.add_aabb(t.pos, t.pos + 1, 'exit', list.size());
   }
 
   export void purge() {
     list.truncate(0);
+    collisions.purge();
   }
 
-  export t * open(dotz::vec2 player) {
-    for (auto i = 0; i < list.size(); i++) {
-      auto & e = list[i];
-
-      auto c = e.pos + 0.5;
-      if (dotz::length(player - c) > 0.5) continue;
-
-      return &e;
-    }
-    return nullptr;
+  export t * open(dotz::vec2 aa, dotz::vec2 bb) {
+    t * result = nullptr;
+    collisions.collides_aabb(aa, bb, [&](auto, auto id) {
+      // TODO: maybe select largest area if colliding with more than one
+      result = &list[id - 1];
+      return true;
+    });
+    return result;
   }
 }
