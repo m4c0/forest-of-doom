@@ -1,12 +1,7 @@
 (def terrain 0)
 (def camping 1)
 
-(def grass
-  (random
-    (tile  9 7 1 1 (terrain))
-    (tile 11 8 1 1 (terrain))))
-
-(def . (tiledef (grass)))
+(def . (tiledef (tile 4 16 1 1 3)))
 
 (def backpack
   (tiledef 
@@ -15,15 +10,27 @@
     (behaviour backpack)
     (loot loot0)))
 
-(def @ (tiledef (.) (backpack)))
+(def _ (tiledef (tile 0 0 1 1 0)))
+(def @ (tiledef (_) (backpack)))
+
+(def # (tiledef
+  (.)
+  (entity 22 30 1 2 (camping))
+  (collision 0 0 0.9 1.7)))
 
 (def ! (tiledef
-  (grass)
+  (.)
   (exit prefabs-camping-0 tent)
   (entry door)))
 
+(def * (tiledef 
+  (.)
+  (entity 20 28 1 1 (camping))
+  (collision 0 0 1 0.4)))
+
 (prefab
-  ..@
+  __@
+  #*.
   ...
   .!.
 )
