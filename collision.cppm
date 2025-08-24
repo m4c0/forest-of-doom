@@ -36,6 +36,8 @@ namespace collision {
     }
 
   public:
+    void purge() { m_data.truncate(0); }
+
     void add_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned owner, unsigned id) {
       add(item { { aa, bb }, type::aabb, owner, id });
     }
@@ -159,8 +161,8 @@ namespace collision {
   }
 
   export void purge_all() {
-    bodies() = {};
-    entities() = {};
+    bodies().purge();
+    entities().purge();
   }
 }
 
