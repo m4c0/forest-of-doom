@@ -19,7 +19,7 @@ struct tdef_node : node {
   prefabs::tiledef tdef {};
   hai::sptr<prefabs::tilemap> tmap {};
   bool has_entity   : 1;
-  bool has_hover    : 1;
+  bool has_over     : 1;
   bool has_tile     : 1;
   bool has_collider : 1;
 };
@@ -71,9 +71,9 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
         nn->has_entity = true;
         valid = true;
       }
-      if (cc->has_hover) {
-        nn->tdef.hover = cc->tdef.hover;
-        nn->has_hover = true;
+      if (cc->has_over) {
+        nn->tdef.over = cc->tdef.over;
+        nn->has_over = true;
         valid = true;
       }
       if (cc->has_collider) {
@@ -111,17 +111,17 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     nn->has_entity = true;
     return nn;
   };
-  ctx.fns["hover"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
-    if (as != 5) err(n, "hover should have uv, size and texid");
+  ctx.fns["over"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
+    if (as != 5) err(n, "over should have uv, size and texid");
 
     auto * nn = new tdef_node { *n };
-    auto & t = nn->tdef.hover;
+    auto & t = nn->tdef.over;
     t.uv.x   = to_i(eval(ctx, aa[0]));
     t.uv.y   = to_i(eval(ctx, aa[1]));
     t.size.x = to_i(eval(ctx, aa[2]));
     t.size.y = to_i(eval(ctx, aa[3]));
     t.texid  = to_i(eval(ctx, aa[4]));
-    nn->has_hover = true;
+    nn->has_over = true;
     return nn;
   };
   ctx.fns["collision"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {

@@ -67,12 +67,12 @@ static void load_prefab(jute::view file, jute::view entry) {
   });
   fox::g->load(fox::layers::over, [=](auto * m) {
     o0->for_each([&](float x, float y, const auto & def) {
-      if (def.hover.size.x) {
+      if (def.over.size.x) {
         *m += {
           .pos   { x, y },
-          .uv    = def.hover.uv,
-          .size  = def.hover.size,
-          .texid = static_cast<fox::texids>(def.hover.texid),
+          .uv    = def.over.uv,
+          .size  = def.over.size,
+          .texid = static_cast<fox::texids>(def.over.texid),
         };
       }
     });

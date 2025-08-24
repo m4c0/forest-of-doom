@@ -32,7 +32,7 @@ namespace prefabs {
     exit exit {};
     sprite tile {};
     sprite entity {};
-    sprite hover {};
+    sprite over {};
     dotz::vec4 collision {};
   };
 
