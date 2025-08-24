@@ -54,7 +54,9 @@ namespace player {
   export auto & playfield() { return g_state.field; }
 
   export void reset() {
+    auto side = g_state.side;
     g_state = {};
+    g_state.side = side;
   }
 
   export auto aabb() {
