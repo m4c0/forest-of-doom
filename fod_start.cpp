@@ -1,6 +1,7 @@
 module fod;
 import fox;
 import input;
+import rng;
 import sitime;
 import v;
 
@@ -20,6 +21,7 @@ const int i = [] {
     delete fox::g;
   };
 
+  rng::seed();
   input::setup();
   return 0;
 }();
