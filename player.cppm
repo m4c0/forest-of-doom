@@ -169,9 +169,10 @@ namespace player {
     exercise(energy_lost_per_sec, ms);
     walk_animation(ms, s);
   
-    const auto collides = [&](float dx, float dy) {
-      auto aa = g_state.sprite.pos + dotz::vec2 { dx, dy + 1.f };
-      auto bb = aa + 1;
+    const auto collides = [&](dotz::vec2 d) {
+      auto [aa, bb] = aabb();
+      aa = aa + d + 0.05;
+      bb = bb + d - 0.05;
 
       bool in_field = false;
       g_state.field.collides_aabb(aa, bb, [&](auto owner, auto id) {
@@ -190,10 +191,10 @@ namespace player {
     };
   
     auto d = dotz::normalise(in) * ms * speed * g_state.energy;
-    if (!collides(d.x, d.y)) {
-    } else if (!collides(0, d.y)) {
+    if (!collides(d)) {
+    } else if (!collides({0.f, d.y})) {
       d.x = 0;
-    } else if (!collides(d.x, 0)) {
+    } else if (!collides({d.x, 0.f})) {
       d.y = 0;
     } else {
       // TODO: do something
