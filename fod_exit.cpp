@@ -88,7 +88,7 @@ void fod::exit(jute::view file, jute::view entry) {
   backpack::purge();
   collision::purge_all();
   exits::purge();
-  player::reset();
+  player::purge();
 
   try {
     load_prefab(file, entry);

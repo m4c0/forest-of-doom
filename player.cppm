@@ -53,7 +53,7 @@ namespace player {
 
   export auto & playfield() { return g_state.field; }
 
-  export void reset() {
+  export void purge() {
     auto side = g_state.side;
     g_state = {};
     g_state.side = side;
