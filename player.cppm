@@ -170,9 +170,10 @@ namespace player {
     walk_animation(ms, s);
   
     const auto collides = [&](dotz::vec2 d) {
+      static constexpr const float margin = 0.025;
       auto [aa, bb] = aabb();
-      aa = aa + d + 0.05;
-      bb = bb + d - 0.05;
+      aa = aa + d + margin;
+      bb = bb + d - margin;
 
       bool in_field = false;
       g_state.field.collides_aabb(aa, bb, [&](auto owner, auto id) {
