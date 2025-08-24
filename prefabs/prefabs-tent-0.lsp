@@ -23,8 +23,6 @@
 (def ^ (tiledef (tile  9 50 1 1 (terrain)) (cbox)))
 (def / (tiledef (tile 12 51 1 1 (terrain)) (cbox)))
 
-(def ' (tiledef (tile 9 51 1 1 (terrain))))
-
 (def @ (tiledef (_) (backpack)))
 
 (def # (tiledef
@@ -46,6 +44,5 @@
   r__@a
   e#*.3
   e...3
-  e.!.3
-  \^'^/
+  \^!^/
 )
