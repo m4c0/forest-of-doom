@@ -5,6 +5,7 @@ import fox;
 import hai;
 import jute;
 import loots;
+import player;
 import silog;
 
 namespace exits {
@@ -19,7 +20,8 @@ namespace exits {
 
   export void add(t t) {
     list.push_back_doubling(t);
-    collisions.add_aabb(t.pos, t.pos + 1, 'exit', list.size());
+    // add margin to avoid triggering from neighbours
+    collisions.add_aabb(t.pos + 0.25f, t.pos + 0.75f, 'exit', list.size());
   }
 
   export void purge() {
@@ -27,7 +29,11 @@ namespace exits {
     collisions.purge();
   }
 
-  export t * open(dotz::vec2 aa, dotz::vec2 bb) {
+  export t * open() {
+    auto [aa, bb] = player::aabb();
+    aa = aa + 0.25;
+    bb = bb + 0.25;
+
     t * result = nullptr;
     collisions.collides_aabb(aa, bb, [&](auto, auto id) {
       // TODO: maybe select largest area if colliding with more than one

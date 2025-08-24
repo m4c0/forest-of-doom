@@ -11,10 +11,9 @@ import silog;
 
 static void on_action() {
   auto pc = player::center();
-  auto [aa, bb] = player::aabb();
 
   if (auto i = backpack::open(pc)) return fod::open_backpack(i);
-  if (auto i = exits::open(aa, bb)) return fod::exit(*i->file, *i->entry);
+  if (auto i = exits::open()) return fod::exit(*i->file, *i->entry);
 
   fod::open_player_inv();
 }
