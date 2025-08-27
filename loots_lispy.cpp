@@ -14,12 +14,12 @@ struct loot_node : node {
 hai::array<loots::item> loots::parse(jute::view filename) {
   hai::array<loot_node> buf { 10240 };
   auto cur = buf.begin();
-  alloc_node = [&] -> void * {
+
+  context ctx {};
+  ctx.allocator = [&] -> node * {
     if (cur == buf.end()) throw 0;
     return cur++;
   };
-
-  context ctx {};
   ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as == 0) err(n, "rand requires at least a parameter");
     return eval(ctx, aa[rng::rand(as)]);
@@ -27,7 +27,7 @@ hai::array<loots::item> loots::parse(jute::view filename) {
   ctx.fns["item"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as != 2) err(n, "item expects two coordinates");
 
-    auto * nn = new loot_node { *n };
+    auto * nn = new (ctx.allocator()) loot_node { *n };
     nn->item.sprite.x = to_i(aa[0]);
     nn->item.sprite.y = to_i(aa[1]);
     nn->has_item = true;
@@ -44,7 +44,6 @@ hai::array<loots::item> loots::parse(jute::view filename) {
     res[i++] = nn->item;
   });
 
-  alloc_node = [] -> void * { return nullptr; };
   return res;
 }
 hai::array<loots::item> loots::load(jute::view table_name) {

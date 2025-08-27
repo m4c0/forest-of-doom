@@ -28,12 +28,12 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
 
   hai::array<tdef_node> buf { 10240 };
   auto cur = buf.begin();
-  alloc_node = [&] -> void * {
+
+  context ctx {};
+  ctx.allocator = [&] -> node * {
     if (cur == buf.end()) throw 0;
     return cur++;
   };
-
-  context ctx {};
   ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as == 0) err(n, "rand requires at least a parameter");
     return eval(ctx, aa[rng::rand(as)]);
@@ -41,7 +41,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   ctx.fns["tiledef"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as == 0) err(n, "tiledef must have at least one attribute");
 
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     for (auto * c = aa; *c; c++) {
       auto * cc = static_cast<const tdef_node *>(eval(ctx, *c));
       bool valid = false;
@@ -88,7 +88,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   ctx.fns["tile"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as != 5) err(n, "tile should have uv, size and texid");
 
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     auto & t = nn->tdef.tile;
     t.uv.x   = to_i(eval(ctx, aa[0]));
     t.uv.y   = to_i(eval(ctx, aa[1]));
@@ -101,7 +101,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   ctx.fns["entity"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as != 5) err(n, "entity should have uv, size and texid");
 
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     auto & t = nn->tdef.entity;
     t.uv.x   = to_i(eval(ctx, aa[0]));
     t.uv.y   = to_i(eval(ctx, aa[1]));
@@ -114,7 +114,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   ctx.fns["over"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as != 5) err(n, "over should have uv, size and texid");
 
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     auto & t = nn->tdef.over;
     t.uv.x   = to_i(eval(ctx, aa[0]));
     t.uv.y   = to_i(eval(ctx, aa[1]));
@@ -127,7 +127,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   ctx.fns["collision"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
     if (as != 4) err(n, "collision should have pos and size");
 
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     auto & c = nn->tdef.collision;
     c.x = to_f(eval(ctx, aa[0]));
     c.y = to_f(eval(ctx, aa[1]));
@@ -140,7 +140,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     if (as != 1) err(n, "behaviour requires a value");
     auto val = eval(ctx, aa[0]);
     if (!is_atom(val)) err(n, "behaviour must be an atom");
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     nn->tdef.behaviour = val->atom;
     return nn;
   };
@@ -150,7 +150,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     if (!is_atom(file)) err(n, "exit point file name must be an atom");
     auto tgt = eval(ctx, aa[1]);
     if (!is_atom(tgt)) err(n, "exit point target name must be an atom");
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     nn->tdef.exit = exit {
       .file = file->atom,
       .entry = tgt->atom,
@@ -161,7 +161,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     if (as != 1) err(n, "entry point requires a name");
     auto val = eval(ctx, aa[0]);
     if (!is_atom(val)) err(n, "entry point must be an atom");
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     nn->tdef.entry = val->atom;
     return nn;
   };
@@ -169,7 +169,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     if (as != 1) err(n, "loot table requires a value");
     auto val = eval(ctx, aa[0]);
     if (!is_atom(val)) err(n, "loot table must be an atom");
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     nn->tdef.loot = val->atom;
     return nn;
   };
@@ -177,7 +177,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     unsigned w = 0;
     unsigned h = as;
 
-    auto * nn = new tdef_node { *n };
+    auto * nn = new (ctx.allocator()) tdef_node { *n };
     for (auto i = 0; aa[i]; i++) {
       auto c = aa[i];
       if (!is_atom(c)) err(c, "rows in prefabs must be atoms");
@@ -202,8 +202,6 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     if (n->tmap) prefab = n;
   });
   if (!prefab) return nullptr;
-
-  alloc_node = [] -> void * { return nullptr; };
 
   g_cache[filename] = prefab->tmap;
   return &*g_cache[filename];
