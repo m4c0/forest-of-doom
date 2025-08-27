@@ -43,7 +43,7 @@ static void on_frame(float ms) {
 }
 
 void fod::poc() {
-  input::reset();;
+  input::reset();
   input::on_key_down(input::keys::ACTION, on_action);
   input::on_key_down(input::keys::REST, on_rest);
   fod::on_frame = ::on_frame;
