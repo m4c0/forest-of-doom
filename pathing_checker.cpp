@@ -1,4 +1,5 @@
 #pragma leco test
+import jojo;
 import jute;
 import lispy;
 import print;
@@ -24,7 +25,7 @@ int main() try {
     return n;
   };
   
-  lispy::run("pathing.lsp", cm.ctx, [](auto * n) {
+  lispy::run(jojo::read_cstr("pathing.lsp"), cm.ctx, [](auto * n) {
   });
 } catch (const lispy::parser_error & e) {
   errln("pathing.lsp", ":", e.line, ":", e.col, ": ", e.msg);

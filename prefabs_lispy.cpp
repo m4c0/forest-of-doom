@@ -197,7 +197,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   };
 
   const tdef_node * prefab {};
-  run(filename, ctx, [&](auto * node) {
+  run(jojo::read_cstr(filename), ctx, [&](auto * node) {
     auto n = static_cast<const tdef_node *>(node);
     if (n->tmap) prefab = n;
   });

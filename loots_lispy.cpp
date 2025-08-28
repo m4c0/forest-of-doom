@@ -1,4 +1,5 @@
 module loots;
+import jojo;
 import lispy;
 import rng;
 import silog;
@@ -36,7 +37,7 @@ hai::array<loots::item> loots::parse(jute::view filename) {
 
   hai::array<loots::item> res { 8 };
   unsigned i = 0;
-  run(filename, ctx, [&](auto * node) {
+  run(jojo::read_cstr(filename), ctx, [&](auto * node) {
     auto nn = static_cast<const loot_node *>(node);
     if (!nn->has_item) return; // defs, etc
 
