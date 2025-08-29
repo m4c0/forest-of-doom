@@ -53,9 +53,19 @@ int main() try {
   jute::heap start {};
   lispy::run(jojo::read_cstr("pathing.lsp"), cm.ctx, [&](auto * n) {
     auto * nn = static_cast<const node *>(n);
-    if (*nn->start != "") start = nn->start;
+    if (*nn->start != "") {
+      start = nn->start;
+
+      auto * tn = cm.ctx.defs[*nn->start];
+      if (!tn) lispy::err(nn, "undefined start");
+
+      // Only used to validate the def
+      [[maybe_unused]]
+      auto * tt = static_cast<const node *>(lispy::eval(cm.ctx, tn));
+    }
   });
   if (*start == "") errln("pathing.lsp:1:1: missing start");
+
 } catch (const lispy::parser_error & e) {
   errln("pathing.lsp", ":", e.line, ":", e.col, ": ", e.msg);
   return 1;
