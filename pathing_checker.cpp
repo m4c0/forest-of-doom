@@ -5,10 +5,15 @@ import lispy;
 import print;
 
 int main() try {
+  struct exit {
+    jute::heap entry;
+    jute::heap target;
+  };
   struct node : lispy::node {
     jute::heap file;
     jute::heap entry;
     jute::heap start;
+    exit exit;
   };
 
   lispy::ctx_w_mem<node> cm {};
@@ -30,6 +35,18 @@ int main() try {
     nn->file = a->atom;
     return nn;
   };
+  cm.ctx.fns["exit"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+    if (as != 2) lispy::err(n, "exit expects name and target def");
+    auto a0 = static_cast<const node *>(lispy::eval(ctx, aa[0]));
+    if (!lispy::is_atom(a0)) lispy::err(aa[0], "expecting atom as point name");
+    auto a1 = static_cast<const node *>(lispy::eval(ctx, aa[1]));
+    if (!lispy::is_atom(a1)) lispy::err(aa[1], "expecting atom as def name");
+
+    auto nn = new (ctx.allocator()) node {};
+    nn->exit = exit { a0->atom, a1->atom };
+    return n;
+  };
+
   cm.ctx.fns["from"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as < 1) lispy::err(n, "from expects file, entry and one or more exit");
     auto nn = new (ctx.allocator()) node {};
