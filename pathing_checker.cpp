@@ -6,6 +6,7 @@ import print;
 
 int main() try {
   struct node : lispy::node {
+    jute::heap start;
   };
 
   lispy::ctx_w_mem<node> cm {};
@@ -20,11 +21,18 @@ int main() try {
     if (as != 1) lispy::err(n, "start expects the target");
     auto a = lispy::eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "start expects the def name");
-    return n;
+
+    auto nn = new (ctx.allocator()) node { *n };
+    nn->start = a->atom;
+    return nn;
   };
   
-  lispy::run(jojo::read_cstr("pathing.lsp"), cm.ctx, [](auto * n) {
+  jute::heap start {};
+  lispy::run(jojo::read_cstr("pathing.lsp"), cm.ctx, [&](auto * n) {
+    auto * nn = static_cast<const node *>(n);
+    if (*nn->start != "") start = nn->start;
   });
+  if (*start == "") errln("pathing.lsp:1:1: missing start");
 } catch (const lispy::parser_error & e) {
   errln("pathing.lsp", ":", e.line, ":", e.col, ": ", e.msg);
   return 1;
