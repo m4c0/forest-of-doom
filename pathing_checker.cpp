@@ -7,18 +7,18 @@ import print;
 int main() try {
   struct node : lispy::node {
     jute::heap file;
-    jute::heap enter;
+    jute::heap entry;
     jute::heap start;
   };
 
   lispy::ctx_w_mem<node> cm {};
-  cm.ctx.fns["enter"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
-    if (as != 1) lispy::err(n, "enter expects entry name");
+  cm.ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+    if (as != 1) lispy::err(n, "entry expects entry name");
     auto a = static_cast<const node *>(lispy::eval(ctx, aa[0]));
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as entry name");
 
     auto nn = new (ctx.allocator()) node {};
-    nn->enter = a->atom;
+    nn->entry = a->atom;
     return nn;
   };
   cm.ctx.fns["file"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
@@ -31,12 +31,12 @@ int main() try {
     return nn;
   };
   cm.ctx.fns["from"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
-    if (as < 1) lispy::err(n, "from expects file, enter and one or more exit");
+    if (as < 1) lispy::err(n, "from expects file, entry and one or more exit");
     auto nn = new (ctx.allocator()) node {};
     for (auto i = 0; i < as; i++) {
       auto a = static_cast<const node *>(lispy::eval(ctx, aa[i]));
       if (*a->file != "") nn->file = a->file;
-      if (*a->enter != "") nn->enter = a->enter;
+      if (*a->entry != "") nn->entry = a->entry;
     }
     return nn;
   };
