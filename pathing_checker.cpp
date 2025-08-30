@@ -1,4 +1,5 @@
 #pragma leco test
+import hai;
 import jojo;
 import jute;
 import lispy;
@@ -9,11 +10,18 @@ int main() try {
     jute::heap entry;
     jute::heap target;
   };
+  struct from {
+    jute::heap file;
+    jute::heap entry;
+    jute::heap start;
+    hai::array<exit> exits;
+  };
   struct node : lispy::node {
     jute::heap file;
     jute::heap entry;
     jute::heap start;
     exit exit;
+    hai::sptr<from> from;
   };
 
   lispy::ctx_w_mem<node> cm {};
