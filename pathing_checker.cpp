@@ -63,7 +63,7 @@ int main() try {
         case n_entry: f->entry = a->u.str; break;
         case n_start: lispy::err(aa[i], "cannot have a start inside a from"); break;
         case n_exit: f->exits[*a->u.exit.key] = a->u.exit.value; break;
-        case n_from: f = a->u.from; break;
+        case n_from: lispy::err(aa[i], "no copy support yet"); break;
       }
     }
     return new (ctx.allocator()) node { {}, n_from, { .from { f } }};
