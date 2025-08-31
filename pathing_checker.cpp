@@ -8,21 +8,26 @@ import print;
 
 int main() try {
   struct exit {
-    jute::heap entry;
-    jute::heap target;
+    jute::heap key;
+    jute::heap value;
   };
   struct from {
     jute::heap file;
     jute::heap entry;
     jute::heap start;
-    hashley::fin<jute::heap> exits;
+    hashley::fin<jute::heap> exits { 13 };
+  };
+  enum ntype {
+    n_empty, n_file, n_entry, n_exit, n_from, n_start
   };
   struct node : lispy::node {
-    jute::heap file;
-    jute::heap entry;
-    jute::heap start;
-    exit exit;
-    hai::sptr<from> from;
+    ntype type = n_empty;
+    union u {
+      jute::heap str;
+      exit exit;
+      hai::sptr<from> from;
+      ~u() {}
+    } u;
   };
 
   lispy::ctx_w_mem<node> cm {};
@@ -30,19 +35,13 @@ int main() try {
     if (as != 1) lispy::err(n, "entry expects entry name");
     auto a = static_cast<const node *>(lispy::eval(ctx, aa[0]));
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as entry name");
-
-    auto nn = new (ctx.allocator()) node {};
-    nn->entry = a->atom;
-    return nn;
+    return new (ctx.allocator()) node { {}, n_entry, { a->atom } };
   };
   cm.ctx.fns["file"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "file expects prefab name");
     auto a = static_cast<const node *>(lispy::eval(ctx, aa[0]));
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as file name");
-
-    auto nn = new (ctx.allocator()) node {};
-    nn->file = a->atom;
-    return nn;
+    return new (ctx.allocator()) node { {}, n_file, { a->atom } };
   };
   cm.ctx.fns["exit"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 2) lispy::err(n, "exit expects name and target def");
@@ -50,39 +49,39 @@ int main() try {
     if (!lispy::is_atom(a0)) lispy::err(aa[0], "expecting atom as point name");
     auto a1 = static_cast<const node *>(lispy::eval(ctx, aa[1]));
     if (!lispy::is_atom(a1)) lispy::err(aa[1], "expecting atom as def name");
-
-    auto nn = new (ctx.allocator()) node {};
-    nn->exit = exit { a0->atom, a1->atom };
-    return n;
+    return new (ctx.allocator()) node { {}, n_exit, { .exit { a0->atom, a1->atom } } };
   };
 
   cm.ctx.fns["from"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as < 1) lispy::err(n, "from expects file, entry and one or more exit");
-    auto nn = new (ctx.allocator()) node {};
+    auto f = hai::sptr<from>::make();
     for (auto i = 0; i < as; i++) {
       auto a = static_cast<const node *>(lispy::eval(ctx, aa[i]));
-      if (*a->file != "") nn->file = a->file;
-      if (*a->entry != "") nn->entry = a->entry;
+      switch (a->type) {
+        case n_empty: break;
+        case n_file: f->file = a->u.str; break;
+        case n_entry: f->entry = a->u.str; break;
+        case n_start: lispy::err(aa[i], "cannot have a start inside a from"); break;
+        case n_exit: f->exits[*a->u.exit.key] = a->u.exit.value; break;
+        case n_from: f = a->u.from; break;
+      }
     }
-    return nn;
+    return new (ctx.allocator()) node { {}, n_from, { .from { f } }};
   };
   cm.ctx.fns["start"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "start expects the target");
     auto a = lispy::eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "start expects the def name");
-
-    auto nn = new (ctx.allocator()) node { *n };
-    nn->start = a->atom;
-    return nn;
+    return new (ctx.allocator()) node { {}, n_start, { a->atom } };
   };
   
   jute::heap start {};
   lispy::run(jojo::read_cstr("pathing.lsp"), cm.ctx, [&](auto * n) {
     auto * nn = static_cast<const node *>(n);
-    if (*nn->start != "") {
-      start = nn->start;
+    if (nn->type == n_start) {
+      start = nn->u.str;
 
-      auto * tn = cm.ctx.defs[*nn->start];
+      auto * tn = cm.ctx.defs[*start];
       if (!tn) lispy::err(nn, "undefined start");
 
       // Only used to validate the def
