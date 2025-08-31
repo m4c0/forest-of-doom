@@ -8,14 +8,14 @@ import print;
 
 int main() try {
   struct exit {
-    jute::heap key;
-    jute::heap value;
+    jute::view key;
+    jute::view value;
   };
   struct from {
-    jute::heap file;
-    jute::heap entry;
-    jute::heap start;
-    hashley::fin<jute::heap> exits { 13 };
+    jute::view file;
+    jute::view entry;
+    jute::view start;
+    hashley::fin<jute::view> exits { 13 };
   };
   enum ntype {
     n_empty, n_file, n_entry, n_exit, n_from, n_start
@@ -23,7 +23,7 @@ int main() try {
   struct node : lispy::node {
     ntype type = n_empty;
     union u {
-      jute::heap str;
+      jute::view str;
       exit exit;
       hai::sptr<from> from;
       ~u() {}
@@ -62,7 +62,7 @@ int main() try {
         case n_file: f->file = a->u.str; break;
         case n_entry: f->entry = a->u.str; break;
         case n_start: lispy::err(aa[i], "cannot have a start inside a from"); break;
-        case n_exit: f->exits[*a->u.exit.key] = a->u.exit.value; break;
+        case n_exit: f->exits[a->u.exit.key] = a->u.exit.value; break;
         case n_from: lispy::err(aa[i], "no copy support yet"); break;
       }
     }
@@ -72,6 +72,7 @@ int main() try {
     if (as != 1) lispy::err(n, "start expects the target");
     auto a = lispy::eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "start expects the def name");
+    if (!ctx.defs.has(a->atom)) lispy::err(aa[0], "missing def");
     return new (ctx.allocator()) node { {}, n_start, { a->atom } };
   };
   
