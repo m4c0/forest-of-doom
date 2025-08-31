@@ -1,5 +1,6 @@
 #pragma leco test
 import hai;
+import hashley;
 import jojo;
 import jute;
 import lispy;
@@ -14,7 +15,7 @@ int main() try {
     jute::heap file;
     jute::heap entry;
     jute::heap start;
-    hai::array<exit> exits;
+    hashley::fin<jute::heap> exits;
   };
   struct node : lispy::node {
     jute::heap file;
