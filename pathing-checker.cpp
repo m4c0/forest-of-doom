@@ -90,7 +90,7 @@ int main() try {
       start = nn->u.str;
 
       const auto rec = [&](auto & rec, jute::view key) -> void {
-        auto * tn = cm.ctx.defs[start];
+        auto * tn = cm.ctx.defs[key];
         if (!tn) lispy::err(nn, "undefined key");
 
         auto * tt = static_cast<const node *>(lispy::eval(cm.ctx, tn));
