@@ -71,7 +71,7 @@ int main() try {
         case n_from: lispy::err(aa[i], "no copy support yet"); break;
       }
     }
-    return new (ctx.allocator()) node { {}, n_from, { .from { f } }};
+    return new (ctx.allocator()) node { *n, n_from, { .from { f } }};
   };
   cm.ctx.fns["start"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "start expects the target");
@@ -89,7 +89,7 @@ int main() try {
     if (nn->type == n_start) {
       start = nn->u.str;
 
-      const auto rec = [&](auto & rec, jute::view key) -> void {
+      const auto rec = [&](auto & rec, auto * nn, jute::view key) -> void {
         auto * tn = cm.ctx.defs[key];
         if (!tn) lispy::err(nn, "undefined key");
 
@@ -101,10 +101,10 @@ int main() try {
         for (auto key : tt->u.from->exit_names) {
           auto val = tt->u.from->exits[key];
           if (froms.has(val)) continue;
-          rec(rec, val);
+          rec(rec, tt, val);
         }
       };
-      rec(rec, start);
+      rec(rec, nn, start);
     }
   });
   if (start == "") errln("pathing.lsp:1:1: missing start");
