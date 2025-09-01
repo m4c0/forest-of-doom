@@ -76,21 +76,25 @@ int main() try {
     return new (ctx.allocator()) node { *a, n_start, { a->atom } };
   };
   
-  jute::heap start {};
-  lispy::run(jojo::read_cstr("pathing.lsp"), cm.ctx, [&](auto * n) {
+  auto src = jojo::read_cstr("pathing.lsp");
+  hashley::fin<from> froms { 127 };
+  jute::view start {};
+  lispy::run(src, cm.ctx, [&](auto * n) {
     auto * nn = static_cast<const node *>(n);
     if (nn->type == n_start) {
       start = nn->u.str;
 
-      auto * tn = cm.ctx.defs[*start];
-      if (!tn) lispy::err(nn, "undefined start");
+      const auto rec = [&](auto & rec, jute::view key) {
+        auto * tn = cm.ctx.defs[start];
+        if (!tn) lispy::err(nn, "undefined key");
 
-      // Only used to validate the def
-      [[maybe_unused]]
-      auto * tt = static_cast<const node *>(lispy::eval(cm.ctx, tn));
+        auto * tt = static_cast<const node *>(lispy::eval(cm.ctx, tn));
+        if (tt->type != n_from) lispy::err(nn, "expecting a key to a 'from'");
+      };
+      rec(rec, start);
     }
   });
-  if (*start == "") errln("pathing.lsp:1:1: missing start");
+  if (start == "") errln("pathing.lsp:1:1: missing start");
 
 } catch (const lispy::parser_error & e) {
   errln("pathing.lsp", ":", e.line, ":", e.col, ": ", e.msg);
