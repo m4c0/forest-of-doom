@@ -32,10 +32,15 @@ namespace pathing {
     } u;
   };
 
-  export void load();
+  export struct t {
+    hashley::fin<hai::sptr<from>> froms { 127 };
+    jute::view start {};
+  };
+
+  export [[nodiscard]] t load();
 }
 
-void pathing::load() {
+pathing::t pathing::load() {
   lispy::ctx_w_mem<node> cm {};
   cm.ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "entry expects entry name");
@@ -87,12 +92,11 @@ void pathing::load() {
   };
   
   auto src = jojo::read_cstr("pathing.lsp");
-  hashley::fin<hai::sptr<from>> froms { 127 };
-  jute::view start {};
+  t res {};
   lispy::run(src, cm.ctx, [&](auto * n) {
     auto * nn = static_cast<const node *>(n);
     if (nn->type == n_start) {
-      start = nn->u.str;
+      res.start = nn->u.str;
 
       const auto rec = [&](auto & rec, auto * nn, jute::view key) -> void {
         auto * tn = cm.ctx.defs[key];
@@ -101,16 +105,17 @@ void pathing::load() {
         auto * tt = static_cast<const node *>(lispy::eval(cm.ctx, tn));
         if (tt->type != n_from) lispy::err(nn, "expecting a key to a 'from'");
 
-        froms[key] = tt->u.from;
+        res.froms[key] = tt->u.from;
 
         for (auto key : tt->u.from->exit_names) {
           auto val = tt->u.from->exits[key];
-          if (froms.has(val)) continue;
+          if (res.froms.has(val)) continue;
           rec(rec, tt, val);
         }
       };
-      rec(rec, nn, start);
+      rec(rec, nn, res.start);
     }
   });
-  if (start == "") lispy::fail({ "missing start"_hs, 1, 1 });
+  if (res.start == "") lispy::fail({ "missing start"_hs, 1, 1 });
+  return res;
 }
