@@ -35,13 +35,13 @@ int main() try {
     if (as != 1) lispy::err(n, "entry expects entry name");
     auto a = static_cast<const node *>(lispy::eval(ctx, aa[0]));
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as entry name");
-    return new (ctx.allocator()) node { {}, n_entry, { a->atom } };
+    return new (ctx.allocator()) node { *aa[0], n_entry, { a->atom } };
   };
   cm.ctx.fns["file"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "file expects prefab name");
     auto a = static_cast<const node *>(lispy::eval(ctx, aa[0]));
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as file name");
-    return new (ctx.allocator()) node { {}, n_file, { a->atom } };
+    return new (ctx.allocator()) node { *aa[0], n_file, { a->atom } };
   };
   cm.ctx.fns["exit"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 2) lispy::err(n, "exit expects name and target def");
@@ -49,7 +49,7 @@ int main() try {
     if (!lispy::is_atom(a0)) lispy::err(aa[0], "expecting atom as point name");
     auto a1 = static_cast<const node *>(lispy::eval(ctx, aa[1]));
     if (!lispy::is_atom(a1)) lispy::err(aa[1], "expecting atom as def name");
-    return new (ctx.allocator()) node { {}, n_exit, { .exit { a0->atom, a1->atom } } };
+    return new (ctx.allocator()) node { *n, n_exit, { .exit { a0->atom, a1->atom } } };
   };
 
   cm.ctx.fns["from"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
@@ -71,9 +71,9 @@ int main() try {
   cm.ctx.fns["start"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "start expects the target");
     auto a = lispy::eval(ctx, aa[0]);
-    if (!lispy::is_atom(a)) lispy::err(aa[0], "start expects the def name");
-    if (!ctx.defs.has(a->atom)) lispy::err(aa[0], "missing def");
-    return new (ctx.allocator()) node { {}, n_start, { a->atom } };
+    if (!lispy::is_atom(a)) lispy::err(a, "start expects the def name");
+    if (!ctx.defs.has(a->atom)) lispy::err(a, "missing def");
+    return new (ctx.allocator()) node { *a, n_start, { a->atom } };
   };
   
   jute::heap start {};
