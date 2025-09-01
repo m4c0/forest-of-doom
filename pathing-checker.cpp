@@ -16,6 +16,7 @@ int main() try {
     jute::view entry;
     jute::view start;
     hashley::fin<jute::view> exits { 13 };
+    hai::varray<jute::view> exit_names { 16 };
   };
   enum ntype {
     n_empty, n_file, n_entry, n_exit, n_from, n_start
@@ -62,7 +63,11 @@ int main() try {
         case n_file: f->file = a->u.str; break;
         case n_entry: f->entry = a->u.str; break;
         case n_start: lispy::err(aa[i], "cannot have a start inside a from"); break;
-        case n_exit: f->exits[a->u.exit.key] = a->u.exit.value; break;
+        case n_exit: {
+          f->exits[a->u.exit.key] = a->u.exit.value;
+          f->exit_names.push_back_doubling(a->u.exit.key);
+          break;
+        }
         case n_from: lispy::err(aa[i], "no copy support yet"); break;
       }
     }
@@ -77,19 +82,27 @@ int main() try {
   };
   
   auto src = jojo::read_cstr("pathing.lsp");
-  hashley::fin<from> froms { 127 };
+  hashley::fin<hai::sptr<from>> froms { 127 };
   jute::view start {};
   lispy::run(src, cm.ctx, [&](auto * n) {
     auto * nn = static_cast<const node *>(n);
     if (nn->type == n_start) {
       start = nn->u.str;
 
-      const auto rec = [&](auto & rec, jute::view key) {
+      const auto rec = [&](auto & rec, jute::view key) -> void {
         auto * tn = cm.ctx.defs[start];
         if (!tn) lispy::err(nn, "undefined key");
 
         auto * tt = static_cast<const node *>(lispy::eval(cm.ctx, tn));
         if (tt->type != n_from) lispy::err(nn, "expecting a key to a 'from'");
+
+        froms[key] = tt->u.from;
+
+        for (auto key : tt->u.from->exit_names) {
+          auto val = tt->u.from->exits[key];
+          if (froms.has(val)) continue;
+          rec(rec, val);
+        }
       };
       rec(rec, start);
     }
