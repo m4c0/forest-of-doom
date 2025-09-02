@@ -9,7 +9,7 @@
 (def . (tiledef (grass)))
 
 (def P (tiledef (grass) (entry start)))
-(def > (tiledef (grass) (exit prefabs-island-0 start)))
+(def > (tiledef (grass) (exit start)))
 
 (def X (tiledef
          (grass) 

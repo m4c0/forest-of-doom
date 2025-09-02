@@ -32,7 +32,7 @@
 
 (def ! (tiledef
   (.)
-  (exit prefabs-camping-0 tent)
+  (exit door)
   (entry door)))
 
 (def * (tiledef 

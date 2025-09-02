@@ -6,6 +6,7 @@ import exit;
 import fox;
 import input;
 import jute;
+import pathing;
 import player;
 import prefabs;
 import silog;
@@ -23,10 +24,9 @@ static void load_prefab(jute::view file, jute::view entry) {
 
       if (*def.entry == entry) player::teleport({ x, y - player_h });
 
-      if (def.exit.file.size()) exits::add({
+      if (def.exit.size()) exits::add({
         .pos   { x, y },
-        .file  = def.exit.file,
-        .entry = def.exit.entry,
+        .name  = def.exit,
       });
     });
 
@@ -79,7 +79,12 @@ static void load_prefab(jute::view file, jute::view entry) {
   });
 }
 
-void fod::exit(jute::view file, jute::view entry) {
+static pathing::t g_pathing;
+static hai::sptr<pathing::from> g_current;
+
+static void load() {
+  auto file = g_current->file;
+  auto entry = g_current->entry;
   silog::log(silog::info, "Loading %s entering from %s", file.begin(), entry.begin());
 
   input::reset();
@@ -95,4 +100,20 @@ void fod::exit(jute::view file, jute::view entry) {
     fod::poc();
   } catch (...) {
   }
+}
+
+void fod::exit() {
+  g_pathing = pathing::load();
+  g_current = g_pathing.froms[g_pathing.start];
+  if (!g_current) silog::die("Missing target [%s]", g_pathing.start.cstr().begin());
+  load();
+}
+
+void fod::exit(jute::view thru) {
+  auto to = g_current->exits[thru];
+  if (to == "") silog::die("Target %s does not exist from %s", to.cstr().begin(), g_current->file.cstr().begin());
+
+  g_current = g_pathing.froms[to];
+  if (!g_current) silog::die("Missing target [%s]", to.cstr().begin());
+  load();
 }

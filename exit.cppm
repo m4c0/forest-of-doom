@@ -11,8 +11,7 @@ import silog;
 namespace exits {
   struct t {
     dotz::vec2 pos;
-    jute::heap file;
-    jute::heap entry;
+    jute::heap name;
   };
 
   hai::varray<t> list { 128 };

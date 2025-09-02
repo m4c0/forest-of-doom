@@ -58,7 +58,7 @@
 
 (def ! (tiledef (grass)
                 (entry tent)
-                (exit prefabs-tent-0 door)))
+                (exit tent)))
 
 (def P (tiledef (grass) (entry start)))
 

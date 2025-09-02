@@ -13,7 +13,7 @@ static void on_action() {
   auto pc = player::center();
 
   if (auto i = backpack::open(pc)) return fod::open_backpack(i);
-  if (auto i = exits::open()) return fod::exit(*i->file, *i->entry);
+  if (auto i = exits::open()) return fod::exit(*i->name);
 
   fod::open_player_inv();
 }

@@ -20,16 +20,11 @@ namespace prefabs {
     unsigned texid {};
   };
 
-  export struct exit {
-    jute::heap file {};
-    jute::heap entry {};
-  };
-
   export struct tiledef {
     jute::heap behaviour {};
     jute::heap loot {};
     jute::heap entry {};
-    exit exit {};
+    jute::heap exit {};
     sprite tile {};
     sprite entity {};
     sprite over {};

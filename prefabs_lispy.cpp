@@ -57,7 +57,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
         nn->tdef.loot = cc->tdef.loot;
         valid = true;
       }
-      if (cc->tdef.exit.file.size()) {
+      if (cc->tdef.exit.size()) {
         nn->tdef.exit = cc->tdef.exit;
         valid = true;
       }
@@ -145,16 +145,11 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     return nn;
   };
   ctx.fns["exit"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {
-    if (as != 2) err(n, "exit point requires a file name and a target name");
-    auto file = eval(ctx, aa[0]);
-    if (!is_atom(file)) err(n, "exit point file name must be an atom");
-    auto tgt = eval(ctx, aa[1]);
-    if (!is_atom(tgt)) err(n, "exit point target name must be an atom");
+    if (as != 1) err(n, "exit point requires a name");
+    auto val = eval(ctx, aa[0]);
+    if (!is_atom(val)) err(n, "exit point name must be an atom");
     auto * nn = new (ctx.allocator()) tdef_node { *n };
-    nn->tdef.exit = exit {
-      .file = file->atom,
-      .entry = tgt->atom,
-    };
+    nn->tdef.exit = val->atom;
     return nn;
   };
   ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const node * {

@@ -10,7 +10,8 @@ import jute;
 import loots;
 
 namespace fod {
-  void exit(jute::view file, jute::view entry);
+  void exit();
+  void exit(jute::view thru);
   void poc();
   void open_backpack(hai::array<loots::item> *);
   void open_player_inv();

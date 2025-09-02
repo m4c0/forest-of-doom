@@ -6,6 +6,6 @@
 (def initial-tent (from
   (file prefabs-tent-0)
   (entry door)
-  (exit tent initial-camping)))
+  (exit door initial-camping)))
 
 (start initial-camping)

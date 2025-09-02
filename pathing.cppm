@@ -13,7 +13,7 @@ namespace pathing {
     jute::view key;
     jute::view value;
   };
-  struct from {
+  export struct from {
     jute::view file;
     jute::view entry;
     hashley::fin<jute::view> exits { 13 };
@@ -33,6 +33,7 @@ namespace pathing {
   };
 
   export struct t {
+    hai::cstr src {};
     hashley::fin<hai::sptr<from>> froms { 127 };
     jute::view start {};
   };
@@ -91,9 +92,9 @@ pathing::t pathing::load() {
     return new (ctx.allocator()) node { *a, n_start, { a->atom } };
   };
   
-  auto src = jojo::read_cstr("pathing.lsp");
   t res {};
-  lispy::run(src, cm.ctx, [&](auto * n) {
+  res.src = jojo::read_cstr("pathing.lsp");
+  lispy::run(res.src, cm.ctx, [&](auto * n) {
     auto * nn = static_cast<const node *>(n);
     if (nn->type == n_start) {
       res.start = nn->u.str;
