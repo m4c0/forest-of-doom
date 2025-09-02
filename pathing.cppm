@@ -79,7 +79,16 @@ pathing::t pathing::load() {
           f->exit_names.push_back_doubling(a->u.exit.key);
           break;
         }
-        case n_from: lispy::err(aa[i], "no copy support yet"); break;
+        case n_from: {
+          auto ff = a->u.from;
+          f->file = ff->file;
+          f->entry = ff->entry;
+          for (auto e : ff->exit_names) {
+            f->exits[e] = ff->exits[e];
+            f->exit_names.push_back_doubling(e);
+          }
+          break;
+        }
       }
     }
     return new (ctx.allocator()) node { *n, n_from, { .from { f } }};
