@@ -85,7 +85,9 @@ static hai::sptr<pathing::from> g_current;
 static void load() {
   auto file = g_current->file;
   auto entry = g_current->entry;
-  silog::log(silog::info, "Loading %s entering from %s", file.begin(), entry.begin());
+  silog::log(silog::info, "Loading %.*s entering from %.*s",
+      static_cast<int>(file.size()), file.begin(),
+      static_cast<int>(entry.size()), entry.begin());
 
   input::reset();
   fod::on_frame = [](auto) {};
