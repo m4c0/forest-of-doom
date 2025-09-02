@@ -10,6 +10,9 @@
 (def tallgrass (tiledef 
   (grass)
   (random
+    (entity 26 53 1 1 (camping))
+    (entity 26 54 1 1 (camping))
+    (entity 26 55 1 1 (camping))
     (entity 22 39 1 1 (camping))
     (entity 23 39 1 1 (camping))
     (entity 22 40 1 1 (camping))
@@ -66,6 +69,9 @@
 (def o (tiledef (grass)
   (entity 18 22 1 1 (camping))
   (collision 0.0 0.0 1.0 1.0)))
+(def x (tiledef (grass)
+  (entity 20 32 1 2 (camping))
+  (collision 0.0 0.0 1.0 2.0)))
 
 (def P (tiledef (grass) (entry start)))
 
@@ -78,7 +84,7 @@
   '________________________'
   '________^_______________'
   _........................_
-  _........@___............_
+  _.......x@___............_
   __.......____oO.........__
   _........_!__P..........._
   _........____............_
