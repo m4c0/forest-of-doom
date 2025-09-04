@@ -42,6 +42,11 @@
     (rock)
     )))
 
+(def L (tiledef (_) (exit left)))
+(def > (tiledef (L) (entry left)))
+(def R (tiledef (_) (exit right)))
+(def < (tiledef (R) (entry right)))
+
 (def ' (tiledef (tile 0 0 1 1 (terrain))))
 (def % (tiledef
   (')
@@ -61,11 +66,11 @@
   '________'
   '________'
   '________'
-  _........_
-  _........_
-  __......__
-  _........_
-  _........_
+  L........R
+  L........R
+  >_......_<
+  L........R
+  L........R
   'v_______'
   '________'
   )
