@@ -8,6 +8,7 @@
 
 (def initial-camping (from
   (file prefabs-camping-0)
+  (unique-id initial-camping)
   (entry tent)
   (exit left woods-right)
   (exit right woods-left)
@@ -15,6 +16,7 @@
 
 (def initial-tent (from
   (file prefabs-tent-0)
+  (unique-id initial-tent)
   (entry door)
   (exit door initial-camping)))
 
