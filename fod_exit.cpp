@@ -11,7 +11,16 @@ import player;
 import prefabs;
 import silog;
 
-static void load_prefab(jute::view file, jute::view entry) {
+static pathing::t g_pathing;
+static hai::sptr<pathing::from> g_current;
+
+static void load_prefab() {
+  auto file = g_current->file;
+  auto entry = g_current->entry;
+  silog::log(silog::info, "Loading %.*s entering from %.*s",
+      static_cast<int>(file.size()), file.begin(),
+      static_cast<int>(entry.size()), entry.begin());
+
   auto o0 = prefabs::load(file);
 
   fox::g->load(fox::layers::floor, [=](auto * m) {
@@ -79,16 +88,7 @@ static void load_prefab(jute::view file, jute::view entry) {
   });
 }
 
-static pathing::t g_pathing;
-static hai::sptr<pathing::from> g_current;
-
 static void load() {
-  auto file = g_current->file;
-  auto entry = g_current->entry;
-  silog::log(silog::info, "Loading %.*s entering from %.*s",
-      static_cast<int>(file.size()), file.begin(),
-      static_cast<int>(entry.size()), entry.begin());
-
   input::reset();
   fod::on_frame = [](auto) {};
 
@@ -98,7 +98,7 @@ static void load() {
   player::purge();
 
   try {
-    load_prefab(file, entry);
+    load_prefab();
     fod::poc();
   } catch (...) {
   }
