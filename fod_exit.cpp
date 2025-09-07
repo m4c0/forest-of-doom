@@ -15,6 +15,9 @@ static pathing::t g_pathing;
 static hai::sptr<pathing::from> g_current;
 
 static void load_prefab() {
+  auto uid = g_current->uniqueid;
+  if (uid != "") silog::log(silog::warning, "TBD: load uniques");
+
   auto file = g_current->file;
   auto entry = g_current->entry;
   silog::log(silog::info, "Loading %.*s entering from %.*s",
@@ -114,6 +117,9 @@ void fod::exit() {
 void fod::exit(jute::view thru) {
   auto to = g_current->exits[thru];
   if (to == "") silog::die("Target %s does not exist from %s", to.cstr().begin(), g_current->file.cstr().begin());
+
+  auto uid = g_current->uniqueid;
+  if (uid != "") silog::log(silog::warning, "TBD: save uniques");
 
   g_current = g_pathing.froms[to];
   if (!g_current) silog::die("Missing target [%s]", to.cstr().begin());
