@@ -39,13 +39,20 @@ namespace pathing {
     jute::view start {};
   };
 
+  struct context : lispy::context {
+    t * res;
+  };
   export [[nodiscard]] t load();
 }
 
 pathing::t pathing::load() {
   static constexpr const auto eval = lispy::eval<pathing::node>;
 
-  lispy::ctx_w_mem<node> cm {};
+  t res {};
+  res.src = jojo::read_cstr("pathing.lsp");
+
+  lispy::ctx_w_mem<node, context> cm {};
+  cm.ctx.res = &res;
   cm.ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "entry expects entry name");
     auto a = eval(ctx, aa[0]);
@@ -109,43 +116,40 @@ pathing::t pathing::load() {
     auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(a, "start expects the def name");
     if (!ctx.defs.has(a->atom)) lispy::err(a, "missing def");
-    return new (ctx.allocator()) node { *a, n_start, { a->atom } };
+
+    auto res = static_cast<context &>(ctx).res;
+    res->start = a->atom;
+
+    hashley::fin<jute::heap> uids { 127 };
+    const auto rec = [&](auto & rec, auto * nn, jute::view key) -> void {
+      auto * tn = ctx.defs[key];
+      if (!tn) lispy::err(nn, "undefined key");
+
+      auto * tt = eval(ctx, tn);
+      if (tt->type != n_from) lispy::err(nn, "expecting a key to a 'from'");
+
+      auto f = tt->u.from;
+      if (f->uniqueid != "") {
+        auto & file = uids[f->uniqueid];
+        if (*file != "" && *file != f->file)
+          lispy::err(nn, "same unique id used in a different file");
+        file = f->file;
+      }
+
+      res->froms[key] = f;
+
+      for (auto key : f->exit_names) {
+        auto val = f->exits[key];
+        if (res->froms.has(val)) continue;
+        rec(rec, tt, val);
+      }
+    };
+    rec(rec, a, res->start);
+
+    return n;
   };
   
-  t res {};
-  res.src = jojo::read_cstr("pathing.lsp");
-  lispy::run(res.src, cm.ctx, [&](auto * n) {
-    auto * nn = static_cast<const node *>(n);
-    if (nn->type == n_start) {
-      res.start = nn->u.str;
-
-      hashley::fin<jute::heap> uids { 127 };
-      const auto rec = [&](auto & rec, auto * nn, jute::view key) -> void {
-        auto * tn = cm.ctx.defs[key];
-        if (!tn) lispy::err(nn, "undefined key");
-
-        auto * tt = eval(cm.ctx, tn);
-        if (tt->type != n_from) lispy::err(nn, "expecting a key to a 'from'");
-
-        auto f = tt->u.from;
-        if (f->uniqueid != "") {
-          auto & file = uids[f->uniqueid];
-          if (*file != "" && *file != f->file)
-            lispy::err(nn, "same unique id used in a different file");
-          file = f->file;
-        }
-
-        res.froms[key] = f;
-
-        for (auto key : f->exit_names) {
-          auto val = f->exits[key];
-          if (res.froms.has(val)) continue;
-          rec(rec, tt, val);
-        }
-      };
-      rec(rec, nn, res.start);
-    }
-  });
+  lispy::run(res.src, cm.ctx);
   if (res.start == "") lispy::fail({ "missing start"_hs, 1, 1 });
   return res;
 }
