@@ -6,14 +6,19 @@ import silog;
 import sires;
 
 struct loot_node : lispy::node {
-  loots::item item;
-  bool has_item : 1;
 };
-static constexpr const auto clone = lispy::clone<loot_node>;
 static constexpr const auto eval = lispy::eval<loot_node>;
 
+struct context : lispy::context {
+  hai::array<loots::item> * res;
+  unsigned i = 0;
+};
+
 hai::array<loots::item> loots::parse(jute::view filename) {
-  lispy::ctx_w_mem<loot_node> cm {};
+  hai::array<loots::item> res { 8 };
+
+  lispy::ctx_w_mem<loot_node, context> cm {};
+  cm.ctx.res = &res;
   cm.ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as == 0) err(n, "rand requires at least a parameter");
     return eval(ctx, aa[rng::rand(as)]);
@@ -21,22 +26,17 @@ hai::array<loots::item> loots::parse(jute::view filename) {
   cm.ctx.fns["item"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 2) err(n, "item expects two coordinates");
 
-    auto * nn = clone(&ctx, n);
-    nn->item.sprite.x = to_i(aa[0]);
-    nn->item.sprite.y = to_i(aa[1]);
-    nn->has_item = true;
-    return nn;
+    auto & res = *static_cast<context &>(ctx).res;
+    auto & i = static_cast<context &>(ctx).i;
+    if (i == res.size()) err(n, "too many items for this inventory");
+
+    res[i++] = {
+      .sprite { to_i(aa[0]), to_i(aa[1]) },
+    };
+    return n;
   };
 
-  hai::array<loots::item> res { 8 };
-  unsigned i = 0;
-  run(jojo::read_cstr(filename), cm.ctx, [&](auto * node) {
-    auto nn = static_cast<const loot_node *>(node);
-    if (!nn->has_item) return; // defs, etc
-
-    if (i == res.size()) err(nn, "too many items for this inventory");
-    res[i++] = nn->item;
-  });
+  run(jojo::read_cstr(filename), cm.ctx);
 
   return res;
 }
