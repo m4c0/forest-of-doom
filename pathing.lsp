@@ -1,10 +1,15 @@
-(def woods (from
+(def woods-left (from
   (file prefabs-woods-0)
+  (entry left)
   (exit left woods-right)
-  (exit right woods-left)))
-
-(def woods-left (from (woods) (entry left)))
-(def woods-right (from (woods) (entry right)))
+  (exit right woods-left) ; go somewhere else
+  ))
+(def woods-right (from
+  (file prefabs-woods-0)
+  (entry right)
+  (exit right woods-left)
+  (exit left woods-right) ; go somewhere else
+  ))
 
 (def initial-camping (from
   (file prefabs-camping-0)
