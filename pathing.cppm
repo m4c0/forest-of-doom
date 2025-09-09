@@ -43,30 +43,32 @@ namespace pathing {
 }
 
 pathing::t pathing::load() {
+  static constexpr const auto eval = lispy::eval<pathing::node>;
+
   lispy::ctx_w_mem<node> cm {};
   cm.ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "entry expects entry name");
-    auto a = static_cast<const node *>(lispy::eval(ctx, aa[0]));
+    auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as entry name");
     return new (ctx.allocator()) node { *aa[0], n_entry, { a->atom } };
   };
   cm.ctx.fns["file"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "file expects prefab name");
-    auto a = static_cast<const node *>(lispy::eval(ctx, aa[0]));
+    auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as file name");
     return new (ctx.allocator()) node { *aa[0], n_file, { a->atom } };
   };
   cm.ctx.fns["unique-id"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "unique id expects prefab name");
-    auto a = static_cast<const node *>(lispy::eval(ctx, aa[0]));
+    auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as unique id name");
     return new (ctx.allocator()) node { *aa[0], n_uniqueid, { a->atom } };
   };
   cm.ctx.fns["exit"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 2) lispy::err(n, "exit expects name and target def");
-    auto a0 = static_cast<const node *>(lispy::eval(ctx, aa[0]));
+    auto a0 = eval(ctx, aa[0]);
     if (!lispy::is_atom(a0)) lispy::err(aa[0], "expecting atom as point name");
-    auto a1 = static_cast<const node *>(lispy::eval(ctx, aa[1]));
+    auto a1 = eval(ctx, aa[1]);
     if (!lispy::is_atom(a1)) lispy::err(aa[1], "expecting atom as def name");
     return new (ctx.allocator()) node { *n, n_exit, { .exit { a0->atom, a1->atom } } };
   };
@@ -75,7 +77,7 @@ pathing::t pathing::load() {
     if (as < 1) lispy::err(n, "from expects file, entry and one or more exit");
     auto f = hai::sptr<from>::make();
     for (auto i = 0; i < as; i++) {
-      auto a = static_cast<const node *>(lispy::eval(ctx, aa[i]));
+      auto a = eval(ctx, aa[i]);
       switch (a->type) {
         case n_empty: break;
         case n_file: f->file = a->u.str; break;
@@ -104,7 +106,7 @@ pathing::t pathing::load() {
   };
   cm.ctx.fns["start"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "start expects the target");
-    auto a = lispy::eval(ctx, aa[0]);
+    auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(a, "start expects the def name");
     if (!ctx.defs.has(a->atom)) lispy::err(a, "missing def");
     return new (ctx.allocator()) node { *a, n_start, { a->atom } };
@@ -122,7 +124,7 @@ pathing::t pathing::load() {
         auto * tn = cm.ctx.defs[key];
         if (!tn) lispy::err(nn, "undefined key");
 
-        auto * tt = static_cast<const node *>(lispy::eval(cm.ctx, tn));
+        auto * tt = eval(cm.ctx, tn);
         if (tt->type != n_from) lispy::err(nn, "expecting a key to a 'from'");
 
         auto f = tt->u.from;
