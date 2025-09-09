@@ -16,7 +16,6 @@ static hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
 
 struct tdef_node : lispy::node {
   prefabs::tiledef tdef {};
-  hai::sptr<prefabs::tilemap> tmap {};
   bool has_entity   : 1;
   bool has_over     : 1;
   bool has_tile     : 1;
@@ -24,10 +23,14 @@ struct tdef_node : lispy::node {
 };
 static constexpr const auto eval = lispy::eval<tdef_node>;
 
+struct context : lispy::context {
+  hai::sptr<prefabs::tilemap> res;
+};
+
 const prefabs::tilemap * prefabs::parse(jute::view filename) {
   if (g_cache.has(filename)) return &*g_cache[filename];
 
-  lispy::ctx_w_mem<tdef_node> cm {};
+  lispy::ctx_w_mem<tdef_node, context> cm {};
   cm.ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as == 0) err(n, "rand requires at least a parameter");
     return eval(ctx, aa[rng::rand(as)]);
@@ -166,8 +169,10 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     unsigned w = 0;
     unsigned h = as;
 
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
-    for (auto i = 0; aa[i]; i++) {
+    auto & tmap = static_cast<context &>(ctx).res;
+    if (tmap) err(n, "multiple prefabs defined");
+
+    for (auto i = 0; i < h; i++) {
       auto c = aa[i];
       if (!is_atom(c)) err(c, "rows in prefabs must be atoms");
       if (w == 0) w = c->atom.size();
@@ -178,21 +183,17 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
         auto cid = eval(ctx, ctx.defs[id]);
         // TODO: validate tiledef
 
-        if (!nn->tmap) nn->tmap = hai::sptr { new prefabs::tilemap { w, h } };
-        (*nn->tmap)(x, i) = cid->tdef;
+        if (!tmap) tmap = hai::sptr { new prefabs::tilemap { w, h } };
+        (*tmap)(x, i) = cid->tdef;
       }
     }
-    return nn;
+    return n;
   };
 
-  const tdef_node * prefab {};
-  run(jojo::read_cstr(filename), cm.ctx, [&](auto * node) {
-    auto n = static_cast<const tdef_node *>(node);
-    if (n->tmap) prefab = n;
-  });
-  if (!prefab) return nullptr;
+  run(jojo::read_cstr(filename), cm.ctx);
+  if (!cm.ctx.res) return nullptr;
 
-  g_cache[filename] = prefab->tmap;
+  g_cache[filename] = cm.ctx.res;
   return &*g_cache[filename];
 }
 const prefabs::tilemap * prefabs::load(jute::view filename) {
