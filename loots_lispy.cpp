@@ -17,13 +17,15 @@ struct context : lispy::context {
 hai::array<loots::item> loots::parse(jute::view filename) {
   hai::array<loots::item> res { 8 };
 
-  lispy::ctx_w_mem<loot_node, context> cm {};
-  cm.ctx.res = &res;
-  cm.ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  context ctx {
+    { .allocator = lispy::allocator<loot_node>() },
+  };
+  ctx.res = &res;
+  ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as == 0) err(n, "rand requires at least a parameter");
     return eval(ctx, aa[rng::rand(as)]);
   };
-  cm.ctx.fns["item"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["item"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 2) err(n, "item expects two coordinates");
 
     auto & res = *static_cast<context &>(ctx).res;
@@ -36,7 +38,7 @@ hai::array<loots::item> loots::parse(jute::view filename) {
     return n;
   };
 
-  run(jojo::read_cstr(filename), cm.ctx);
+  run(jojo::read_cstr(filename), ctx);
 
   return res;
 }

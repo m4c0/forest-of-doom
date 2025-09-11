@@ -51,27 +51,29 @@ pathing::t pathing::load() {
   t res {};
   res.src = jojo::read_cstr("pathing.lsp");
 
-  lispy::ctx_w_mem<node, context> cm {};
-  cm.ctx.res = &res;
-  cm.ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  context ctx {
+    { .allocator = lispy::allocator<node>() },
+  };
+  ctx.res = &res;
+  ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "entry expects entry name");
     auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as entry name");
     return new (ctx.allocator()) node { *aa[0], n_entry, { a->atom } };
   };
-  cm.ctx.fns["file"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["file"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "file expects prefab name");
     auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as file name");
     return new (ctx.allocator()) node { *aa[0], n_file, { a->atom } };
   };
-  cm.ctx.fns["unique-id"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["unique-id"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "unique id expects prefab name");
     auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(aa[0], "expecting atom as unique id name");
     return new (ctx.allocator()) node { *aa[0], n_uniqueid, { a->atom } };
   };
-  cm.ctx.fns["exit"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["exit"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 2) lispy::err(n, "exit expects name and target def");
     auto a0 = eval(ctx, aa[0]);
     if (!lispy::is_atom(a0)) lispy::err(aa[0], "expecting atom as point name");
@@ -80,7 +82,7 @@ pathing::t pathing::load() {
     return new (ctx.allocator()) node { *n, n_exit, { .exit { a0->atom, a1->atom } } };
   };
 
-  cm.ctx.fns["from"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["from"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as < 1) lispy::err(n, "from expects file, entry and one or more exit");
     auto f = hai::sptr<from>::make();
     for (auto i = 0; i < as; i++) {
@@ -111,7 +113,7 @@ pathing::t pathing::load() {
     }
     return new (ctx.allocator()) node { *n, n_from, { .from { f } }};
   };
-  cm.ctx.fns["start"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["start"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) lispy::err(n, "start expects the target");
     auto a = eval(ctx, aa[0]);
     if (!lispy::is_atom(a)) lispy::err(a, "start expects the def name");
@@ -149,7 +151,7 @@ pathing::t pathing::load() {
     return n;
   };
   
-  lispy::run(res.src, cm.ctx);
+  lispy::run(res.src, ctx);
   if (res.start == "") lispy::fail({ "missing start"_hs, 1, 1 });
   return res;
 }
