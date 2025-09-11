@@ -33,16 +33,16 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
   context ctx {
     { .allocator = lispy::allocator<tdef_node>() },
   };
-  ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["random"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as == 0) err(n, "rand requires at least a parameter");
-    return eval(ctx, aa[rng::rand(as)]);
+    return eval(n->ctx, aa[rng::rand(as)]);
   };
-  ctx.fns["tiledef"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["tiledef"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as == 0) err(n, "tiledef must have at least one attribute");
 
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     for (auto * c = aa; *c; c++) {
-      auto * cc = eval(ctx, *c);
+      auto * cc = eval(n->ctx, *c);
       bool valid = false;
       if (cc->tdef.behaviour.size()) {
         nn->tdef.behaviour = cc->tdef.behaviour;
@@ -84,94 +84,94 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     }
     return nn;
   };
-  ctx.fns["tile"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["tile"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 5) err(n, "tile should have uv, size and texid");
 
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     auto & t = nn->tdef.tile;
-    t.uv.x   = to_i(eval(ctx, aa[0]));
-    t.uv.y   = to_i(eval(ctx, aa[1]));
-    t.size.x = to_i(eval(ctx, aa[2]));
-    t.size.y = to_i(eval(ctx, aa[3]));
-    t.texid  = to_i(eval(ctx, aa[4]));
+    t.uv.x   = to_i(eval(n->ctx, aa[0]));
+    t.uv.y   = to_i(eval(n->ctx, aa[1]));
+    t.size.x = to_i(eval(n->ctx, aa[2]));
+    t.size.y = to_i(eval(n->ctx, aa[3]));
+    t.texid  = to_i(eval(n->ctx, aa[4]));
     nn->has_tile = true;
     return nn;
   };
-  ctx.fns["entity"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["entity"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 5) err(n, "entity should have uv, size and texid");
 
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     auto & t = nn->tdef.entity;
-    t.uv.x   = to_i(eval(ctx, aa[0]));
-    t.uv.y   = to_i(eval(ctx, aa[1]));
-    t.size.x = to_i(eval(ctx, aa[2]));
-    t.size.y = to_i(eval(ctx, aa[3]));
-    t.texid  = to_i(eval(ctx, aa[4]));
+    t.uv.x   = to_i(eval(n->ctx, aa[0]));
+    t.uv.y   = to_i(eval(n->ctx, aa[1]));
+    t.size.x = to_i(eval(n->ctx, aa[2]));
+    t.size.y = to_i(eval(n->ctx, aa[3]));
+    t.texid  = to_i(eval(n->ctx, aa[4]));
     nn->has_entity = true;
     return nn;
   };
-  ctx.fns["over"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["over"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 5) err(n, "over should have uv, size and texid");
 
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     auto & t = nn->tdef.over;
-    t.uv.x   = to_i(eval(ctx, aa[0]));
-    t.uv.y   = to_i(eval(ctx, aa[1]));
-    t.size.x = to_i(eval(ctx, aa[2]));
-    t.size.y = to_i(eval(ctx, aa[3]));
-    t.texid  = to_i(eval(ctx, aa[4]));
+    t.uv.x   = to_i(eval(n->ctx, aa[0]));
+    t.uv.y   = to_i(eval(n->ctx, aa[1]));
+    t.size.x = to_i(eval(n->ctx, aa[2]));
+    t.size.y = to_i(eval(n->ctx, aa[3]));
+    t.texid  = to_i(eval(n->ctx, aa[4]));
     nn->has_over = true;
     return nn;
   };
-  ctx.fns["collision"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["collision"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 4) err(n, "collision should have pos and size");
 
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     auto & c = nn->tdef.collision;
-    c.x = to_f(eval(ctx, aa[0]));
-    c.y = to_f(eval(ctx, aa[1]));
-    c.z = to_f(eval(ctx, aa[2]));
-    c.w = to_f(eval(ctx, aa[3]));
+    c.x = to_f(eval(n->ctx, aa[0]));
+    c.y = to_f(eval(n->ctx, aa[1]));
+    c.z = to_f(eval(n->ctx, aa[2]));
+    c.w = to_f(eval(n->ctx, aa[3]));
     nn->has_collider = true;
     return nn;
   };
-  ctx.fns["behaviour"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["behaviour"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) err(n, "behaviour requires a value");
-    auto val = eval(ctx, aa[0]);
+    auto val = eval(n->ctx, aa[0]);
     if (!is_atom(val)) err(n, "behaviour must be an atom");
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     nn->tdef.behaviour = val->atom;
     return nn;
   };
-  ctx.fns["exit"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["exit"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) err(n, "exit point requires a name");
-    auto val = eval(ctx, aa[0]);
+    auto val = eval(n->ctx, aa[0]);
     if (!is_atom(val)) err(n, "exit point name must be an atom");
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     nn->tdef.exit = val->atom;
     return nn;
   };
-  ctx.fns["entry"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["entry"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) err(n, "entry point requires a name");
-    auto val = eval(ctx, aa[0]);
+    auto val = eval(n->ctx, aa[0]);
     if (!is_atom(val)) err(n, "entry point must be an atom");
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     nn->tdef.entry = val->atom;
     return nn;
   };
-  ctx.fns["loot"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["loot"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 1) err(n, "loot table requires a value");
-    auto val = eval(ctx, aa[0]);
+    auto val = eval(n->ctx, aa[0]);
     if (!is_atom(val)) err(n, "loot table must be an atom");
-    auto * nn = new (ctx.allocator()) tdef_node { *n };
+    auto * nn = new (n->ctx->allocator()) tdef_node { *n };
     nn->tdef.loot = val->atom;
     return nn;
   };
-  ctx.fns["prefab"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["prefab"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     unsigned w = 0;
     unsigned h = as;
 
-    auto & tmap = static_cast<context &>(ctx).res;
+    auto & tmap = static_cast<context *>(n->ctx)->res;
     if (tmap) err(n, "multiple prefabs defined");
 
     for (auto i = 0; i < h; i++) {
@@ -181,8 +181,8 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
       if (c->atom.size() != w) err(c, "inconsistent number of symbols in prefab");
       for (auto x = 0; x < c->atom.size(); x++) {
         auto id = c->atom.subview(x, 1).middle;
-        if (!ctx.defs.has(id)) err(c, "unknown tiledef", x);
-        auto cid = eval(ctx, ctx.defs[id]);
+        if (!n->ctx->defs.has(id)) err(c, "unknown tiledef", x);
+        auto cid = eval(n->ctx, n->ctx->defs[id]);
         // TODO: validate tiledef
 
         if (!tmap) tmap = hai::sptr { new prefabs::tilemap { w, h } };
@@ -192,7 +192,7 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
     return n;
   };
 
-  run(jojo::read_cstr(filename), ctx);
+  run(jojo::read_cstr(filename), &ctx);
   if (!ctx.res) return nullptr;
 
   g_cache[filename] = ctx.res;

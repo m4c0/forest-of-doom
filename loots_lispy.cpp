@@ -21,15 +21,15 @@ hai::array<loots::item> loots::parse(jute::view filename) {
     { .allocator = lispy::allocator<loot_node>() },
   };
   ctx.res = &res;
-  ctx.fns["random"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["random"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as == 0) err(n, "rand requires at least a parameter");
-    return eval(ctx, aa[rng::rand(as)]);
+    return eval(n->ctx, aa[rng::rand(as)]);
   };
-  ctx.fns["item"] = [](auto ctx, auto n, auto aa, auto as) -> const lispy::node * {
+  ctx.fns["item"] = [](auto n, auto aa, auto as) -> const lispy::node * {
     if (as != 2) err(n, "item expects two coordinates");
 
-    auto & res = *static_cast<context &>(ctx).res;
-    auto & i = static_cast<context &>(ctx).i;
+    auto & res = *static_cast<context *>(n->ctx)->res;
+    auto & i = static_cast<context *>(n->ctx)->i;
     if (i == res.size()) err(n, "too many items for this inventory");
 
     res[i++] = {
@@ -38,7 +38,7 @@ hai::array<loots::item> loots::parse(jute::view filename) {
     return n;
   };
 
-  run(jojo::read_cstr(filename), ctx);
+  run(jojo::read_cstr(filename), &ctx);
 
   return res;
 }
