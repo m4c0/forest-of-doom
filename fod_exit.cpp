@@ -1,6 +1,7 @@
 module fod;
 import backpack;
 import collision;
+import drops;
 import dotz;
 import exit;
 import fox;
@@ -97,6 +98,7 @@ static void load() {
 
   backpack::purge();
   collision::purge_all();
+  drops::purge();
   exits::purge();
   player::purge();
 
