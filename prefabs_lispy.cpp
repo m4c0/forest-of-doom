@@ -25,7 +25,7 @@ struct context : lispy::context {
   prefabs::tilemap res {};
 };
 
-static prefabs::tilemap parse(jute::view filename) {
+static prefabs::tilemap parse(jute::view src) {
   context ctx {
     { .allocator = lispy::allocator<tdef_node>() },
   };
@@ -188,7 +188,7 @@ static prefabs::tilemap parse(jute::view filename) {
     return n;
   };
 
-  run(jojo::read_cstr(filename), &ctx);
+  run(src, &ctx);
   if (!ctx.res) silog::die("missing prefab definition");
   return traits::move(ctx.res);
 }

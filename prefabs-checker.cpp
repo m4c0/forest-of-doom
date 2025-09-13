@@ -1,4 +1,5 @@
 #pragma leco test
+import jojo;
 import jute;
 import lispy;
 import pprent;
@@ -9,11 +10,15 @@ static void ignore(prefabs::tilemap) {}
 
 // TODO: validate entry/exit
 int main() {
+  jojo::on_error([](void *, jute::view msg) {
+    errln(msg);
+  });
+
   int result = 0;
   for (auto p : pprent::list("prefabs")) {
     auto fn = jute::heap{"prefabs/"} + jute::view::unsafe(p);
     if (!(*fn).ends_with(".lsp")) continue;
-    prefabs::load(*fn, ignore);
+    prefabs::load_file(*fn, ignore);
     //try {
     //  if (!prefab) {
     //    errln(fn, ": missing prefab definition");
