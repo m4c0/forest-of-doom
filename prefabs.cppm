@@ -32,12 +32,18 @@ namespace prefabs {
   };
 
   export class tilemap {
-    unsigned m_width = 16;
-    unsigned m_height = 16;
-    hai::array<tiledef> m_data { m_width * m_height };
+    unsigned m_width = 0;
+    unsigned m_height = 0;
+    hai::array<tiledef> m_data {};
   public:
     constexpr tilemap() = default;
-    constexpr tilemap(unsigned w, unsigned h) : m_width { w }, m_height { h } {}
+    constexpr tilemap(unsigned w, unsigned h) : 
+      m_width { w }
+    , m_height { h }
+    , m_data { w * h }
+    {}
+
+    [[nodiscard]] constexpr operator bool() const { return m_data.size() > 0; }
 
     [[nodiscard]] constexpr const auto & operator()(unsigned x, unsigned y) const {
       if (x >= m_width || y >= m_height) throw assert_error { "out of map bounds"_hs };
@@ -59,6 +65,6 @@ namespace prefabs {
     }
   };
 
-  export const tilemap * parse(jute::view filename);
-  export [[nodiscard]] const tilemap * load(jute::view filename);
+  export void load_file(jute::view filename, hai::fn<void, tilemap> callback);
+  export void load(jute::view name, hai::fn<void, tilemap> callback);
 }

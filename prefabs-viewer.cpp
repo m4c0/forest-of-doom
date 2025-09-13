@@ -9,14 +9,9 @@ import v;
 
 fox::main * g_fox;
 
-const int i = [] {
-  v::on_start = [] {
-    g_fox = new fox::main {};
-
-    jute::view name = "prefabs-plains-0.lsp";
-    auto o0 = prefabs::load(name);
+static void load_prefab(prefabs::tilemap o0) {
     g_fox->load(fox::layers::floor, [&](auto * m) {
-      o0->for_each([&](float x, float y, const auto & def) {
+      o0.for_each([&](float x, float y, const auto & def) {
         *m += fox::sprite {
           .pos   { x, y },
           .uv    = def.tile.uv,
@@ -26,7 +21,7 @@ const int i = [] {
       });
     });
     g_fox->load(fox::layers::entities, [&](auto * m) {
-      o0->for_each([&](float x, float y, const auto & def) {
+      o0.for_each([&](float x, float y, const auto & def) {
         if (dotz::length(def.entity.size))
           *m += fox::sprite {
             .pos   { x, y },
@@ -37,7 +32,7 @@ const int i = [] {
       });
     });
     g_fox->load(fox::layers::player, [&](auto * m) {
-      o0->for_each([&](float x, float y, const auto & def) {
+      o0.for_each([&](float x, float y, const auto & def) {
         if (dotz::length(def.collision))
           *m += fox::sprite {
             .pos   { x + def.collision.x, y + def.collision.y },
@@ -47,6 +42,14 @@ const int i = [] {
           };
       });
     });
+}
+
+const int i = [] {
+  v::on_start = [] {
+    g_fox = new fox::main {};
+
+    jute::view name = "prefabs-plains-0.lsp";
+    prefabs::load(name, load_prefab);
   };
   v::on_frame = [] {
     g_fox->on_frame(16, 32, 8);

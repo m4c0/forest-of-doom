@@ -15,24 +15,15 @@ import silog;
 static pathing::t g_pathing;
 static hai::sptr<pathing::from> g_current;
 
-static void load_prefab() {
-  auto uid = g_current->uniqueid;
-  if (uid != "") silog::log(silog::warning, "TBD: load uniques");
-
-  auto file = g_current->file;
+static void load_prefab(prefabs::tilemap o0) {
   auto entry = g_current->entry;
-  silog::log(silog::info, "Loading %.*s entering from %.*s",
-      static_cast<int>(file.size()), file.begin(),
-      static_cast<int>(entry.size()), entry.begin());
 
-  auto o0 = prefabs::load(file);
-
-  fox::g->load(fox::layers::floor, [=](auto * m) {
+  fox::g->load(fox::layers::floor, [&](auto * m) {
     // Add the field with a margin (otherwise we only limit the player from
     // fully leaving the field)
-    player::playfield().add_aabb({1}, o0->size() - 1, 'fild', 1);
+    player::playfield().add_aabb({1}, o0.size() - 1, 'fild', 1);
 
-    o0->for_each([&](float x, float y, const auto & def) {
+    o0.for_each([&](float x, float y, const auto & def) {
       static constexpr const auto player_h = 1.f;
 
       if (*def.entry == entry) player::teleport({ x, y - player_h });
@@ -43,7 +34,7 @@ static void load_prefab() {
       });
     });
 
-    o0->for_each([&](float x, float y, const auto & def) {
+    o0.for_each([&](float x, float y, const auto & def) {
       *m += fox::sprite {
         .pos   { x, y },
         .uv    = def.tile.uv,
@@ -51,7 +42,7 @@ static void load_prefab() {
         .texid = static_cast<fox::texids>(def.tile.texid),
       };
     });
-    o0->for_each([&](float x, float y, const auto & def) {
+    o0.for_each([&](float x, float y, const auto & def) {
       if (dotz::length(def.collision.zw()) > 0) {
         auto aa = def.collision.xy() + dotz::vec2 { x, y };
         auto bb = aa + def.collision.zw();
@@ -78,8 +69,8 @@ static void load_prefab() {
       }
     });
   });
-  fox::g->load(fox::layers::over, [=](auto * m) {
-    o0->for_each([&](float x, float y, const auto & def) {
+  fox::g->load(fox::layers::over, [&](auto * m) {
+    o0.for_each([&](float x, float y, const auto & def) {
       if (def.over.size.x) {
         *m += {
           .pos   { x, y },
@@ -90,6 +81,8 @@ static void load_prefab() {
       }
     });
   });
+
+  fod::poc();
 }
 
 static void load() {
@@ -102,11 +95,16 @@ static void load() {
   exits::purge();
   player::purge();
 
-  try {
-    load_prefab();
-    fod::poc();
-  } catch (...) {
-  }
+  auto uid = g_current->uniqueid;
+  if (uid != "") silog::log(silog::warning, "TBD: load uniques");
+
+  auto file = g_current->file;
+  auto entry = g_current->entry;
+  silog::log(silog::info, "Loading %.*s entering from %.*s",
+      static_cast<int>(file.size()), file.begin(),
+      static_cast<int>(entry.size()), entry.begin());
+
+  prefabs::load(file, load_prefab);
 }
 
 void fod::exit() {

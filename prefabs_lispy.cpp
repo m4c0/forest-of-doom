@@ -8,11 +8,9 @@ import no;
 import rng;
 import silog;
 import sires;
+import traits;
 
 using namespace jute::literals;
-
-// TODO: eviction rules
-static hashley::fin<hai::sptr<prefabs::tilemap>> g_cache { 127 };
 
 struct tdef_node : lispy::node {
   prefabs::tiledef tdef {};
@@ -24,12 +22,10 @@ struct tdef_node : lispy::node {
 static constexpr const auto eval = lispy::eval<tdef_node>;
 
 struct context : lispy::context {
-  hai::sptr<prefabs::tilemap> res;
+  prefabs::tilemap res {};
 };
 
-const prefabs::tilemap * prefabs::parse(jute::view filename) {
-  if (g_cache.has(filename)) return &*g_cache[filename];
-
+static prefabs::tilemap parse(jute::view filename) {
   context ctx {
     { .allocator = lispy::allocator<tdef_node>() },
   };
@@ -185,27 +181,28 @@ const prefabs::tilemap * prefabs::parse(jute::view filename) {
         auto cid = eval(n->ctx, n->ctx->defs[id]);
         // TODO: validate tiledef
 
-        if (!tmap) tmap = hai::sptr { new prefabs::tilemap { w, h } };
-        (*tmap)(x, i) = cid->tdef;
+        if (!tmap) tmap = prefabs::tilemap { w, h };
+        tmap(x, i) = cid->tdef;
       }
     }
     return n;
   };
 
   run(jojo::read_cstr(filename), &ctx);
-  if (!ctx.res) return nullptr;
-
-  g_cache[filename] = ctx.res;
-  return &*g_cache[filename];
+  if (!ctx.res) silog::die("missing prefab definition");
+  return traits::move(ctx.res);
 }
-const prefabs::tilemap * prefabs::load(jute::view filename) {
-  try {
-    auto fn = (filename + ".lsp").cstr();
-    auto prefab = parse(sires::real_path_name(fn)); 
-    if (!prefab) silog::die("missing prefab definition");
-    return prefab;
-  } catch (const lispy::parser_error & e) {
-    silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
-    throw;
-  }
+void prefabs::load_file(jute::view filename, hai::fn<void, tilemap> callback) {
+  jojo::read(filename, nullptr, [=](void *, const hai::cstr & lsp) mutable {
+    try {
+      callback(parse(lsp));
+    } catch (const lispy::parser_error & e) {
+      silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
+      throw;
+    }
+  });
+}
+void prefabs::load(jute::view name, hai::fn<void, tilemap> callback) {
+  auto fn = (name + ".lsp").cstr();
+  load_file(sires::real_path_name(fn), callback);
 }
