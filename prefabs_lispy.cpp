@@ -25,7 +25,7 @@ struct context : lispy::context {
   prefabs::tilemap res {};
 };
 
-static prefabs::tilemap parse(jute::view src) {
+prefabs::tilemap prefabs::parse(jute::view src) {
   context ctx {
     { .allocator = lispy::allocator<tdef_node>() },
   };
@@ -192,17 +192,14 @@ static prefabs::tilemap parse(jute::view src) {
   if (!ctx.res) silog::die("missing prefab definition");
   return traits::move(ctx.res);
 }
-void prefabs::load_file(jute::view filename, hai::fn<void, tilemap> callback) {
-  jojo::read(filename, nullptr, [=](void *, const hai::cstr & lsp) mutable {
+void prefabs::load(jute::view name, hai::fn<void, tilemap> callback) {
+  auto fn = (name + ".lsp").cstr();
+  jojo::read(fn, nullptr, [&](void *, const hai::cstr & lsp) mutable {
     try {
       callback(parse(lsp));
     } catch (const lispy::parser_error & e) {
-      silog::log(silog::error, "%s:%d:%d: %s", filename.cstr().begin(), e.line, e.col, e.msg.begin());
+      silog::log(silog::error, "%s.lsp:%d:%d: %s", fn.begin(), e.line, e.col, e.msg.begin());
       throw;
     }
   });
-}
-void prefabs::load(jute::view name, hai::fn<void, tilemap> callback) {
-  auto fn = (name + ".lsp").cstr();
-  load_file(sires::real_path_name(fn), callback);
 }

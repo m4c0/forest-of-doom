@@ -65,6 +65,6 @@ namespace prefabs {
     }
   };
 
-  export void load_file(jute::view filename, hai::fn<void, tilemap> callback);
+  export tilemap parse(jute::view src);
   export void load(jute::view name, hai::fn<void, tilemap> callback);
 }
