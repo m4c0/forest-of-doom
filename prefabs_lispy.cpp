@@ -136,7 +136,7 @@ prefabs::tilemap prefabs::parse(jute::view src) {
     auto val = eval(n->ctx, aa[0]);
     if (!is_atom(val)) err(n, "behaviour must be an atom");
     auto * nn = new (n->ctx->allocator()) tdef_node { *n };
-    nn->tdef.behaviour = val->atom;
+    nn->tdef.behaviour = jute::heap { val->atom };
     return nn;
   };
   ctx.fns["exit"] = [](auto n, auto aa, auto as) -> const lispy::node * {
@@ -144,7 +144,7 @@ prefabs::tilemap prefabs::parse(jute::view src) {
     auto val = eval(n->ctx, aa[0]);
     if (!is_atom(val)) err(n, "exit point name must be an atom");
     auto * nn = new (n->ctx->allocator()) tdef_node { *n };
-    nn->tdef.exit = val->atom;
+    nn->tdef.exit = jute::heap { val->atom };
     return nn;
   };
   ctx.fns["entry"] = [](auto n, auto aa, auto as) -> const lispy::node * {
@@ -152,7 +152,7 @@ prefabs::tilemap prefabs::parse(jute::view src) {
     auto val = eval(n->ctx, aa[0]);
     if (!is_atom(val)) err(n, "entry point must be an atom");
     auto * nn = new (n->ctx->allocator()) tdef_node { *n };
-    nn->tdef.entry = val->atom;
+    nn->tdef.entry = jute::heap { val->atom };
     return nn;
   };
   ctx.fns["loot"] = [](auto n, auto aa, auto as) -> const lispy::node * {
@@ -160,7 +160,7 @@ prefabs::tilemap prefabs::parse(jute::view src) {
     auto val = eval(n->ctx, aa[0]);
     if (!is_atom(val)) err(n, "loot table must be an atom");
     auto * nn = new (n->ctx->allocator()) tdef_node { *n };
-    nn->tdef.loot = val->atom;
+    nn->tdef.loot = jute::heap { val->atom };
     return nn;
   };
   ctx.fns["prefab"] = [](auto n, auto aa, auto as) -> const lispy::node * {
@@ -188,7 +188,7 @@ prefabs::tilemap prefabs::parse(jute::view src) {
     return n;
   };
 
-  run(src, &ctx);
+  lispy::run<tdef_node>(src, &ctx);
   if (!ctx.res) silog::die("missing prefab definition");
   return traits::move(ctx.res);
 }

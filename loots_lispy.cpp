@@ -38,7 +38,7 @@ hai::array<loots::item> loots::parse(jute::view filename) {
     return n;
   };
 
-  run(jojo::read_cstr(filename), &ctx);
+  lispy::run<loot_node>(jojo::read_cstr(filename), &ctx);
 
   return res;
 }

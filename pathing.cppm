@@ -135,7 +135,7 @@ pathing::t pathing::load() {
         auto & file = uids[f->uniqueid];
         if (*file != "" && *file != f->file)
           lispy::err(nn, "same unique id used in a different file");
-        file = f->file;
+        file = jute::heap { f->file };
       }
 
       res->froms[key] = f;
@@ -151,7 +151,7 @@ pathing::t pathing::load() {
     return n;
   };
   
-  lispy::run(res.src, &ctx);
+  lispy::run<node>(res.src, &ctx);
   if (res.start == "") lispy::fail({ "missing start"_hs, 1, 1 });
   return res;
 }

@@ -17,7 +17,7 @@ int main() {
   });
 
   for (auto p : pprent::list("prefabs")) {
-    auto fn = jute::heap{"prefabs/"} + jute::view::unsafe(p);
+    jute::heap fn = jute::heap{"prefabs/"} + jute::view::unsafe(p);
     if (!(*fn).ends_with(".lsp")) continue;
     jojo::read(*fn, nullptr, [&](void *, const hai::cstr & lsp) {
       try {

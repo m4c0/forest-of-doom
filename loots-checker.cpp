@@ -8,7 +8,7 @@ import print;
 int main() {
   int result = 0;
   for (auto p : pprent::list("loots")) {
-    auto fn = jute::heap{"loots/"} + jute::view::unsafe(p);
+    jute::heap fn = "loots/" + jute::view::unsafe(p);
     if (!(*fn).ends_with(".lsp")) continue;
     try {
       auto inv = loots::parse(*fn);
