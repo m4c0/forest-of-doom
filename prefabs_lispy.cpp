@@ -1,7 +1,6 @@
 module prefabs;
 import hai;
 import hashley;
-import jojo;
 import jute;
 import lispy;
 import no;
@@ -194,7 +193,7 @@ prefabs::tilemap prefabs::parse(jute::view src) {
 }
 void prefabs::load(jute::view name, hai::fn<void, tilemap> callback) {
   auto fn = (name + ".lsp").cstr();
-  jojo::read(fn, nullptr, [&](void *, const hai::cstr & lsp) mutable {
+  sires::read(fn, nullptr, [&](void *, const hai::cstr & lsp) mutable {
     try {
       callback(parse(lsp));
     } catch (const lispy::parser_error & e) {
