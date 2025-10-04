@@ -11,7 +11,7 @@ int main() {
     jute::heap fn = "loots/" + jute::view::unsafe(p);
     if (!(*fn).ends_with(".lsp")) continue;
     try {
-      auto inv = loots::parse(*fn);
+      auto inv = loots::load(*fn);
       if (inv.size() == 0) {
         errln(fn, ": missing items");
         result = 1;

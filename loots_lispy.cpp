@@ -14,7 +14,7 @@ struct context : lispy::context {
   unsigned i = 0;
 };
 
-hai::array<loots::item> loots::parse(jute::view filename) {
+static hai::array<loots::item> parse(jute::view filename) {
   hai::array<loots::item> res { 8 };
 
   context ctx {

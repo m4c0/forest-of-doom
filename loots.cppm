@@ -14,6 +14,5 @@ namespace loots {
     }
   };
 
-  export hai::array<item> parse(jute::view filename);
   export hai::array<item> load(jute::view table_name);
 }
