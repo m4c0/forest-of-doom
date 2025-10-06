@@ -8,8 +8,10 @@ import print;
 int main() {
   int result = 0;
   for (auto p : pprent::list("loots")) {
-    jute::heap fn = "loots/" + jute::view::unsafe(p);
-    if (!(*fn).ends_with(".lsp")) continue;
+    auto [name, ext] = jute::view::unsafe(p).rsplit('.');
+    if (ext != "lsp") continue;
+
+    jute::heap fn = "loots/" + name;
     try {
       auto inv = loots::load(*fn);
       if (inv.size() == 0) {
